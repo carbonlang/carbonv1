@@ -46,22 +46,27 @@ ident			{letter}({letter}|{dec_digit})*
 %%
 
 "/*".*"*/"							{ printf("[ COMMENT ]"); }
+
+"module"							{ printf("[ MODULE ]"); }
+"import"							{ printf("[ IMPORT ]"); }
+"from"								{ printf("[ FROM ]"); }
+"as"								{ printf("[ AS ]"); }
+
 "def"								{ printf("[ DEF ]"); }
 "main"								{ printf("[ MAIN ]"); }
-"import"							{ printf("[ IMPORT ]"); }
-"return"							{ printf("[ RETURN ]"); }
-"."									{ printf("[ . ]"); }
+
+"("								{ printf("[ ( ]"); }
+")"								{ printf("[ ) ]"); }
+"["								{ printf("[ [ ]"); }
+"]"								{ printf("[ ] ]"); }
+"{"								{ printf("[ { ]"); }
+"}"								{ printf("[ } ]"); }
+"."								{ printf("[ . ]"); }
 "->"								{ printf("[ -> ]"); }
-":"									{ printf("[ : ]"); }
-";"									{ printf("[ ; ]"); }
-","									{ printf("[ , ]"); }
+":"								{ printf("[ : ]"); }
+";"								{ printf("[ ; ]"); }
+","								{ printf("[ , ]"); }
 "..."								{ printf("[ ... ]"); }
-"("									{ printf("[ ( ]"); }
-")"									{ printf("[ ) ]"); }
-"["									{ printf("[ [ ]"); }
-"]"									{ printf("[ ] ]"); }
-"{"									{ printf("[ { ]"); }
-"}"									{ printf("[ } ]"); }
 
 "register"							{ printf("[ STORAGE_CLASS:register ]"); }
 "static"							{ printf("[ STORAGE_CLASS:static ]"); }
@@ -111,19 +116,17 @@ ident			{letter}({letter}|{dec_digit})*
 
 {str_lit}							{ printf("[ LIT:string ]"); }
 
-"null"|{hex_lit}|{bin_lit}			{ printf("[ LIT:pointer ]"); }
+"null"|{hex_lit}|{bin_lit}					{ printf("[ LIT:pointer ]"); }
 
-{ident}								{ printf("[ IDENTIFIER ]"); }
-
-"+"									{ printf("[ OP:B:AR:+ ]"); }
-"-"									{ printf("[ OP:B:AR:- ]"); }
-"*"									{ printf("[ OP:B:AR:* ]"); }
-"/"									{ printf("[ OP:B:AR:/ ]"); }
-"%"									{ printf("[ OP:B:AR:%% ]"); }
+"+"								{ printf("[ OP:B:AR:+ ]"); }
+"-"								{ printf("[ OP:B:AR:- ]"); }
+"*"								{ printf("[ OP:B:AR:* ]"); }
+"/"								{ printf("[ OP:B:AR:/ ]"); }
+"%"								{ printf("[ OP:B:AR:%% ]"); }
 "=="								{ printf("[ OP:B:RL:== ]"); }
 "!="								{ printf("[ OP:B:RL:!= ]"); }
-"<"									{ printf("[ OP:B:RL:< ]"); }
-">"									{ printf("[ OP:B:RL:> ]"); }
+"<"								{ printf("[ OP:B:RL:< ]"); }
+">"								{ printf("[ OP:B:RL:> ]"); }
 "<="								{ printf("[ OP:B:RL:<= ]"); }
 ">="								{ printf("[ OP:B:RL:>= ]"); }
 ">>"								{ printf("[ OP:B:SH:>> ]"); }
@@ -132,23 +135,36 @@ ident			{letter}({letter}|{dec_digit})*
 "<<<"								{ printf("[ OP:B:SH:<<< ]"); }
 "||"								{ printf("[ OP:B:LG:|| ]"); }
 "&&"								{ printf("[ OP:B:LG:&& ]"); }
-"&"									{ printf("[ OP:B:BT:& ]"); }
-"|"									{ printf("[ OP:B:BT:| ]"); }
-"^"									{ printf("[ OP:B:BT:^ ]"); }
+"&"								{ printf("[ OP:B:BT:& ]"); }
+"|"								{ printf("[ OP:B:BT:| ]"); }
+"^"								{ printf("[ OP:B:BT:^ ]"); }
 "&^"								{ printf("[ OP:B:BT:&^ ]"); }
 
-"!"									{ printf("[ OP:U:L:! ]"); }
-"~"									{ printf("[ OP:U:L:~ ]"); }
-"@"									{ printf("[ OP:U:L:@ ]"); }
+"!"								{ printf("[ OP:U:L:! ]"); }
+"~"								{ printf("[ OP:U:L:~ ]"); }
+"@"								{ printf("[ OP:U:L:@ ]"); }
 "++"								{ printf("[ OP:U:R:++ ]"); }
 "--"								{ printf("[ OP:U:R:-- ]"); }
 
-"="									{ printf("[ OP:B:AS:= ]"); }
+"="								{ printf("[ OP:B:AS:= ]"); }
 
 "public"							{ printf("[ ASC_MOD:public ]"); }
 "private"							{ printf("[ ASC_MOD:private ]"); }
 
+"return"							{ printf("[ STMT:return ]"); }
+"break"								{ printf("[ STMT:break ]"); }
+"continue"							{ printf("[ STMT:continue ]"); }
+"goto"								{ printf("[ STMT:goto ]"); }
+"fallthrough"							{ printf("[ STMT:fallthrough ]"); }
+"if"								{ printf("[ STMT:if ]"); }
+"else"								{ printf("[ STMT:else ]"); }
+"for"								{ printf("[ STMT:for ]"); }
+"while"								{ printf("[ STMT:while ]"); }
+"do"								{ printf("[ STMT:do ]"); }
+"defer"								{ printf("[ STMT:defer ]"); }
+"extend"							{ printf("[ STMT:extend ]"); }
 
+{ident}								{ printf("[ IDENTIFIER ]"); }
 
 %%
 
