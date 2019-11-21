@@ -1,0 +1,67 @@
+/*
+ * This is a multi line comment.
+ * Multi line comments are ignored.
+ */
+
+import "io"
+
+def main() -> (int) {
+	const bool b = false
+	register int i1 = 2x110011100
+	int i2 = 8x1237
+	int i3 = 10x233
+	int i4 = 16x1FF4ED
+	int i5 = 3454
+	int i6 = -12
+	int i7 = +12
+	int i8 = -16x1FF4ED
+	float32 f1 = 123.45
+	float32 f1 = 123e7
+	float32 f1 = 123.456e-67
+	char c1 = 'a'
+	char c2 = '\n'
+	char c3 = 25
+	string s2 = r'this is a test'
+	string s1 = r"this is a test"
+	string s4 = 'this is a test'
+	string s3 = "this is a test"
+	string s5 = r'''this is a test'''
+	string s6 = r"""this is a test"""
+	string s8 = '''this is a test'''
+	string s7 = """this is a test"""
+	ptr : int p1
+	type struct Person {
+		int age
+		char gender
+		string name
+	}
+			
+	a = b + c - d * (e / f % g)
+	a == b
+	a != b
+	a < b
+	a <= b
+	a > b
+	a >= b
+	a >> 1
+	a << 1
+	a >>> 1
+	a <<< 1
+	a || b
+	a && b
+	a & b
+	a | b
+	a ^ b
+	a &^ c
+	!a
+	~a
+	@a
+	a++
+	a--
+	
+
+	/* This is another comment */
+	io.Print(c)
+
+	return 0
+}
