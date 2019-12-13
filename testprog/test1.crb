@@ -1,5 +1,6 @@
 /* This is a comment */
 
+import "print" from "io" as "cout"
 import "print" from "io"
 import "math"
 
