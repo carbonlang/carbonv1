@@ -7,7 +7,7 @@ import "math"
 module Global {
 }
 
-def main() -> (int) {
+def main(int a, bool b) -> (int) {
 	const bool b = false
 	register int i1 = 2x110011100
 	int i2 = 8x1237

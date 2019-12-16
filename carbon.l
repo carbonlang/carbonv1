@@ -53,27 +53,26 @@ ident			{letter}({letter}|{dec_digit})*
 
 %%
 
-"/*".*"*/"							{ printf("[ COMMENT ]"); }
+"/*".*"*/"							{ return COMMENT; }
 
-"module"							{ printf("[ MODULE ]"); }
-"import"							{ printf("[ IMPORT ]"); }
-"from"								{ printf("[ FROM ]"); }
-"as"								{ printf("[ AS ]"); }
+"module"							{ return MODULE; }
+"import"							{ return IMPORT; }
+"from"								{ return FROM; }
+"as"								{ return AS; }
 
-"def"								{ printf("[ DEF ]"); }
-"main"								{ printf("[ MAIN ]"); }
+"def"								{ return DEF; }
 
-"("								{ printf("[ ( ]"); }
-")"								{ printf("[ ) ]"); }
-"["								{ printf("[ [ ]"); }
-"]"								{ printf("[ ] ]"); }
-"{"								{ printf("[ { ]"); }
-"}"								{ printf("[ } ]"); }
-"."								{ printf("[ . ]"); }
-"->"								{ printf("[ -> ]"); }
-":"								{ printf("[ : ]"); }
-";"								{ printf("[ ; ]"); }
-","								{ printf("[ , ]"); }
+"("								{ return '('; }
+")"								{ return ')'; }
+"["								{ return '['; }
+"]"								{ return ']'; }
+"{"								{ return '{'; }
+"}"								{ return '}'; }
+"->"								{ return DASH_GREATER; }
+"."								{ return '.'; }
+":"								{ return ':'; }
+";"								{ return ';'; }
+","								{ return ','; }
 "..."								{ printf("[ ... ]"); }
 
 "register"							{ printf("[ STORAGE_CLASS:register ]"); }
@@ -83,26 +82,26 @@ ident			{letter}({letter}|{dec_digit})*
 "restrict"							{ printf("[ TYPE_QUALIFIER:restrict ]"); }
 "atomic"							{ printf("[ TYPE_QUALIFIER:atomic ]"); }
 
-"bool"								{ printf("[ TYPE:bool ]"); }
-"char"								{ printf("[ TYPE:char ]"); }
-"byte"								{ printf("[ TYPE:byte ]"); }
-"int"								{ printf("[ TYPE:int ]"); }
-"int8"								{ printf("[ TYPE:int8 ]"); }
-"int16"								{ printf("[ TYPE:int16 ]"); }
-"int32"								{ printf("[ TYPE:int32 ]"); }
-"int64"								{ printf("[ TYPE:int64 ]"); }
-"uint"								{ printf("[ TYPE:uint ]"); }
-"uint8"								{ printf("[ TYPE:uint8 ]"); }
-"uint16"							{ printf("[ TYPE:uint16 ]"); }
-"uint32"							{ printf("[ TYPE:uint32 ]"); }
-"uint64"							{ printf("[ TYPE:uint64 ]"); }
-"float32"							{ printf("[ TYPE:float32 ]"); }
-"float64"							{ printf("[ TYPE:float64 ]"); }
-"float128"							{ printf("[ TYPE:float128 ]"); }
+"bool"								{ return BOOL; }
+"char"								{ return CHAR; }
+"byte"								{ return BYTE; }
+"int"								{ return INT; }
+"int8"								{ return INT8; }
+"int16"								{ return INT16; }
+"int32"								{ return INT32; }
+"int64"								{ return INT64; }
+"uint"								{ return UINT; }
+"uint8"								{ return UINT8; }
+"uint16"							{ return UINT16; }
+"uint32"							{ return UINT32; }
+"uint64"							{ return UINT64; }
+"float32"							{ return FLOAT32; }
+"float64"							{ return FLOAT64; }
+"float128"							{ return FLOAT128; }
 
-"string"							{ printf("[ TYPE:string ]"); }
+"string"							{ return BOOL; }
 
-"ptr"								{ printf("[ TYPE:ptr ]"); }
+"ptr"								{ return BOOL; }
 
 "true"								{ printf("[ LIT:true ]"); }
 "false"								{ printf("[ LIT:false ]"); }
@@ -122,8 +121,8 @@ ident			{letter}({letter}|{dec_digit})*
 
 {char_lit}							{ printf("[ LIT:char ]"); }
 
-\"[^"]*\"							{ printf("[ LIT:str1 ]"); }
-\'[^']*\'							{ printf("[ LIT:str2 ]"); }
+\"[^"]*\"							{ return STR1_LITERAL; printf("[ LIT:str1 ]"); }
+\'[^']*\'							{ return STR2_LITERAL; printf("[ LIT:str2 ]"); }
 {str_lit}							{ printf("[ LIT:string ]"); }
 
 "null"|{hex_lit}|{bin_lit}					{ printf("[ LIT:pointer ]"); }
@@ -174,7 +173,8 @@ ident			{letter}({letter}|{dec_digit})*
 "defer"								{ printf("[ STMT:defer ]"); }
 "extend"							{ printf("[ STMT:extend ]"); }
 
-{ident}								{ printf("[ IDENTIFIER ]"); }
+{ident}								{ return IDENTIFIER; printf("[ IDENTIFIER ]"); }
+
 
 %%
 
