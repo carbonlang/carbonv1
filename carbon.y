@@ -15,6 +15,10 @@
 %token IDENTIFIER
 %token DEF
 %token BOOL CHAR BYTE INT INT8 INT16 INT32 INT64 UINT UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 FLOAT128
+%token STRING POINTER
+%token TRUE FALSE
+%token REGISTER STATIC
+%token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
 
 %start source_file
 
@@ -39,7 +43,7 @@ import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("I
 
 module_defn	: MODULE IDENTIFIER '{' '}'					{ printf("Module\n"); }
 
-func_defn	: DEF IDENTIFIER '(' func_param_list ')' DASH_GREATER '(' func_return_list ')' '{'	{ printf("Function\n"); }
+func_defn	: DEF IDENTIFIER '(' func_param_list ')' DASH_GREATER '(' func_return_list ')' '{' statements '}'	{ printf("Function\n"); }
 
 func_param_list	: /* empty */
 		| func_param
@@ -58,7 +62,24 @@ func_return	: type IDENTIFIER
 		| type
 		;
 
-type		: BOOL					{ printf("Bool\n"); }
+type		: storage_class type_qualifier type_name
+		| storage_class type_name
+		| type_qualifier type_name
+		| type_name
+		;
+
+storage_class	: REGISTER				{ printf("Restrict\n"); }
+		| STATIC				{ printf("Static\n"); }
+		;
+
+type_qualifier	: CONST					{ printf("Const\n"); }
+		| VOLATILE				{ printf("Volatile\n"); }
+		| RESTRICT				{ printf("Restirct\n"); }
+		| ATOMIC				{ printf("Atomic\n"); }
+		| CONST_RESTRICT			{ printf("Const Restrict\n"); }
+		;
+
+type_name	: BOOL					{ printf("Bool\n"); }
 		| CHAR					{ printf("Char\n"); }
 		| BYTE					{ printf("Byte\n"); }
 		| INT					{ printf("Int\n"); }
@@ -74,8 +95,35 @@ type		: BOOL					{ printf("Bool\n"); }
 		| FLOAT32				{ printf("UInt32\n"); }
 		| FLOAT64				{ printf("UInt64\n"); }
 		| FLOAT128				{ printf("UInt128\n"); }
+		| STRING				{ printf("String\n"); }
+		| POINTER				{ printf("Pointer\n"); }
 		| IDENTIFIER				{ printf("CustomType\n"); }
 		;
+
+statements	: type_defn
+		;
+
+type_defn	: type IDENTIFIER
+		| type IDENTIFIER '=' literal
+		;
+
+literal		: bool_lit
+		| int_lit
+/*		| float_lit
+		| char_lit
+		| str_lit
+		| ptr_lit
+		| func_lit
+		| composite_lit
+		| tupple_lit
+*/
+		;
+
+bool_lit	: TRUE					{ printf("True\n"); }
+		| FALSE					{ printf("False\n"); }
+		;
+
+int_lit		:
 
 %%
 

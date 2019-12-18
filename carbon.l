@@ -75,12 +75,13 @@ ident			{letter}({letter}|{dec_digit})*
 ","								{ return ','; }
 "..."								{ printf("[ ... ]"); }
 
-"register"							{ printf("[ STORAGE_CLASS:register ]"); }
-"static"							{ printf("[ STORAGE_CLASS:static ]"); }
-"const"								{ printf("[ TYPE_QUALIFIER:const ]"); }
-"volatile"							{ printf("[ TYPE_QUALIFIER:volatile ]"); }
-"restrict"							{ printf("[ TYPE_QUALIFIER:restrict ]"); }
-"atomic"							{ printf("[ TYPE_QUALIFIER:atomic ]"); }
+"register"							{ return REGISTER; }
+"static"							{ return STATIC; }
+"const"								{ return CONST; }
+"volatile"							{ return VOLATILE; }
+"restrict"							{ return RESTRICT; }
+"atomic"							{ return ATOMIC; }
+"const restrict"						{ return CONST_RESTRICT; }
 
 "bool"								{ return BOOL; }
 "char"								{ return CHAR; }
@@ -99,12 +100,12 @@ ident			{letter}({letter}|{dec_digit})*
 "float64"							{ return FLOAT64; }
 "float128"							{ return FLOAT128; }
 
-"string"							{ return BOOL; }
+"string"							{ return STRING; }
 
-"ptr"								{ return BOOL; }
+"ptr"								{ return POINTER; }
 
-"true"								{ printf("[ LIT:true ]"); }
-"false"								{ printf("[ LIT:false ]"); }
+"true"								{ return TRUE; }
+"false"								{ return FALSE; }
 
 "type"								{ printf("[ TYPE:type ]"); }
 "struct"							{ printf("[ TYPE:struct ]"); }
@@ -155,7 +156,7 @@ ident			{letter}({letter}|{dec_digit})*
 "++"								{ printf("[ OP:U:R:++ ]"); }
 "--"								{ printf("[ OP:U:R:-- ]"); }
 
-"="								{ printf("[ OP:B:AS:= ]"); }
+"="								{ return '='; }
 
 "public"							{ printf("[ ASC_MOD:public ]"); }
 "private"							{ printf("[ ASC_MOD:private ]"); }
