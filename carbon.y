@@ -9,7 +9,8 @@
 
 %token MODULE
 %token IMPORT FROM AS
-%token STR1_LITERAL STR2_LITERAL
+%token STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
+%token HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
 %token COMMENT
 %token DASH_GREATER
 %token IDENTIFIER
@@ -19,6 +20,7 @@
 %token TRUE FALSE
 %token REGISTER STATIC
 %token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
+%token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT STRING_LIT
 
 %start source_file
 
@@ -68,7 +70,7 @@ type		: storage_class type_qualifier type_name
 		| type_name
 		;
 
-storage_class	: REGISTER				{ printf("Restrict\n"); }
+storage_class	: REGISTER				{ printf("Register\n"); }
 		| STATIC				{ printf("Static\n"); }
 		;
 
@@ -100,7 +102,11 @@ type_name	: BOOL					{ printf("Bool\n"); }
 		| IDENTIFIER				{ printf("CustomType\n"); }
 		;
 
-statements	: type_defn
+statements	: statements stmt
+		| stmt
+		;
+
+stmt		: type_defn
 		;
 
 type_defn	: type IDENTIFIER
@@ -109,10 +115,10 @@ type_defn	: type IDENTIFIER
 
 literal		: bool_lit
 		| int_lit
-/*		| float_lit
+		| float_lit
 		| char_lit
 		| str_lit
-		| ptr_lit
+/*		| ptr_lit
 		| func_lit
 		| composite_lit
 		| tupple_lit
@@ -123,7 +129,27 @@ bool_lit	: TRUE					{ printf("True\n"); }
 		| FALSE					{ printf("False\n"); }
 		;
 
-int_lit		:
+int_lit		: BINARY_LIT				{ printf("Binary Literal\n"); }
+		| OCTAL_LIT				{ printf("Octal Literal\n"); }
+		| DECIMAL_LIT				{ printf("Decimal Literal\n"); }
+		| HEX_LIT				{ printf("Hex Literal\n"); }
+		;
+
+float_lit	: FLOAT_LIT				{ printf("Float Literal\n"); }
+		;
+
+char_lit	: CHAR_LIT				{ printf("Char Literal\n"); }
+		;
+
+str_lit		: STR1_LITERAL				{ printf("String1 Literal\n"); }
+		| STR2_LITERAL				{ printf("String2 Literal\n"); }
+		| RSTR1_LITERAL				{ printf("RString1 Literal\n"); }
+		| RSTR2_LITERAL				{ printf("RString2 Literal\n"); }
+		| HSTR1_LITERAL				{ printf("HString1 Literal\n"); }
+		| HSTR2_LITERAL				{ printf("HString2 Literal\n"); }
+		| HRSTR1_LITERAL			{ printf("HRString1 Literal\n"); }
+		| HRSTR2_LITERAL			{ printf("HRString2 Literal\n"); }
+		;
 
 %%
 

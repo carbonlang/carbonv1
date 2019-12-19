@@ -42,12 +42,6 @@ float_lit		("+"|"-")?{float_1}|{float_2}|{float_3}
 escape_char		\\("a"|"b"|"f"|"n"|"r"|"t"|"v")
 char_lit		"'"([a-zA-z]|{escape_char})"'"|[0-255]
 
-
-raw_str_lit		"r"("'".*"'"|\".*\")
-h_raw_str_lit		"r"("'''".*"'''"|\"\"\".*\"\"\")
-h_itr_str_lit		("'''".*"'''"|\"\"\".*\"\"\")
-str_lit			{raw_str_lit}|{h_raw_str_lit}|{h_itr_str_lit}
-
 letter			[a-zA-Z]
 ident			{letter}({letter}|{dec_digit})*
 
@@ -113,18 +107,24 @@ ident			{letter}({letter}|{dec_digit})*
 "enum"								{ printf("[ TYPE:enum ]"); }
 "option"							{ printf("[ TYPE:option ]"); }
 
-{bin_lit}							{ printf("[ LIT:binary ]"); }
-{oct_lit}							{ printf("[ LIT:octal ]"); }
-{dec_lit}							{ printf("[ LIT:decimal ]"); }
-{hex_lit}							{ printf("[ LIT:hex ]"); }
+{bin_lit}							{ return BINARY_LIT; }
+{oct_lit}							{ return OCTAL_LIT; }
+{dec_lit}							{ return DECIMAL_LIT; }
+{hex_lit}							{ return HEX_LIT; }
 
-{float_lit}							{ printf("[ LIT:float ]"); }
+{float_lit}							{ return FLOAT_LIT; }
 
-{char_lit}							{ printf("[ LIT:char ]"); }
+{char_lit}							{ return CHAR_LIT; }
 
-\"[^"]*\"							{ return STR1_LITERAL; printf("[ LIT:str1 ]"); }
-\'[^']*\'							{ return STR2_LITERAL; printf("[ LIT:str2 ]"); }
-{str_lit}							{ printf("[ LIT:string ]"); }
+\"[^"]*\"							{ return STR1_LITERAL; }
+\'[^']*\'							{ return STR2_LITERAL; }
+"r"\"[^"]*\"							{ return RSTR1_LITERAL; }
+"r"\'[^']*\'							{ return RSTR2_LITERAL; }
+
+\"\"\"[^"""]*\"\"\"						{ return HSTR1_LITERAL; }
+\'\'\'[^''']*\'\'\'						{ return HSTR2_LITERAL; }
+"r"\"\"\"[^"""]*\"\"\"						{ return HRSTR1_LITERAL; }
+"r"\'\'\'[^''']*\'\'\'						{ return HRSTR2_LITERAL; }
 
 "null"|{hex_lit}|{bin_lit}					{ printf("[ LIT:pointer ]"); }
 
@@ -174,7 +174,7 @@ ident			{letter}({letter}|{dec_digit})*
 "defer"								{ printf("[ STMT:defer ]"); }
 "extend"							{ printf("[ STMT:extend ]"); }
 
-{ident}								{ return IDENTIFIER; printf("[ IDENTIFIER ]"); }
+{ident}								{ return IDENTIFIER; }
 
 
 %%
