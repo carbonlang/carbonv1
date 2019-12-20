@@ -101,11 +101,11 @@ ident			{letter}({letter}|{dec_digit})*
 "true"								{ return TRUE; }
 "false"								{ return FALSE; }
 
-"type"								{ printf("[ TYPE:type ]"); }
-"struct"							{ printf("[ TYPE:struct ]"); }
-"union"								{ printf("[ TYPE:union ]"); }
-"enum"								{ printf("[ TYPE:enum ]"); }
-"option"							{ printf("[ TYPE:option ]"); }
+"type"								{ return TYPE; }
+"struct"							{ return STRUCT; }
+"union"								{ return UNION; }
+"enum"								{ return ENUM; }
+"option"							{ return OPTION; }
 
 {bin_lit}							{ return BINARY_LIT; }
 {oct_lit}							{ return OCTAL_LIT; }
@@ -128,27 +128,27 @@ ident			{letter}({letter}|{dec_digit})*
 
 "null"|{hex_lit}|{bin_lit}					{ printf("[ LIT:pointer ]"); }
 
-"+"								{ printf("[ OP:B:AR:+ ]"); }
-"-"								{ printf("[ OP:B:AR:- ]"); }
-"*"								{ printf("[ OP:B:AR:* ]"); }
-"/"								{ printf("[ OP:B:AR:/ ]"); }
-"%"								{ printf("[ OP:B:AR:%% ]"); }
-"=="								{ printf("[ OP:B:RL:== ]"); }
-"!="								{ printf("[ OP:B:RL:!= ]"); }
-"<"								{ printf("[ OP:B:RL:< ]"); }
-">"								{ printf("[ OP:B:RL:> ]"); }
-"<="								{ printf("[ OP:B:RL:<= ]"); }
-">="								{ printf("[ OP:B:RL:>= ]"); }
-">>"								{ printf("[ OP:B:SH:>> ]"); }
-"<<"								{ printf("[ OP:B:SH:<< ]"); }
-">>>"								{ printf("[ OP:B:SH:>>> ]"); }
-"<<<"								{ printf("[ OP:B:SH:<<< ]"); }
-"||"								{ printf("[ OP:B:LG:|| ]"); }
-"&&"								{ printf("[ OP:B:LG:&& ]"); }
-"&"								{ printf("[ OP:B:BT:& ]"); }
-"|"								{ printf("[ OP:B:BT:| ]"); }
-"^"								{ printf("[ OP:B:BT:^ ]"); }
-"&^"								{ printf("[ OP:B:BT:&^ ]"); }
+"+"								{ return '+'; }
+"-"								{ return '-'; }
+"*"								{ return '*'; }
+"/"								{ return '/'; }
+"%"								{ return '%'; }
+"=="								{ return IS_EQUAL; }
+"!="								{ return IS_NOT_EQUAL; }
+"<"								{ return IS_LESS; }
+">"								{ return IS_GREATER; }
+"<="								{ return IS_LESS_OR_EQ; }
+">="								{ return IS_GREATER_OR_EQ; }
+">>"								{ return RIGHT_SHIFT; }
+"<<"								{ return LEFT_SHIFT; }
+">>>"								{ return RIGHT_SHIFT_US; }
+"<<<"								{ return LEFT_SHIFT_US; }
+"||"								{ return LOGICAL_OR; }
+"&&"								{ return LOGICAL_AND; }
+"&"								{ return BITWISE_AND; }
+"|"								{ return BITWISE_OR; }
+"^"								{ return BITWISE_NOT; }
+"&^"								{ return BITWISE_XOR; }
 
 "!"								{ printf("[ OP:U:L:! ]"); }
 "~"								{ printf("[ OP:U:L:~ ]"); }

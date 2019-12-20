@@ -37,8 +37,23 @@ def main(int a, bool b) -> (int) {
 		char gender
 		string name
 	}
-			
-	a = b + c - d * (e / f % g)
+	type union Person {
+		int age
+		char gender
+		string name
+	}
+	type enum Color {
+		RED
+		GREEN
+		BLUE
+	}
+	type option Result {
+		int ok
+		string result
+	}
+
+	a = b
+	a = b + c - d
 	a == b
 	a != b
 	a < b
@@ -60,7 +75,6 @@ def main(int a, bool b) -> (int) {
 	@a
 	a++
 	a--
-	
 
 	/* This is another comment */
 	io.Print(c)
