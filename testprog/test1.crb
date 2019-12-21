@@ -7,6 +7,17 @@ import "math"
 module Global {
 }
 
+type struct GlobalPerson {
+	int a
+	int b
+}
+
+extend GlobalPerson {
+	def run(int a) -> (int) {
+		int x
+	}
+}
+
 def main(int a, bool b) -> (int) {
 	const bool b = false
 	register int i1 = 2x110011100
@@ -31,7 +42,7 @@ def main(int a, bool b) -> (int) {
 	string s6 = r"""this is a test"""
 	string s8 = '''this is a test'''
 	string s7 = """this is a test"""
-	ptr : int p1
+	ptr : int p1 = null
 	type struct Person {
 		int age
 		char gender
@@ -51,6 +62,8 @@ def main(int a, bool b) -> (int) {
 		int ok
 		string result
 	}
+
+	Person p1 = Person{age: 20, 'M'}
 
 	a = b
 	a = b + c - d

@@ -18,7 +18,9 @@
 %token BOOL CHAR BYTE INT INT8 INT16 INT32 INT64 UINT UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 FLOAT128
 %token STRING POINTER
 %token TYPE STRUCT UNION ENUM OPTION
+%token EXTEND
 %token TRUE FALSE
+%token PTR_NULL
 %token REGISTER STATIC
 %token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
 %token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT STRING_LIT
@@ -36,8 +38,8 @@ source_file	: top_level			{ }
 		;
 
 top_level	: import_decl			{ }
-		/* | type_defn			{ } */
-		/* | type_func			{ } */
+		| type_defn			{ }
+		| type_func			{ }
 		| module_defn			{ }
 		| func_defn			{ }
 		| COMMENT			{ printf("Comment\n"); }
@@ -76,6 +78,18 @@ func_return	: type IDENTIFIER
 		| type
 		;
 
+type_func	: EXTEND type_name '{' func_defns '}'				{ printf("Type Function\n"); }
+		| EXTEND type_name '{' '}'
+		;
+
+func_defns	: func_defn
+		| func_defns func_defn
+		;
+
+/******************************************************************************************/
+/************************************** TYPES *********************************************/
+/******************************************************************************************/
+
 type		: storage_class type_qualifier type_name
 		| storage_class type_name
 		| type_qualifier type_name
@@ -111,8 +125,20 @@ type_name	: BOOL					{ printf("Bool\n"); }
 		| FLOAT128				{ printf("UInt128\n"); }
 		| STRING				{ printf("String\n"); }
 		| POINTER ':' type_name			{ printf("Pointer\n"); }
+/*		| tupple_type				{ printf("Tupple\n"); } */
+/*		| function_type				{ printf("Function\n"); } */
 		| IDENTIFIER				{ printf("CustomType\n"); }
 		;
+
+/*
+function_type	: func_sign
+		;
+*/
+
+
+/******************************************************************************************/
+/************************************** STATEMENTS ****************************************/
+/******************************************************************************************/
 
 statements	: statements stmt
 		| stmt
@@ -121,21 +147,25 @@ statements	: statements stmt
 stmt		: var_decl
 		| type_defn
 /*		| expression_stmt */
-		| assignment_stmt			{ printf("Ass Stmt\n"); }
+		| assignment_stmt			{ printf("Assign Stmt\n"); }
 		;
 
 var_decl	: type IDENTIFIER
 		| type IDENTIFIER '=' literal
 		;
 
+/******************************************************************************************/
+/************************************** LITERAL *******************************************/
+/******************************************************************************************/
+
 literal		: bool_lit
 		| int_lit
 		| float_lit
 		| char_lit
 		| str_lit
-/*		| ptr_lit */
+		| ptr_lit
 		| func_lit
-/*		| composite_lit */
+		| composite_lit
 		| tupple_lit
 		;
 
@@ -165,6 +195,45 @@ str_lit		: STR1_LITERAL				{ printf("String1 Literal\n"); }
 		| HRSTR2_LITERAL			{ printf("HRString2 Literal\n"); }
 		;
 
+ptr_lit		: PTR_NULL				{ printf("Null\n"); }
+		;
+
+func_lit	: DEF func_sign func_body
+		;
+
+composite_lit	: IDENTIFIER '{' composite_list '}'	{ printf("Composite Literal\n"); }
+		;
+
+composite_list	: keyed_element
+		| composite_list ',' keyed_element
+		;
+
+keyed_element	: comp_element
+		| comp_key ':' comp_element
+		;
+
+comp_key	: IDENTIFIER
+		;
+
+comp_element	: literal
+		;
+
+tupple_lit	: '(' tupple_items ')'
+		;
+
+tupple_items	: tupple_item
+		| tupple_items ',' tupple_item
+		;
+
+tupple_item	: IDENTIFIER
+		| literal
+/*		| expression */
+		;
+
+/******************************************************************************************/
+/******************************* COMPOSITE TYPE DEFINITION ********************************/
+/******************************************************************************************/
+
 type_defn	: struct_defn
 		| union_defn
 		| enum_defn
@@ -191,19 +260,9 @@ enum_fields	: IDENTIFIER
 		| enum_fields IDENTIFIER
 		;
 
-assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
-		| identifier_list assign_op IDENTIFIER		{ printf("Assign stmt\n"); }
-		;
-
-identifier_list	: IDENTIFIER
-		| identifier_list ',' IDENTIFIER
-		;
-
-assign_op	: '='						{ printf("=\n"); }
-		| arith_op '='					{ printf("Arith =\n"); }
-		| shift_op '='					{ printf("Shift =\n"); }
-		| logical_op '='				{ printf("Logical =\n"); }
-		;
+/******************************************************************************************/
+/************************************** OPERATORS *****************************************/
+/******************************************************************************************/
 
 arith_op	: '+'						{ printf("+\n"); }
 		| '-'						{ printf("-\n"); }
@@ -219,9 +278,6 @@ shift_op	: RIGHT_SHIFT					{ printf("<<\n"); }
 
 logical_op	: LOGICAL_AND					{ printf("&&\n"); }
 		| LOGICAL_OR					{ printf("||\n"); }
-		;
-
-expression	: operand_expr binary_op operand_expr		{ printf("Binary Expr\n"); }
 		;
 
 binary_op	: arith_op
@@ -243,6 +299,24 @@ bit_op		: BITWISE_AND					{ printf("&\n"); }
 		| BITWISE_OR					{ printf("|\n"); }
 		| BITWISE_NOT					{ printf("^\n"); }
 		| BITWISE_XOR					{ printf("&^\n"); }
+
+/******************************************************************************************/
+
+assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
+		| identifier_list assign_op IDENTIFIER		{ printf("Assign stmt\n"); }
+		;
+
+identifier_list	: IDENTIFIER
+		| identifier_list ',' IDENTIFIER
+		;
+
+assign_op	: '='						{ printf("=\n"); }
+		| arith_op '='					{ printf("Arith =\n"); }
+		| shift_op '='					{ printf("Shift =\n"); }
+		| logical_op '='				{ printf("Logical =\n"); }
+		;
+
+expression	: operand_expr binary_op operand_expr		{ printf("Binary Expr\n"); }
 		;
 
 operand_expr	: primary_expr
@@ -271,21 +345,6 @@ expression_list	: expression
 operand		: literal
 		| IDENTIFIER
 		| '(' expression ')'
-		;
-
-tupple_lit	: '(' tupple_lit_items ')'
-		;
-
-tupple_lit_items : tupple_lit_item
-		| tupple_lit_item ',' tupple_lit_items
-		;
-
-tupple_lit_item	: IDENTIFIER
-		| expression
-		| literal
-		;
-
-func_lit	: DEF func_sign func_body
 		;
 
 %%

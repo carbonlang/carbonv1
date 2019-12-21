@@ -126,7 +126,7 @@ ident			{letter}({letter}|{dec_digit})*
 "r"\"\"\"[^"""]*\"\"\"						{ return HRSTR1_LITERAL; }
 "r"\'\'\'[^''']*\'\'\'						{ return HRSTR2_LITERAL; }
 
-"null"|{hex_lit}|{bin_lit}					{ printf("[ LIT:pointer ]"); }
+"null"								{ return PTR_NULL; }
 
 "+"								{ return '+'; }
 "-"								{ return '-'; }
@@ -172,7 +172,7 @@ ident			{letter}({letter}|{dec_digit})*
 "while"								{ printf("[ STMT:while ]"); }
 "do"								{ printf("[ STMT:do ]"); }
 "defer"								{ printf("[ STMT:defer ]"); }
-"extend"							{ printf("[ STMT:extend ]"); }
+"extend"							{ return EXTEND; }
 
 {ident}								{ return IDENTIFIER; }
 
