@@ -66,28 +66,23 @@ def main(int a, bool b) -> (int) {
 	Person p1 = Person{age: 20, 'M'}
 
 	a = b
-	a = b + c - d
-	a == b
-	a != b
-	a < b
-	a <= b
-	a > b
-	a >= b
-	a >> 1
-	a << 1
-	a >>> 1
-	a <<< 1
-	a || b
-	a && b
-	a & b
-	a | b
-	a ^ b
-	a &^ c
-	!a
-	~a
-	@a
+	a = (b + c) - d
+	c = a >> 1
+	c = a << 1
+	c = a >>> 1
+	c = a <<< 1
+	c = a || b
+	c = a && b
+	c = a & b
+	c = a | b
+	c = a ^ b
+	c = a &^ c
+	c = !a
+	c = ~a
+	c = @a
 	a++
 	a--
+	b = c++
 
 	/* This is another comment */
 	io.Print(c)

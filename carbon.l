@@ -47,7 +47,7 @@ ident			{letter}({letter}|{dec_digit})*
 
 %%
 
-"/*".*"*/"							{ return COMMENT; }
+"/*".*"*/"							; /* Ignore all comments */
 
 "module"							{ return MODULE; }
 "import"							{ return IMPORT; }
@@ -150,11 +150,11 @@ ident			{letter}({letter}|{dec_digit})*
 "^"								{ return BITWISE_NOT; }
 "&^"								{ return BITWISE_XOR; }
 
-"!"								{ printf("[ OP:U:L:! ]"); }
-"~"								{ printf("[ OP:U:L:~ ]"); }
-"@"								{ printf("[ OP:U:L:@ ]"); }
-"++"								{ printf("[ OP:U:R:++ ]"); }
-"--"								{ printf("[ OP:U:R:-- ]"); }
+"!"								{ return LU_NOT; }
+"~"								{ return LU_2COMP; }
+"@"								{ return LU_ADD_OF; }
+"++"								{ return RU_INC; }
+"--"								{ return RU_DEC; }
 
 "="								{ return '='; }
 

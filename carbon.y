@@ -11,7 +11,6 @@
 %token IMPORT FROM AS
 %token STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
 %token HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
-%token COMMENT
 %token DASH_GREATER
 %token IDENTIFIER
 %token DEF
@@ -23,11 +22,18 @@
 %token PTR_NULL
 %token REGISTER STATIC
 %token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
-%token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT STRING_LIT
+%token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT
 %token RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token LOGICAL_OR LOGICAL_AND
 %token BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
+%token LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
+
+%left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
+%left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
+%left LOGICAL_OR LOGICAL_AND
+%left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
+
 
 %start source_file
 
@@ -42,7 +48,6 @@ top_level	: import_decl			{ }
 		| type_func			{ }
 		| module_defn			{ }
 		| func_defn			{ }
-		| COMMENT			{ printf("Comment\n"); }
 		;
 
 import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("Import From As\n"); }
@@ -148,6 +153,7 @@ stmt		: var_decl
 		| type_defn
 /*		| expression_stmt */
 		| assignment_stmt			{ printf("Assign Stmt\n"); }
+		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
 		;
 
 var_decl	: type IDENTIFIER
@@ -264,6 +270,13 @@ enum_fields	: IDENTIFIER
 /************************************** OPERATORS *****************************************/
 /******************************************************************************************/
 
+binary_op	: arith_op
+		| rel_op
+		| shift_op
+		| logical_op
+		| bit_op
+		;
+
 arith_op	: '+'						{ printf("+\n"); }
 		| '-'						{ printf("-\n"); }
 		| '/'						{ printf("/\n"); }
@@ -280,13 +293,6 @@ logical_op	: LOGICAL_AND					{ printf("&&\n"); }
 		| LOGICAL_OR					{ printf("||\n"); }
 		;
 
-binary_op	: arith_op
-		| rel_op
-		| shift_op
-		| logical_op
-		| bit_op
-		;
-
 rel_op		: IS_EQUAL					{ printf("==\n"); }
 		| IS_NOT_EQUAL					{ printf("!=\n"); }
 		| IS_LESS					{ printf("<\n"); }
@@ -300,51 +306,48 @@ bit_op		: BITWISE_AND					{ printf("&\n"); }
 		| BITWISE_NOT					{ printf("^\n"); }
 		| BITWISE_XOR					{ printf("&^\n"); }
 
-/******************************************************************************************/
-
-assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
-		| identifier_list assign_op IDENTIFIER		{ printf("Assign stmt\n"); }
-		;
-
-identifier_list	: IDENTIFIER
-		| identifier_list ',' IDENTIFIER
-		;
-
 assign_op	: '='						{ printf("=\n"); }
 		| arith_op '='					{ printf("Arith =\n"); }
 		| shift_op '='					{ printf("Shift =\n"); }
 		| logical_op '='				{ printf("Logical =\n"); }
 		;
 
-expression	: operand_expr binary_op operand_expr		{ printf("Binary Expr\n"); }
+/******************************************************************************************/
+
+assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
 		;
 
-operand_expr	: primary_expr
+identifier_list	: IDENTIFIER
+		| identifier_list ',' IDENTIFIER
 		;
 
-primary_expr	: operand
-		| primary_expr field_selector
-		| primary_expr index
-		| primary_expr call
+expression	: unary_expr					{ printf("Unary Expr\n"); }
+		| operand_expr binary_op operand_expr		{ printf("Binary Expr\n"); }
 		;
 
-field_selector	: '.' IDENTIFIER				{ printf("X.Y\n"); }
+unary_expr	: lu_op operand_expr
+		| operand_expr ru_op
+		| operand_expr
 		;
 
-index		: '[' expression ']'				{ printf("[ ]\n"); }
+lu_op		: LU_NOT
+		| LU_2COMP
+		| LU_ADD_OF
 		;
 
-call		: '(' ')'					{ printf("()\n"); }
-		| '(' expression_list ')'			{ printf("(...)\n"); }
+ru_op		: RU_INC					{ printf("++\n"); }
+		| RU_DEC					{ printf("--\n"); }
 		;
 
-expression_list	: expression
-		| expression_list ',' expression
+operand_expr	: operand
 		;
 
 operand		: literal
 		| IDENTIFIER
 		| '(' expression ')'
+		;
+
+inc_dec_stmt	: operand_expr ru_op
 		;
 
 %%
