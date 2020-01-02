@@ -128,11 +128,11 @@ ident			{letter}({letter}|{dec_digit})*
 
 "null"								{ return PTR_NULL; }
 
-"+"								{ return '+'; }
-"-"								{ return '-'; }
-"*"								{ return '*'; }
-"/"								{ return '/'; }
-"%"								{ return '%'; }
+"+"								{ return PLUS; }
+"-"								{ return MINUS; }
+"*"								{ return MULTIPLY; }
+"/"								{ return DIVIDE; }
+"%"								{ return MODULUS; }
 "=="								{ return IS_EQUAL; }
 "!="								{ return IS_NOT_EQUAL; }
 "<"								{ return IS_LESS; }
@@ -161,21 +161,22 @@ ident			{letter}({letter}|{dec_digit})*
 "public"							{ printf("[ ASC_MOD:public ]"); }
 "private"							{ printf("[ ASC_MOD:private ]"); }
 
-"return"							{ printf("[ STMT:return ]"); }
-"break"								{ printf("[ STMT:break ]"); }
-"continue"							{ printf("[ STMT:continue ]"); }
-"goto"								{ printf("[ STMT:goto ]"); }
-"fallthrough"							{ printf("[ STMT:fallthrough ]"); }
-"if"								{ printf("[ STMT:if ]"); }
-"else"								{ printf("[ STMT:else ]"); }
-"for"								{ printf("[ STMT:for ]"); }
-"while"								{ printf("[ STMT:while ]"); }
-"do"								{ printf("[ STMT:do ]"); }
-"defer"								{ printf("[ STMT:defer ]"); }
+"return"							{ return RETURN; }
+"break"								{ return BREAK; }
+"continue"							{ return CONTINUE; }
+"goto"								{ return GOTO; }
+"fallthrough"							{ return FALLTHROUGH; }
+"if"								{ return IF; }
+"else"								{ return ELSE; }
+"for"								{ return FOR; }
+"while"								{ return WHILE; }
+"do"								{ return DO; }
+"switch"							{ return SWITCH; }
+"case"								{ return CASE; }
+"defer"								{ return DEFER; }
 "extend"							{ return EXTEND; }
 
 {ident}								{ return IDENTIFIER; }
-
 
 %%
 

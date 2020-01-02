@@ -23,17 +23,22 @@
 %token REGISTER STATIC
 %token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
 %token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT
+
+%token PLUS MINUS MULTIPLY DIVIDE MODULUS
 %token RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token LOGICAL_OR LOGICAL_AND
 %token BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %token LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
 
+%token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFER
+
+%left PLUS MINUS MULTIPLY DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
-
+%left LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
 
 %start source_file
 
@@ -57,13 +62,10 @@ import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("I
 
 module_defn	: MODULE IDENTIFIER '{' '}'					{ printf("Module\n"); }
 
-func_defn	: DEF IDENTIFIER func_sign func_body				{ printf("Function\n"); }
+func_defn	: DEF IDENTIFIER func_sign block				{ printf("Function\n"); }
 		;
 
 func_sign	: '(' func_param_list ')' DASH_GREATER '(' func_return_list ')'
-		;
-
-func_body	: '{' statements '}'
 		;
 
 func_param_list	: /* empty */
@@ -154,11 +156,17 @@ stmt		: var_decl
 /*		| expression_stmt */
 		| assignment_stmt			{ printf("Assign Stmt\n"); }
 		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
+		| selection				{ printf("Selection\n"); }
+		| iteration				{ printf("Iteration\n"); }
+		| jump_stmt				{ printf("Jump stmt\n"); }
+		| defer_stmt				{ printf("Defer Stmt\n"); }
 		;
 
 var_decl	: type IDENTIFIER
 		| type IDENTIFIER '=' literal
 		;
+
+block		: '{' statements '}'
 
 /******************************************************************************************/
 /************************************** LITERAL *******************************************/
@@ -172,7 +180,7 @@ literal		: bool_lit
 		| ptr_lit
 		| func_lit
 		| composite_lit
-		| tupple_lit
+		/* | tupple_lit */
 		;
 
 bool_lit	: TRUE					{ printf("True\n"); }
@@ -204,7 +212,7 @@ str_lit		: STR1_LITERAL				{ printf("String1 Literal\n"); }
 ptr_lit		: PTR_NULL				{ printf("Null\n"); }
 		;
 
-func_lit	: DEF func_sign func_body
+func_lit	: DEF func_sign block
 		;
 
 composite_lit	: IDENTIFIER '{' composite_list '}'	{ printf("Composite Literal\n"); }
@@ -224,6 +232,7 @@ comp_key	: IDENTIFIER
 comp_element	: literal
 		;
 
+/*
 tupple_lit	: '(' tupple_items ')'
 		;
 
@@ -233,8 +242,9 @@ tupple_items	: tupple_item
 
 tupple_item	: IDENTIFIER
 		| literal
-/*		| expression */
+		| expression
 		;
+*/
 
 /******************************************************************************************/
 /******************************* COMPOSITE TYPE DEFINITION ********************************/
@@ -277,10 +287,11 @@ binary_op	: arith_op
 		| bit_op
 		;
 
-arith_op	: '+'						{ printf("+\n"); }
-		| '-'						{ printf("-\n"); }
-		| '/'						{ printf("/\n"); }
-		| '%'						{ printf("%%\n"); }
+arith_op	: PLUS						{ printf("+\n"); }
+		| MINUS						{ printf("-\n"); }
+		| MULTIPLY					{ printf("-\n"); }
+		| DIVIDE					{ printf("/\n"); }
+		| MODULUS					{ printf("%%\n"); }
 		;
 
 shift_op	: RIGHT_SHIFT					{ printf("<<\n"); }
@@ -322,7 +333,7 @@ identifier_list	: IDENTIFIER
 		;
 
 expression	: unary_expr					{ printf("Unary Expr\n"); }
-		| operand_expr binary_op operand_expr		{ printf("Binary Expr\n"); }
+		| operand_expr binary_op expression		{ printf("Binary Expr\n"); }
 		;
 
 unary_expr	: lu_op operand_expr
@@ -347,7 +358,85 @@ operand		: literal
 		| '(' expression ')'
 		;
 
+/******************************************************************************************/
+/************************************** STATEMENTS ****************************************/
+/******************************************************************************************/
+
 inc_dec_stmt	: operand_expr ru_op
+		;
+
+iteration	: for_stmt
+		| while_stmt
+		| dowhile_stmt
+		;
+
+for_stmt	: FOR '(' for_init for_cond for_post ')' block
+		;
+
+for_init	: simnple_stmt ';'
+		| ';'
+		;
+
+for_cond	: expression ';'
+		| ';'
+		;
+
+for_post	: simnple_stmt ';'
+		| /* empty */
+		;
+
+simnple_stmt	: inc_dec_stmt
+		| assignment_stmt
+		;
+
+while_stmt	: WHILE '(' while_cond ')' block
+		;
+
+while_cond	: expression
+		;
+
+dowhile_stmt	: DO block WHILE '(' while_cond ')'
+		;
+
+defer_stmt	: DEFER block
+		;
+
+selection	: if_stmt
+		| switch_stmt
+		;
+
+if_stmt		: if_block
+		| if_block else_block
+		| if_block else_if_block else_block
+		;
+
+if_block	: IF '(' if_cond ')' block
+		;
+
+else_block	: ELSE block
+		;
+
+else_if_block	: ELSE IF '(' if_cond ')' block
+		| else_if_block ELSE IF '(' if_cond ')' block
+		;
+
+if_cond		: expression
+		;
+
+switch_stmt	: SWITCH '(' case_cond ')' '{' case_block '}'
+		;
+
+case_block	: CASE case_cond ':' statements
+		| case_block CASE ':' statements
+		;
+
+case_cond	: expression
+		;
+
+jump_stmt	: GOTO IDENTIFIER
+		| CONTINUE
+		| BREAK
+		| RETURN
 		;
 
 %%

@@ -85,7 +85,9 @@ def main(int a, bool b) -> (int) {
 	b = c++
 
 	/* This is another comment */
-	io.Print(c)
+	io.Print()
+
+	io.Print(a, b)
 
 	if (x > y) {
 		x = y
