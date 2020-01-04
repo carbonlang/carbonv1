@@ -153,7 +153,7 @@ statements	: statements stmt
 
 stmt		: var_decl
 		| type_defn
-/*		| expression_stmt */
+		| expression_stmt
 		| assignment_stmt			{ printf("Assign Stmt\n"); }
 		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
 		| selection				{ printf("Selection\n"); }
@@ -167,6 +167,9 @@ var_decl	: type IDENTIFIER
 		;
 
 block		: '{' statements '}'
+
+expression_stmt	: expression
+		;
 
 /******************************************************************************************/
 /************************************** LITERAL *******************************************/
@@ -324,6 +327,8 @@ assign_op	: '='						{ printf("=\n"); }
 		;
 
 /******************************************************************************************/
+/************************************** STATEMENTS ****************************************/
+/******************************************************************************************/
 
 assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
 		;
@@ -333,12 +338,12 @@ identifier_list	: IDENTIFIER
 		;
 
 expression	: unary_expr					{ printf("Unary Expr\n"); }
-		| operand_expr binary_op expression		{ printf("Binary Expr\n"); }
+		| expression binary_op expression		{ printf("Binary Expr\n"); }
 		;
 
-unary_expr	: lu_op operand_expr
-		| operand_expr ru_op
-		| operand_expr
+unary_expr	: lu_op unary_expr
+		| unary_expr ru_op
+		| primary_expr
 		;
 
 lu_op		: LU_NOT
@@ -350,19 +355,12 @@ ru_op		: RU_INC					{ printf("++\n"); }
 		| RU_DEC					{ printf("--\n"); }
 		;
 
-operand_expr	: operand
-		;
-
-operand		: literal
+primary_expr	: literal
 		| IDENTIFIER
 		| '(' expression ')'
 		;
 
-/******************************************************************************************/
-/************************************** STATEMENTS ****************************************/
-/******************************************************************************************/
-
-inc_dec_stmt	: operand_expr ru_op
+inc_dec_stmt	: unary_expr ru_op
 		;
 
 iteration	: for_stmt
