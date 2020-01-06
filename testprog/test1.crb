@@ -63,8 +63,6 @@ def main(int a, bool b) -> (int) {
 		string result
 	}
 
-	Person p1 = Person{age: 20, 'M'}
-
 	a = b
 	a = (b + c) - d
 	c = a >> 1

@@ -150,13 +150,14 @@ ident			{letter}({letter}|{dec_digit})*
 "^"								{ return BITWISE_NOT; }
 "&^"								{ return BITWISE_XOR; }
 
-"!"								{ return LU_NOT; }
-"~"								{ return LU_2COMP; }
-"@"								{ return LU_ADD_OF; }
-"++"								{ return RU_INC; }
-"--"								{ return RU_DEC; }
+"!"								{ return U_NOT; }
+"~"								{ return U_2COMP; }
+"$"								{ return U_POINTER; }
+"@"								{ return U_ADD_OF; }
+"++"								{ return U_INC; }
+"--"								{ return U_DEC; }
 
-"="								{ return '='; }
+"="								{ return EQUAL_TO; }
 
 "public"							{ printf("[ ASC_MOD:public ]"); }
 "private"							{ printf("[ ASC_MOD:private ]"); }

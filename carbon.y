@@ -24,6 +24,7 @@
 %token CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
 %token BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT
 
+%token EQUAL_TO
 %token PLUS MINUS MULTIPLY DIVIDE MODULUS
 %token RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
@@ -38,7 +39,8 @@
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
-%left LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
+
+%left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
 
 %start source_file
 
@@ -67,6 +69,8 @@ func_defn	: DEF IDENTIFIER func_sign block				{ printf("Function\n"); }
 
 func_sign	: '(' func_param_list ')' DASH_GREATER '(' func_return_list ')'
 		;
+
+block		: '{' statements '}'
 
 func_param_list	: /* empty */
 		| func_param
@@ -151,24 +155,15 @@ statements	: statements stmt
 		| stmt
 		;
 
-stmt		: var_decl
-		| type_defn
-		| expression_stmt
+stmt		: var_decl				{ printf("Var Decl\n"); }
+		| type_defn				{ printf("Type Defn\n"); }
+		/* | expression_stmt			{ printf("Expr Stmt\n"); } */
 		| assignment_stmt			{ printf("Assign Stmt\n"); }
 		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
 		| selection				{ printf("Selection\n"); }
 		| iteration				{ printf("Iteration\n"); }
 		| jump_stmt				{ printf("Jump stmt\n"); }
 		| defer_stmt				{ printf("Defer Stmt\n"); }
-		;
-
-var_decl	: type IDENTIFIER
-		| type IDENTIFIER '=' literal
-		;
-
-block		: '{' statements '}'
-
-expression_stmt	: expression
 		;
 
 /******************************************************************************************/
@@ -283,13 +278,6 @@ enum_fields	: IDENTIFIER
 /************************************** OPERATORS *****************************************/
 /******************************************************************************************/
 
-binary_op	: arith_op
-		| rel_op
-		| shift_op
-		| logical_op
-		| bit_op
-		;
-
 arith_op	: PLUS						{ printf("+\n"); }
 		| MINUS						{ printf("-\n"); }
 		| MULTIPLY					{ printf("-\n"); }
@@ -307,19 +295,6 @@ logical_op	: LOGICAL_AND					{ printf("&&\n"); }
 		| LOGICAL_OR					{ printf("||\n"); }
 		;
 
-rel_op		: IS_EQUAL					{ printf("==\n"); }
-		| IS_NOT_EQUAL					{ printf("!=\n"); }
-		| IS_LESS					{ printf("<\n"); }
-		| IS_GREATER					{ printf(">\n"); }
-		| IS_LESS_OR_EQ					{ printf("<=\n"); }
-		| IS_GREATER_OR_EQ				{ printf(">=\n"); }
-		;
-
-bit_op		: BITWISE_AND					{ printf("&\n"); }
-		| BITWISE_OR					{ printf("|\n"); }
-		| BITWISE_NOT					{ printf("^\n"); }
-		| BITWISE_XOR					{ printf("&^\n"); }
-
 assign_op	: '='						{ printf("=\n"); }
 		| arith_op '='					{ printf("Arith =\n"); }
 		| shift_op '='					{ printf("Shift =\n"); }
@@ -327,7 +302,7 @@ assign_op	: '='						{ printf("=\n"); }
 		;
 
 /******************************************************************************************/
-/************************************** STATEMENTS ****************************************/
+/******************************* ASSIGNMENT STATEMENT *************************************/
 /******************************************************************************************/
 
 assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
@@ -338,21 +313,39 @@ identifier_list	: IDENTIFIER
 		;
 
 expression	: unary_expr					{ printf("Unary Expr\n"); }
-		| expression binary_op expression		{ printf("Binary Expr\n"); }
+		| binary_expr					{ printf("Binary Expr\n"); }
 		;
 
-unary_expr	: lu_op unary_expr
-		| unary_expr ru_op
+binary_expr	: expression PLUS expression			{ printf("+\n"); }
+		| expression MINUS expression			{ printf("-\n"); }
+		| expression MULTIPLY expression		{ printf("*\n"); }
+		| expression DIVIDE expression			{ printf("/\n"); }
+		| expression MODULUS expression			{ printf("%%\n"); }
+		| expression RIGHT_SHIFT expression		{ printf(">>\n"); }
+		| expression LEFT_SHIFT expression		{ printf("<<\n"); }
+		| expression RIGHT_SHIFT_US expression		{ printf(">>>\n"); }
+		| expression LEFT_SHIFT_US expression		{ printf("<<<\n"); }
+		| expression LOGICAL_AND expression		{ printf("&\n"); }
+		| expression LOGICAL_OR expression		{ printf("|\n"); }
+		| expression IS_EQUAL expression		{ printf("==\n"); }
+		| expression IS_NOT_EQUAL expression		{ printf("!=\n"); }
+		| expression IS_LESS expression			{ printf("<\n"); }
+		| expression IS_GREATER expression		{ printf(">\n"); }
+		| expression IS_LESS_OR_EQ expression		{ printf("<=\n"); }
+		| expression IS_GREATER_OR_EQ expression	{ printf(">=\n"); }
+		| expression BITWISE_AND expression		{ printf("&&\n"); }
+		| expression BITWISE_OR expression		{ printf("||\n"); }
+		| expression BITWISE_NOT expression		{ printf("^\n"); }
+		| expression BITWISE_XOR expression		{ printf("&^\n"); }
+		;
+
+unary_expr	: U_NOT unary_expr				{ printf("!\n"); }
+		| U_2COMP unary_expr				{ printf("~\n"); }
+		| U_ADD_OF unary_expr				{ printf("@\n"); }
+		| U_POINTER unary_expr				{ printf("$\n"); }
+		| unary_expr U_INC				{ printf("++\n"); }
+		| unary_expr U_DEC				{ printf("--\n"); }
 		| primary_expr
-		;
-
-lu_op		: LU_NOT
-		| LU_2COMP
-		| LU_ADD_OF
-		;
-
-ru_op		: RU_INC					{ printf("++\n"); }
-		| RU_DEC					{ printf("--\n"); }
 		;
 
 primary_expr	: literal
@@ -360,7 +353,16 @@ primary_expr	: literal
 		| '(' expression ')'
 		;
 
-inc_dec_stmt	: unary_expr ru_op
+/******************************************************************************************/
+/************************************** STATEMENTS ****************************************/
+/******************************************************************************************/
+
+var_decl	: type IDENTIFIER
+		| type IDENTIFIER EQUAL_TO literal
+		;
+
+inc_dec_stmt	: primary_expr U_INC
+		| primary_expr U_DEC
 		;
 
 iteration	: for_stmt
@@ -371,29 +373,29 @@ iteration	: for_stmt
 for_stmt	: FOR '(' for_init for_cond for_post ')' block
 		;
 
-for_init	: simnple_stmt ';'
-		| ';'
+for_init	: ';'
+		| expr ';'
 		;
 
 for_cond	: expression ';'
 		| ';'
 		;
 
-for_post	: simnple_stmt ';'
-		| /* empty */
+for_post	: /* empty */
+		| expr
 		;
 
-simnple_stmt	: inc_dec_stmt
-		| assignment_stmt
+expr		: assign_expr
+		| expr ',' assign_expr
 		;
 
-while_stmt	: WHILE '(' while_cond ')' block
+assign_expr	: expression
 		;
 
-while_cond	: expression
+while_stmt	: WHILE '(' expr ')' block
 		;
 
-dowhile_stmt	: DO block WHILE '(' while_cond ')'
+dowhile_stmt	: DO block WHILE '(' expr ')'
 		;
 
 defer_stmt	: DEFER block
@@ -408,20 +410,17 @@ if_stmt		: if_block
 		| if_block else_if_block else_block
 		;
 
-if_block	: IF '(' if_cond ')' block
+if_block	: IF '(' expr ')' block
 		;
 
 else_block	: ELSE block
 		;
 
-else_if_block	: ELSE IF '(' if_cond ')' block
-		| else_if_block ELSE IF '(' if_cond ')' block
+else_if_block	: ELSE IF '(' expr ')' block
+		| else_if_block ELSE IF '(' expr ')' block
 		;
 
-if_cond		: expression
-		;
-
-switch_stmt	: SWITCH '(' case_cond ')' '{' case_block '}'
+switch_stmt	: SWITCH '(' expr ')' '{' case_block '}'
 		;
 
 case_block	: CASE case_cond ':' statements
