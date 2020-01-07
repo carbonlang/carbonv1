@@ -174,6 +174,7 @@ ident			{letter}({letter}|{dec_digit})*
 "do"								{ return DO; }
 "switch"							{ return SWITCH; }
 "case"								{ return CASE; }
+"default"							{ return DEFAULT; }
 "defer"								{ return DEFER; }
 "extend"							{ return EXTEND; }
 

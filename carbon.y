@@ -32,7 +32,7 @@
 %token BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %token LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
 
-%token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFER
+%token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFAULT DEFER
 
 %left PLUS MINUS MULTIPLY DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
@@ -445,6 +445,7 @@ switch_stmt	: SWITCH '(' expression ')' '{' case_block '}'
 
 case_block	: CASE case_cond ':' statements
 		| case_block CASE ':' statements
+		| DEFAULT ':' statements
 		;
 
 case_cond	: expression
