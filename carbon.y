@@ -295,10 +295,10 @@ logical_op	: LOGICAL_AND					{ printf("&&\n"); }
 		| LOGICAL_OR					{ printf("||\n"); }
 		;
 
-assign_op	: '='						{ printf("=\n"); }
-		| arith_op '='					{ printf("Arith =\n"); }
-		| shift_op '='					{ printf("Shift =\n"); }
-		| logical_op '='				{ printf("Logical =\n"); }
+assign_op	: EQUAL_TO					{ printf("=\n"); }
+		| arith_op EQUAL_TO				{ printf("Arith =\n"); }
+		| shift_op EQUAL_TO				{ printf("Shift =\n"); }
+		| logical_op EQUAL_TO				{ printf("Logical =\n"); }
 		;
 
 /******************************************************************************************/
@@ -437,6 +437,12 @@ jump_stmt	: GOTO IDENTIFIER
 		;
 
 %%
+
+/*
+#ifdef YYDEBUG
+	yydebug = 1;
+#endif
+*/
 
 int main() {
 	yyparse();
