@@ -157,7 +157,7 @@ statements	: statements stmt
 
 stmt		: var_decl				{ printf("Var Decl\n"); }
 		| type_defn				{ printf("Type Defn\n"); }
-		/* | expression_stmt			{ printf("Expr Stmt\n"); } */
+		| expression_stmt			{ printf("Expr Stmt\n"); }
 		| assignment_stmt			{ printf("Assign Stmt\n"); }
 		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
 		| selection				{ printf("Selection\n"); }
@@ -348,9 +348,29 @@ unary_expr	: U_NOT unary_expr				{ printf("!\n"); }
 		| primary_expr
 		;
 
-primary_expr	: literal
-		| IDENTIFIER
-		| '(' expression ')'
+primary_expr	: operand					{ printf("Operand\n"); }
+		| primary_expr index				{ printf("Array Index\n"); }
+		| primary_expr arguments			{ printf("Function Call\n"); }
+		;
+
+operand		: literal
+		| qualified_ident
+		| '(' expression ')'				{ printf("( )\n"); }
+		;
+
+qualified_ident	: IDENTIFIER
+		| qualified_ident '.' IDENTIFIER
+		;
+
+index		: '[' primary_expr ']'
+		;
+
+arguments	: '(' ')'
+		| '(' expression_list ')'
+		;
+
+expression_list	: expression
+		| expression_list ',' expression
 		;
 
 /******************************************************************************************/
@@ -365,44 +385,44 @@ inc_dec_stmt	: primary_expr U_INC
 		| primary_expr U_DEC
 		;
 
-iteration	: for_stmt
-		| while_stmt
-		| dowhile_stmt
+expression_stmt	: primary_expr
+		;
+
+iteration	: for_stmt						{ printf("For Stmt\n"); }
+		| while_stmt						{ printf("While Stmt\n"); }
+		| dowhile_stmt						{ printf("DoWhile Stmt\n"); }
 		;
 
 for_stmt	: FOR '(' for_init for_cond for_post ')' block
 		;
 
 for_init	: ';'
-		| expr ';'
+		| simple_stmt ';'
 		;
 
-for_cond	: expression ';'
-		| ';'
+for_cond	: ';'
+		| expression ';'
 		;
 
 for_post	: /* empty */
-		| expr
+		| simple_stmt
 		;
 
-expr		: assign_expr
-		| expr ',' assign_expr
+simple_stmt	: assignment_stmt
+		| inc_dec_stmt
 		;
 
-assign_expr	: expression
+while_stmt	: WHILE '(' expression ')' block
 		;
 
-while_stmt	: WHILE '(' expr ')' block
-		;
-
-dowhile_stmt	: DO block WHILE '(' expr ')'
+dowhile_stmt	: DO block WHILE '(' expression ')'
 		;
 
 defer_stmt	: DEFER block
 		;
 
-selection	: if_stmt
-		| switch_stmt
+selection	: if_stmt						{ printf("If Stmt\n"); }
+		| switch_stmt						{ printf("Switch Stmt\n"); }
 		;
 
 if_stmt		: if_block
@@ -410,17 +430,17 @@ if_stmt		: if_block
 		| if_block else_if_block else_block
 		;
 
-if_block	: IF '(' expr ')' block
+if_block	: IF '(' expression ')' block
 		;
 
 else_block	: ELSE block
 		;
 
-else_if_block	: ELSE IF '(' expr ')' block
-		| else_if_block ELSE IF '(' expr ')' block
+else_if_block	: ELSE IF '(' expression ')' block
+		| else_if_block ELSE IF '(' expression ')' block
 		;
 
-switch_stmt	: SWITCH '(' expr ')' '{' case_block '}'
+switch_stmt	: SWITCH '(' expression ')' '{' case_block '}'
 		;
 
 case_block	: CASE case_cond ':' statements
@@ -438,11 +458,8 @@ jump_stmt	: GOTO IDENTIFIER
 
 %%
 
-/*
-#ifdef YYDEBUG
-	yydebug = 1;
-#endif
-*/
+
+// yydebug = 1;
 
 int main() {
 	yyparse();
