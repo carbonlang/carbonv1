@@ -34,12 +34,13 @@
 
 %token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFAULT DEFER
 
+%token PUBLIC PRIVATE
+
 %left PLUS MINUS MULTIPLY DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
-
 %left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
 
 %start source_file
@@ -65,12 +66,19 @@ import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("I
 module_defn	: MODULE IDENTIFIER '{' '}'					{ printf("Module\n"); }
 
 func_defn	: DEF IDENTIFIER func_sign block				{ printf("Function\n"); }
+		| access_modifier DEF IDENTIFIER func_sign block		{ printf("Function\n"); }
+		;
+
+access_modifier	: PUBLIC
+		| PRIVATE
 		;
 
 func_sign	: '(' func_param_list ')' DASH_GREATER '(' func_return_list ')'
 		;
 
 block		: '{' statements '}'
+		| '{' '}'
+		;
 
 func_param_list	: /* empty */
 		| func_param
@@ -441,11 +449,14 @@ else_if_block	: ELSE IF '(' expression ')' block
 		;
 
 switch_stmt	: SWITCH '(' expression ')' '{' case_block '}'
+		| SWITCH '(' expression ')' '{' case_block case_default '}'
 		;
 
 case_block	: CASE case_cond ':' statements
-		| case_block CASE ':' statements
-		| DEFAULT ':' statements
+		| case_block CASE case_cond ':' statements
+		;
+
+case_default	: DEFAULT ':' statements
 		;
 
 case_cond	: expression

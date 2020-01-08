@@ -159,8 +159,8 @@ ident			{letter}({letter}|{dec_digit})*
 
 "="								{ return EQUAL_TO; }
 
-"public"							{ printf("[ ASC_MOD:public ]"); }
-"private"							{ printf("[ ASC_MOD:private ]"); }
+"public"							{ return PUBLIC; }
+"private"							{ return PRIVATE; }
 
 "return"							{ return RETURN; }
 "break"								{ return BREAK; }
@@ -181,20 +181,3 @@ ident			{letter}({letter}|{dec_digit})*
 {ident}								{ return IDENTIFIER; }
 
 %%
-
-//int main(int argc, char **argv) {
-//	FILE *fd = stdin;
-//	if (argc > 1 && (fd = fopen(argv[1], "r")) == NULL) {
-//		exit(EXIT_FAILURE);
-//	}
-//
-//	// create a lexer that consumes a file or reads stdin
-//	Lexer lexer(fd);
-//
-//	// here we go!
-//	lexer.lex();
-//
-//	if (fd != stdin)
-//		fclose(fd);
-//	return 0;
-//}
