@@ -78,9 +78,11 @@ def main(int a, bool b) -> (int) {
 	c = !a
 	c = ~a
 	c = @a
+	c = $a
+	c = a[a++] + b(100, c)
 	a++
 	a--
-	b = c++
+	b = c++ + a.b~>c
 
 	io.Print()
 
@@ -126,7 +128,7 @@ def main(int a, bool b) -> (int) {
 }
 
 public def run(int a, int b) -> () {
-	return
+	return 0
 }
 
 private def calc(ptr : int a) -> () {

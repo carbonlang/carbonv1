@@ -31,6 +31,7 @@
 %token LOGICAL_OR LOGICAL_AND
 %token BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %token LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
+%token TIDLE_GREATER
 
 %token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFAULT DEFER
 
@@ -353,24 +354,22 @@ unary_expr	: U_NOT unary_expr				{ printf("!\n"); }
 		| U_POINTER unary_expr				{ printf("$\n"); }
 		| unary_expr U_INC				{ printf("++\n"); }
 		| unary_expr U_DEC				{ printf("--\n"); }
-		| primary_expr
-		;
-
-primary_expr	: operand					{ printf("Operand\n"); }
-		| primary_expr index				{ printf("Array Index\n"); }
-		| primary_expr arguments			{ printf("Function Call\n"); }
+		| operand
 		;
 
 operand		: literal
 		| qualified_ident
+		| operand index					{ printf("Array Index\n"); }
+		| operand arguments				{ printf("Function Call\n"); }
 		| '(' expression ')'				{ printf("( )\n"); }
 		;
 
-qualified_ident	: IDENTIFIER
-		| qualified_ident '.' IDENTIFIER
+qualified_ident	: IDENTIFIER					{ printf("Identifier\n"); }
+		| qualified_ident '.' IDENTIFIER		{ printf("X.Y\n"); }
+		| qualified_ident TIDLE_GREATER IDENTIFIER	{ printf("X~>Y\n"); }
 		;
 
-index		: '[' primary_expr ']'
+index		: '[' expression ']'
 		;
 
 arguments	: '(' ')'
@@ -389,11 +388,11 @@ var_decl	: type IDENTIFIER
 		| type IDENTIFIER EQUAL_TO literal
 		;
 
-inc_dec_stmt	: primary_expr U_INC
-		| primary_expr U_DEC
+inc_dec_stmt	: operand U_INC
+		| operand U_DEC
 		;
 
-expression_stmt	: primary_expr
+expression_stmt	: operand
 		;
 
 iteration	: for_stmt						{ printf("For Stmt\n"); }

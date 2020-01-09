@@ -63,6 +63,7 @@ ident			{letter}({letter}|{dec_digit})*
 "{"								{ return '{'; }
 "}"								{ return '}'; }
 "->"								{ return DASH_GREATER; }
+"~>"								{ return TIDLE_GREATER; }
 "."								{ return '.'; }
 ":"								{ return ':'; }
 ";"								{ return ';'; }
