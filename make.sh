@@ -12,5 +12,6 @@ bison -y -d --debug --report=state carbon.y
 reflex  --flex --bison carbon.l
 cc -Wall -Wunused -Wextra -c y.tab.c
 c++ -Wall -Wunused -Wextra -o carbon y.tab.o lex.yy.cpp ~/reflex/lib/libreflex.a
+read -n1 -r -p "Press any key to continue..." key
 ./carbon < ./testprog/test1.crb
 

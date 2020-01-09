@@ -11,7 +11,7 @@
 %token IMPORT FROM AS
 %token STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
 %token HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
-%token DASH_GREATER
+%token FUNC_RETURN
 %token IDENTIFIER
 %token DEF
 %token BOOL CHAR BYTE INT INT8 INT16 INT32 INT64 UINT UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 FLOAT128
@@ -31,7 +31,7 @@
 %token LOGICAL_OR LOGICAL_AND
 %token BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %token LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
-%token TIDLE_GREATER
+%token PTR_MEMBER
 
 %token RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFAULT DEFER
 
@@ -59,22 +59,22 @@ top_level	: import_decl			{ }
 		| func_defn			{ }
 		;
 
-import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("Import From As\n"); }
-		| IMPORT STR1_LITERAL FROM STR1_LITERAL				{ printf("Import From\n"); }
-		| IMPORT STR1_LITERAL						{ printf("Import\n"); }
+import_decl	: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("[Import From As]"); }
+		| IMPORT STR1_LITERAL FROM STR1_LITERAL				{ printf("[Import From]"); }
+		| IMPORT STR1_LITERAL						{ printf("[Import]"); }
 		;
 
-module_defn	: MODULE IDENTIFIER '{' '}'					{ printf("Module\n"); }
+module_defn	: MODULE IDENTIFIER '{' '}'					{ printf("[Module]"); }
 
-func_defn	: DEF IDENTIFIER func_sign block				{ printf("Function\n"); }
-		| access_modifier DEF IDENTIFIER func_sign block		{ printf("Function\n"); }
+func_defn	: DEF IDENTIFIER func_sign block				{ printf("[Function]"); }
+		| access_modifier DEF IDENTIFIER func_sign block		{ printf("[PP Function]"); }
 		;
 
 access_modifier	: PUBLIC
 		| PRIVATE
 		;
 
-func_sign	: '(' func_param_list ')' DASH_GREATER '(' func_return_list ')'
+func_sign	: '(' func_param_list ')' FUNC_RETURN '(' func_return_list ')'
 		;
 
 block		: '{' statements '}'
@@ -98,8 +98,8 @@ func_return	: type IDENTIFIER
 		| type
 		;
 
-type_func	: EXTEND type_name '{' func_defns '}'				{ printf("Type Function\n"); }
-		| EXTEND type_name '{' '}'
+type_func	: EXTEND type_name '{' func_defns '}'				{ printf("[Type Function]"); }
+		| EXTEND type_name '{' '}'					{ printf("[Type Function]"); }
 		;
 
 func_defns	: func_defn
@@ -116,45 +116,52 @@ type		: storage_class type_qualifier type_name
 		| type_name
 		;
 
-storage_class	: REGISTER				{ printf("Register\n"); }
-		| STATIC				{ printf("Static\n"); }
+storage_class	: REGISTER				{ printf("[Register]"); }
+		| STATIC				{ printf("[Static]"); }
 		;
 
-type_qualifier	: CONST					{ printf("Const\n"); }
-		| VOLATILE				{ printf("Volatile\n"); }
-		| RESTRICT				{ printf("Restirct\n"); }
-		| ATOMIC				{ printf("Atomic\n"); }
-		| CONST_RESTRICT			{ printf("Const Restrict\n"); }
+type_qualifier	: CONST					{ printf("[Const]"); }
+		| VOLATILE				{ printf("[Volatile]"); }
+		| RESTRICT				{ printf("[Restirct]"); }
+		| ATOMIC				{ printf("[Atomic]"); }
+		| CONST_RESTRICT			{ printf("[Const Restrict]"); }
 		;
 
-type_name	: BOOL					{ printf("Bool\n"); }
-		| CHAR					{ printf("Char\n"); }
-		| BYTE					{ printf("Byte\n"); }
-		| INT					{ printf("Int\n"); }
-		| INT8					{ printf("Int8\n"); }
-		| INT16					{ printf("Int16\n"); }
-		| INT32					{ printf("Int32\n"); }
-		| INT64					{ printf("Int64\n"); }
-		| UINT					{ printf("UInt\n"); }
-		| UINT8					{ printf("UInt8\n"); }
-		| UINT16				{ printf("UInt16\n"); }
-		| UINT32				{ printf("UInt32\n"); }
-		| UINT64				{ printf("UInt64\n"); }
-		| FLOAT32				{ printf("UInt32\n"); }
-		| FLOAT64				{ printf("UInt64\n"); }
-		| FLOAT128				{ printf("UInt128\n"); }
-		| STRING				{ printf("String\n"); }
-		| POINTER ':' type_name			{ printf("Pointer\n"); }
-/*		| tupple_type				{ printf("Tupple\n"); } */
-/*		| function_type				{ printf("Function\n"); } */
-		| IDENTIFIER				{ printf("CustomType\n"); }
+type_name	: BOOL					{ printf("[Bool]"); }
+		| CHAR					{ printf("[Char]"); }
+		| BYTE					{ printf("[Byte]"); }
+		| INT					{ printf("[Int]"); }
+		| INT8					{ printf("[Int8]"); }
+		| INT16					{ printf("[Int16]"); }
+		| INT32					{ printf("[Int32]"); }
+		| INT64					{ printf("[Int64]"); }
+		| UINT					{ printf("[UInt]"); }
+		| UINT8					{ printf("[UInt8]"); }
+		| UINT16				{ printf("[UInt16]"); }
+		| UINT32				{ printf("[UInt32]"); }
+		| UINT64				{ printf("[UInt64]"); }
+		| FLOAT32				{ printf("[UInt32]"); }
+		| FLOAT64				{ printf("[UInt64]"); }
+		| FLOAT128				{ printf("[UInt128]"); }
+		| STRING				{ printf("[String]"); }
+		| POINTER ':' type_name			{ printf("[Pointer]"); }
+/*		| tupple_type				{ printf("[Tupple]"); } */
+/*		| function_type				{ printf("[Function]"); } */
+		| IDENTIFIER				{ printf("[CustomType]"); }
 		;
 
 /*
-function_type	: func_sign
+function_type	: '(' func_param_type ')' FUNC_RETURN '(' func_ret_type ')'
+		;
+
+func_param_type	: type
+		| func_param_type ',' type
+		;
+
+func_ret_type	: type
+		| func_ret_type ',' type
 		;
 */
-
 
 /******************************************************************************************/
 /************************************** STATEMENTS ****************************************/
@@ -164,15 +171,15 @@ statements	: statements stmt
 		| stmt
 		;
 
-stmt		: var_decl				{ printf("Var Decl\n"); }
-		| type_defn				{ printf("Type Defn\n"); }
-		| expression_stmt			{ printf("Expr Stmt\n"); }
-		| assignment_stmt			{ printf("Assign Stmt\n"); }
-		| inc_dec_stmt				{ printf("Inc Dec Stmt\n"); }
-		| selection				{ printf("Selection\n"); }
-		| iteration				{ printf("Iteration\n"); }
-		| jump_stmt				{ printf("Jump stmt\n"); }
-		| defer_stmt				{ printf("Defer Stmt\n"); }
+stmt		: var_decl				{ printf("[Var Decl]"); }
+		| type_defn				{ printf("[Type Defn]"); }
+		| expression_stmt			{ printf("[Expr Stmt]"); }
+		| assignment_stmt			{ printf("[Assign Stmt]"); }
+		| inc_dec_stmt				{ printf("[Inc Dec Stmt]"); }
+		| selection				{ printf("[Selection]"); }
+		| iteration				{ printf("[Iteration]"); }
+		| jump_stmt				{ printf("[Jump stmt]"); }
+		| defer_stmt				{ printf("[Defer Stmt]"); }
 		;
 
 /******************************************************************************************/
@@ -190,39 +197,39 @@ literal		: bool_lit
 		/* | tupple_lit */
 		;
 
-bool_lit	: TRUE					{ printf("True\n"); }
-		| FALSE					{ printf("False\n"); }
+bool_lit	: TRUE					{ printf("[True]"); }
+		| FALSE					{ printf("[False]"); }
 		;
 
-int_lit		: BINARY_LIT				{ printf("Binary Literal\n"); }
-		| OCTAL_LIT				{ printf("Octal Literal\n"); }
-		| DECIMAL_LIT				{ printf("Decimal Literal\n"); }
-		| HEX_LIT				{ printf("Hex Literal\n"); }
+int_lit		: BINARY_LIT				{ printf("[Binary Literal]"); }
+		| OCTAL_LIT				{ printf("[Octal Literal]"); }
+		| DECIMAL_LIT				{ printf("[Decimal Literal]"); }
+		| HEX_LIT				{ printf("[Hex Literal]"); }
 		;
 
-float_lit	: FLOAT_LIT				{ printf("Float Literal\n"); }
+float_lit	: FLOAT_LIT				{ printf("[Float Literal]"); }
 		;
 
-char_lit	: CHAR_LIT				{ printf("Char Literal\n"); }
+char_lit	: CHAR_LIT				{ printf("[Char Literal]"); }
 		;
 
-str_lit		: STR1_LITERAL				{ printf("String1 Literal\n"); }
-		| STR2_LITERAL				{ printf("String2 Literal\n"); }
-		| RSTR1_LITERAL				{ printf("RString1 Literal\n"); }
-		| RSTR2_LITERAL				{ printf("RString2 Literal\n"); }
-		| HSTR1_LITERAL				{ printf("HString1 Literal\n"); }
-		| HSTR2_LITERAL				{ printf("HString2 Literal\n"); }
-		| HRSTR1_LITERAL			{ printf("HRString1 Literal\n"); }
-		| HRSTR2_LITERAL			{ printf("HRString2 Literal\n"); }
+str_lit		: STR1_LITERAL				{ printf("[String1 Literal]"); }
+		| STR2_LITERAL				{ printf("[String2 Literal]"); }
+		| RSTR1_LITERAL				{ printf("[RString1 Literal]"); }
+		| RSTR2_LITERAL				{ printf("[RString2 Literal]"); }
+		| HSTR1_LITERAL				{ printf("[HString1 Literal]"); }
+		| HSTR2_LITERAL				{ printf("[HString2 Literal]"); }
+		| HRSTR1_LITERAL			{ printf("[HRString1 Literal]"); }
+		| HRSTR2_LITERAL			{ printf("[HRString2 Literal]"); }
 		;
 
-ptr_lit		: PTR_NULL				{ printf("Null\n"); }
+ptr_lit		: PTR_NULL				{ printf("[Null]"); }
 		;
 
 func_lit	: DEF func_sign block
 		;
 
-composite_lit	: IDENTIFIER '{' composite_list '}'	{ printf("Composite Literal\n"); }
+composite_lit	: IDENTIFIER '{' composite_list '}'	{ printf("[Composite Literal]"); }
 		;
 
 composite_list	: keyed_element
@@ -263,16 +270,16 @@ type_defn	: struct_defn
 		| option_defn
 		;
 
-struct_defn	: TYPE STRUCT IDENTIFIER '{' field_decl '}'	{ printf("Struct Defn\n"); }
+struct_defn	: TYPE STRUCT IDENTIFIER '{' field_decl '}'	{ printf("[Struct Defn]"); }
 		;
 
-union_defn	: TYPE UNION IDENTIFIER '{' field_decl '}'	{ printf("Union Defn\n"); }
+union_defn	: TYPE UNION IDENTIFIER '{' field_decl '}'	{ printf("[Union Defn]"); }
 		;
 
-enum_defn	: TYPE ENUM IDENTIFIER '{' enum_fields '}'	{ printf("Enum Defn\n"); }
+enum_defn	: TYPE ENUM IDENTIFIER '{' enum_fields '}'	{ printf("[Enum Defn]"); }
 		;
 
-option_defn	: TYPE OPTION IDENTIFIER '{' field_decl '}'	{ printf("Option Defn\n"); }
+option_defn	: TYPE OPTION IDENTIFIER '{' field_decl '}'	{ printf("[Option Defn]"); }
 		;
 
 field_decl	: type IDENTIFIER
@@ -287,86 +294,92 @@ enum_fields	: IDENTIFIER
 /************************************** OPERATORS *****************************************/
 /******************************************************************************************/
 
-arith_op	: PLUS						{ printf("+\n"); }
-		| MINUS						{ printf("-\n"); }
-		| MULTIPLY					{ printf("-\n"); }
-		| DIVIDE					{ printf("/\n"); }
-		| MODULUS					{ printf("%%\n"); }
+arith_op	: PLUS						{ printf("[+]"); }
+		| MINUS						{ printf("[-]"); }
+		| MULTIPLY					{ printf("[-]"); }
+		| DIVIDE					{ printf("[/]"); }
+		| MODULUS					{ printf("[%%]"); }
 		;
 
-shift_op	: RIGHT_SHIFT					{ printf("<<\n"); }
-		| LEFT_SHIFT					{ printf(">>\n"); }
-		| RIGHT_SHIFT_US				{ printf("<<<\n"); }
-		| LEFT_SHIFT_US					{ printf(">>>\n"); }
+shift_op	: RIGHT_SHIFT					{ printf("[<<]"); }
+		| LEFT_SHIFT					{ printf("[>>]"); }
+		| RIGHT_SHIFT_US				{ printf("[<<<]"); }
+		| LEFT_SHIFT_US					{ printf("[>>>]"); }
 		;
 
-logical_op	: LOGICAL_AND					{ printf("&&\n"); }
-		| LOGICAL_OR					{ printf("||\n"); }
+logical_op	: LOGICAL_AND					{ printf("[&&]"); }
+		| LOGICAL_OR					{ printf("[||]"); }
 		;
 
-assign_op	: EQUAL_TO					{ printf("=\n"); }
-		| arith_op EQUAL_TO				{ printf("Arith =\n"); }
-		| shift_op EQUAL_TO				{ printf("Shift =\n"); }
-		| logical_op EQUAL_TO				{ printf("Logical =\n"); }
+assign_op	: EQUAL_TO					{ printf("[=]"); }
+		| arith_op EQUAL_TO				{ printf("[Arith =]"); }
+		| shift_op EQUAL_TO				{ printf("[Shift =]"); }
+		| logical_op EQUAL_TO				{ printf("[Logical =]"); }
 		;
 
 /******************************************************************************************/
 /******************************* ASSIGNMENT STATEMENT *************************************/
 /******************************************************************************************/
 
-assignment_stmt	: identifier_list assign_op expression		{ printf("Assign stmt\n"); }
+assignment_stmt	: l_value_list assign_op expression		{ printf("[Assign stmt]"); }
 		;
 
-identifier_list	: IDENTIFIER
-		| identifier_list ',' IDENTIFIER
+l_value_list	: l_value
+		| l_value_list ',' l_value
 		;
 
-expression	: unary_expr					{ printf("Unary Expr\n"); }
-		| binary_expr					{ printf("Binary Expr\n"); }
+l_value		: qualified_ident
+		| U_ADD_OF operand				{ printf("[@]"); }
+		| U_POINTER operand				{ printf("[$]"); }
+		| operand index					{ printf("[LHS Array Index]"); }
 		;
 
-binary_expr	: expression PLUS expression			{ printf("+\n"); }
-		| expression MINUS expression			{ printf("-\n"); }
-		| expression MULTIPLY expression		{ printf("*\n"); }
-		| expression DIVIDE expression			{ printf("/\n"); }
-		| expression MODULUS expression			{ printf("%%\n"); }
-		| expression RIGHT_SHIFT expression		{ printf(">>\n"); }
-		| expression LEFT_SHIFT expression		{ printf("<<\n"); }
-		| expression RIGHT_SHIFT_US expression		{ printf(">>>\n"); }
-		| expression LEFT_SHIFT_US expression		{ printf("<<<\n"); }
-		| expression LOGICAL_AND expression		{ printf("&\n"); }
-		| expression LOGICAL_OR expression		{ printf("|\n"); }
-		| expression IS_EQUAL expression		{ printf("==\n"); }
-		| expression IS_NOT_EQUAL expression		{ printf("!=\n"); }
-		| expression IS_LESS expression			{ printf("<\n"); }
-		| expression IS_GREATER expression		{ printf(">\n"); }
-		| expression IS_LESS_OR_EQ expression		{ printf("<=\n"); }
-		| expression IS_GREATER_OR_EQ expression	{ printf(">=\n"); }
-		| expression BITWISE_AND expression		{ printf("&&\n"); }
-		| expression BITWISE_OR expression		{ printf("||\n"); }
-		| expression BITWISE_NOT expression		{ printf("^\n"); }
-		| expression BITWISE_XOR expression		{ printf("&^\n"); }
+expression	: unary_expr					{ printf("[Unary Expr]"); }
+		| binary_expr					{ printf("[Binary Expr]"); }
 		;
 
-unary_expr	: U_NOT unary_expr				{ printf("!\n"); }
-		| U_2COMP unary_expr				{ printf("~\n"); }
-		| U_ADD_OF unary_expr				{ printf("@\n"); }
-		| U_POINTER unary_expr				{ printf("$\n"); }
-		| unary_expr U_INC				{ printf("++\n"); }
-		| unary_expr U_DEC				{ printf("--\n"); }
+binary_expr	: expression PLUS expression			{ printf("[+]"); }
+		| expression MINUS expression			{ printf("[-]"); }
+		| expression MULTIPLY expression		{ printf("[*]"); }
+		| expression DIVIDE expression			{ printf("[/]"); }
+		| expression MODULUS expression			{ printf("[%%]"); }
+		| expression RIGHT_SHIFT expression		{ printf("[>>]"); }
+		| expression LEFT_SHIFT expression		{ printf("[<<]"); }
+		| expression RIGHT_SHIFT_US expression		{ printf("[>>>]"); }
+		| expression LEFT_SHIFT_US expression		{ printf("[<<<]"); }
+		| expression LOGICAL_AND expression		{ printf("[&]"); }
+		| expression LOGICAL_OR expression		{ printf("[|]"); }
+		| expression IS_EQUAL expression		{ printf("[==]"); }
+		| expression IS_NOT_EQUAL expression		{ printf("[!=]"); }
+		| expression IS_LESS expression			{ printf("[<]"); }
+		| expression IS_GREATER expression		{ printf("[>]"); }
+		| expression IS_LESS_OR_EQ expression		{ printf("[<=]"); }
+		| expression IS_GREATER_OR_EQ expression	{ printf("[>=]"); }
+		| expression BITWISE_AND expression		{ printf("[&&]"); }
+		| expression BITWISE_OR expression		{ printf("[||]"); }
+		| expression BITWISE_NOT expression		{ printf("[^]"); }
+		| expression BITWISE_XOR expression		{ printf("[&^\n"); }
+		;
+
+unary_expr	: U_NOT unary_expr				{ printf("[!]"); }
+		| U_2COMP unary_expr				{ printf("[~]"); }
+		| U_ADD_OF unary_expr				{ printf("[@]"); }
+		| U_POINTER unary_expr				{ printf("[$]"); }
+		| unary_expr U_INC				{ printf("[++]"); }
+		| unary_expr U_DEC				{ printf("[--]"); }
 		| operand
+		| literal
 		;
 
-operand		: literal
-		| qualified_ident
-		| operand index					{ printf("Array Index\n"); }
-		| operand arguments				{ printf("Function Call\n"); }
-		| '(' expression ')'				{ printf("( )\n"); }
+operand		: qualified_ident
+		| operand index					{ printf("[Array Index]"); }
+		| operand arguments				{ printf("[Function Call]"); }
+		| '(' expression ')'				{ printf("[( )]"); }
 		;
 
-qualified_ident	: IDENTIFIER					{ printf("Identifier\n"); }
-		| qualified_ident '.' IDENTIFIER		{ printf("X.Y\n"); }
-		| qualified_ident TIDLE_GREATER IDENTIFIER	{ printf("X~>Y\n"); }
+qualified_ident	: IDENTIFIER					{ printf("[Identifier]"); }
+		| qualified_ident '.' IDENTIFIER		{ printf("[X.Y]"); }
+		| qualified_ident PTR_MEMBER IDENTIFIER		{ printf("[X~>Y]"); }
 		;
 
 index		: '[' expression ']'
@@ -395,9 +408,9 @@ inc_dec_stmt	: operand U_INC
 expression_stmt	: operand
 		;
 
-iteration	: for_stmt						{ printf("For Stmt\n"); }
-		| while_stmt						{ printf("While Stmt\n"); }
-		| dowhile_stmt						{ printf("DoWhile Stmt\n"); }
+iteration	: for_stmt						{ printf("[For Stmt]"); }
+		| while_stmt						{ printf("[While Stmt]"); }
+		| dowhile_stmt						{ printf("[DoWhile Stmt]"); }
 		;
 
 for_stmt	: FOR '(' for_init for_cond for_post ')' block
@@ -428,8 +441,8 @@ dowhile_stmt	: DO block WHILE '(' expression ')'
 defer_stmt	: DEFER block
 		;
 
-selection	: if_stmt						{ printf("If Stmt\n"); }
-		| switch_stmt						{ printf("Switch Stmt\n"); }
+selection	: if_stmt						{ printf("[If Stmt]"); }
+		| switch_stmt						{ printf("[Switch Stmt]"); }
 		;
 
 if_stmt		: if_block
@@ -461,10 +474,11 @@ case_default	: DEFAULT ':' statements
 case_cond	: expression
 		;
 
-jump_stmt	: GOTO IDENTIFIER
-		| CONTINUE
-		| BREAK
-		| RETURN
+jump_stmt	: GOTO IDENTIFIER					{ printf("[Goto]"); }
+		| CONTINUE						{ printf("[Continue]"); }
+		| BREAK							{ printf("[Break]"); }
+		| RETURN						{ printf("[Return]"); }
+/*		| RETURN expression_list				{ printf("[Return Expr]"); } */
 		;
 
 %%

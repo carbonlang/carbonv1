@@ -88,7 +88,8 @@ def main(int a, bool b) -> (int) {
 
 	io.Print(a, b)
 
-	if (x > y) {
+	if (x > y)
+	{
 		x = y
 	} else if (x < y) {
 		x = x - y
@@ -124,12 +125,13 @@ def main(int a, bool b) -> (int) {
 		free(p)
 	}
 
-	return 0
+	return
 }
 
 public def run(int a, int b) -> () {
-	return 0
+	return
 }
 
 private def calc(ptr : int a) -> () {
+	return
 }
