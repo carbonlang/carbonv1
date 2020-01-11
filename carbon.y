@@ -368,10 +368,10 @@ unary_expr	: U_NOT unary_expr				{ printf("[!]"); }
 		| unary_expr U_INC				{ printf("[++]"); }
 		| unary_expr U_DEC				{ printf("[--]"); }
 		| operand
-		| literal
 		;
 
-operand		: qualified_ident
+operand		: literal
+		| qualified_ident
 		| operand index					{ printf("[Array Index]"); }
 		| operand arguments				{ printf("[Function Call]"); }
 		| '(' expression ')'				{ printf("[( )]"); }
@@ -401,8 +401,8 @@ var_decl	: type IDENTIFIER
 		| type IDENTIFIER EQUAL_TO literal
 		;
 
-inc_dec_stmt	: operand U_INC
-		| operand U_DEC
+inc_dec_stmt	: qualified_ident U_INC
+		| qualified_ident U_DEC
 		;
 
 expression_stmt	: operand
