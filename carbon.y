@@ -175,7 +175,7 @@ stmt		: var_decl				{ printf("[Var Decl]"); }
 		| type_defn				{ printf("[Type Defn]"); }
 		| expression_stmt			{ printf("[Expr Stmt]"); }
 		| assignment_stmt			{ printf("[Assign Stmt]"); }
-		| inc_dec_stmt				{ printf("[Inc Dec Stmt]"); }
+/*		| inc_dec_stmt				{ printf("[Inc Dec Stmt]"); } */
 		| selection				{ printf("[Selection]"); }
 		| iteration				{ printf("[Iteration]"); }
 		| jump_stmt				{ printf("[Jump stmt]"); }
@@ -329,8 +329,8 @@ l_value_list	: l_value
 		;
 
 l_value		: qualified_ident
-		| U_ADD_OF operand				{ printf("[@]"); }
-		| U_POINTER operand				{ printf("[$]"); }
+		| U_ADD_OF unary_expr				{ printf("[@]"); }
+		| U_POINTER unary_expr				{ printf("[$]"); }
 		| operand index					{ printf("[LHS Array Index]"); }
 		;
 
@@ -365,8 +365,8 @@ unary_expr	: U_NOT unary_expr				{ printf("[!]"); }
 		| U_2COMP unary_expr				{ printf("[~]"); }
 		| U_ADD_OF unary_expr				{ printf("[@]"); }
 		| U_POINTER unary_expr				{ printf("[$]"); }
-		| unary_expr U_INC				{ printf("[++]"); }
-		| unary_expr U_DEC				{ printf("[--]"); }
+		| PLUS unary_expr				{ printf("[+a]"); }
+		| MINUS unary_expr				{ printf("[-a]"); }
 		| operand
 		;
 
@@ -401,11 +401,7 @@ var_decl	: type IDENTIFIER
 		| type IDENTIFIER EQUAL_TO literal
 		;
 
-inc_dec_stmt	: qualified_ident U_INC
-		| qualified_ident U_DEC
-		;
-
-expression_stmt	: operand
+expression_stmt	: operand arguments					{ printf("[Function Call]"); }
 		;
 
 iteration	: for_stmt						{ printf("[For Stmt]"); }
@@ -429,7 +425,6 @@ for_post	: /* empty */
 		;
 
 simple_stmt	: assignment_stmt
-		| inc_dec_stmt
 		;
 
 while_stmt	: WHILE '(' expression ')' block
