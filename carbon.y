@@ -364,9 +364,10 @@ binary_expr	: expression PLUS expression			{ printf("[+]"); }
 unary_expr	: U_NOT unary_expr				{ printf("[!]"); }
 		| U_2COMP unary_expr				{ printf("[~]"); }
 		| U_ADD_OF unary_expr				{ printf("[@]"); }
-		| U_POINTER unary_expr				{ printf("[$]"); }
+		| MULTIPLY unary_expr				{ printf("[$]"); }
 		| PLUS unary_expr				{ printf("[+a]"); }
 		| MINUS unary_expr				{ printf("[-a]"); }
+		| '(' expression ')'				{ printf("[( )]"); }
 		| operand
 		;
 
@@ -374,7 +375,6 @@ operand		: literal
 		| qualified_ident
 		| operand index					{ printf("[Array Index]"); }
 		| operand arguments				{ printf("[Function Call]"); }
-		| '(' expression ')'				{ printf("[( )]"); }
 		;
 
 qualified_ident	: IDENTIFIER					{ printf("[Identifier]"); }

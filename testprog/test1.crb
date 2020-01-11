@@ -78,9 +78,11 @@ def main(int a, bool b) -> (int) {
 	c = !a
 	c = ~a
 	c = @a
-	c = $a
+	c = *a
+
 	c = a[a] + b(100, c)
 	b = -c + a.b~>c
+	a = b[10][100][20]
 
 	io.Print()
 
