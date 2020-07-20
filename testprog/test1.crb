@@ -4,10 +4,11 @@ import "print" from "io" as "cout"
 import "print" from "io"
 import "math"
 
-module Global {
+ns Global {
+	int g
 }
 
-type struct GlobalPerson {
+struct GlobalPerson {
 	int a
 	int b
 }
@@ -43,22 +44,22 @@ def main(int a, bool b) -> (int) {
 	string s8 = '''this is a test'''
 	string s7 = """this is a test"""
 	ptr : int p1 = null
-	type struct Person {
+	struct Person {
 		int age
 		char gender
 		string name
 	}
-	type union Person {
+	union Person {
 		int age
 		char gender
 		string name
 	}
-	type enum Color {
+	enum Color {
 		RED
 		GREEN
 		BLUE
 	}
-	type option Result {
+	option Result {
 		int ok
 		string result
 	}

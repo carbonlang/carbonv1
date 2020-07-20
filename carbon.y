@@ -33,7 +33,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %defines
 %parse-param { yy::Lexer& lexer }  // Construct parser object with lexer
 
-%code{
+%code {
+	//#include "node.h"
 	#include "lex.yy.h"  // header file generated with reflex --header-file
 	#undef yylex
 	#define yylex lexer.yylex  // Within bison's parse() we should invoke lexer.yylex(), not the global yylex()
@@ -44,7 +45,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	  char* str;  // type of yylval.str is char*
 }
 
-%token MODULE
+%token NAMESAPCE
 %token IMPORT FROM AS
 %token STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
 %token HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
@@ -94,7 +95,7 @@ top_level
 		: import_decl				{ }
 		| type_defn					{ }
 		| type_func					{ }
-		| module_defn				{ }
+		| namespace_defn			{ }
 		| func_defn					{ }
 		;
 
@@ -104,8 +105,8 @@ import_decl
 		| IMPORT STR1_LITERAL										{ printf("[Import]"); }
 		;
 
-module_defn
-		: MODULE IDENTIFIER '{' '}'									{ printf("[Module]"); }
+namespace_defn
+		: NAMESAPCE IDENTIFIER block 								{ printf("[NS]"); }
 
 func_defn
 		: DEF IDENTIFIER func_sign block							{ printf("[Function]"); }
@@ -348,19 +349,19 @@ type_defn
 		;
 
 struct_defn
-		: TYPE STRUCT IDENTIFIER '{' field_decl '}'		{ printf("[Struct Defn]"); }
+		: STRUCT IDENTIFIER '{' field_decl '}'		{ printf("[Struct Defn]"); }
 		;
 
 union_defn
-		: TYPE UNION IDENTIFIER '{' field_decl '}'		{ printf("[Union Defn]"); }
+		: UNION IDENTIFIER '{' field_decl '}'		{ printf("[Union Defn]"); }
 		;
 
 enum_defn
-		: TYPE ENUM IDENTIFIER '{' enum_fields '}'		{ printf("[Enum Defn]"); }
+		: ENUM IDENTIFIER '{' enum_fields '}'		{ printf("[Enum Defn]"); }
 		;
 
 option_defn
-		: TYPE OPTION IDENTIFIER '{' field_decl '}'		{ printf("[Option Defn]"); }
+		: OPTION IDENTIFIER '{' field_decl '}'		{ printf("[Option Defn]"); }
 		;
 
 field_decl

@@ -58,7 +58,7 @@ ident			{letter}({letter}|{dec_digit})*
 %%
 "/*".*"*/"					; /* Ignore all comments */
 
-"module"					{ return yy::parser::token::MODULE; }
+"ns"						{ return yy::parser::token::NAMESAPCE; }
 "import"					{ return yy::parser::token::IMPORT; }
 "from"						{ return yy::parser::token::FROM; }
 "as"					 	{ return yy::parser::token::AS; }
