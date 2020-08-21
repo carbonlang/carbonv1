@@ -19,33 +19,8 @@
 //void TopLevel::codeGen() {
 	//std::cout << "I am the king !";
 //}
-llvm::Value* TopLevel::codeGen(llvm::LLVMContext& context) {
-	return llvm::ConstantFP::get(context, llvm::APFloat(Val));
+llvm::Value* TopLevel::codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder) {
+	llvm::Value *L = llvm::ConstantFP::get(context, llvm::APFloat(10.0));
+	llvm::Value *R = llvm::ConstantFP::get(context, llvm::APFloat(20.0));
+	return builder.CreateFAdd(L, R, "addtmp");
 }
-
-/*
-class ImportDecl : public TopLevel {
-
-};
-
-class TypeDefn : public TopLevel {
-
-};
-
-class TypeFunc : public TopLevel {
-
-};
-
-class NSDefn : public TopLevel {
-
-};
-
-class FuncDefn : public TopLevel {
-
-};
-
-class FuncSign : public FuncDefn {
-
-};
-
-*/

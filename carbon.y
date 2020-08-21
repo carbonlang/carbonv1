@@ -36,12 +36,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %define api.value.type variant
 
 %code {
+	#include <typeinfo>
 	#include "ast.h"
 	#include "lex.yy.h"  // header file generated with reflex --header-file
 	#undef yylex
 	#define yylex lexer.yylex  // Within bison's parse() we should invoke lexer.yylex(), not the global yylex()
+	// #define DEBUG(str) std::cout << str
+	#define DEBUG(str) ;
 	TopLevel programBlock;
-	llvm::LLVMContext context;
 }
 
 %token <int> NAMESAPCE
@@ -85,36 +87,50 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
 
 %type <TopLevel> top_level
+%type <Storage> storage_class
+%type <TypeQualifier> type_qualifier
+%type <TypeName> type_name
+%type <Type> type
+%type <VarDecl> var_decl
+%type <Literal> literal
+%type <BooleanLiteral> bool_lit
+%type <IntegerLiteral> int_lit
+%type <FloatLiteral> float_lit
+%type <CharLiteral> char_lit
+%type <StringLiteral> str_lit
+%type <PointerLiteral> ptr_lit
+%type <FunctionLiteral> func_lit
+%type <CompositeLiteral> composite_lit
 
 %start source_file
 
 %%
 
 source_file
-		: top_level					{ programBlock = $1; programBlock.codeGen(context); }
+		: top_level					{ programBlock = $1; }
 		| source_file top_level		{ }
 		;
 
 top_level
 		: import_decl				{ }
-		| type_defn					{ }
+		| composite_type_defn					{ }
 		| type_func					{ }
 		| namespace_defn			{ }
 		| func_defn					{ }
 		;
 
 import_decl
-		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ printf("[Import From As]"); }
-		| IMPORT STR1_LITERAL FROM STR1_LITERAL						{ printf("[Import From]"); }
-		| IMPORT STR1_LITERAL										{ printf("[Import]"); }
+		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ DEBUG("[Import From As]"); }
+		| IMPORT STR1_LITERAL FROM STR1_LITERAL						{ DEBUG("[Import From]"); }
+		| IMPORT STR1_LITERAL										{ DEBUG("[Import]"); }
 		;
 
 namespace_defn
-		: NAMESAPCE IDENTIFIER block 								{ printf("[NS]"); }
+		: NAMESAPCE IDENTIFIER block 								{ DEBUG("[NS]"); }
 
 func_defn
-		: DEF IDENTIFIER func_sign block							{ printf("[Function]"); }
-		| access_modifier DEF IDENTIFIER func_sign block			{ printf("[PP Function]"); }
+		: DEF IDENTIFIER func_sign block							{ DEBUG("[Function]"); }
+		| access_modifier DEF IDENTIFIER func_sign block			{ DEBUG("[PP Function]"); }
 		;
 
 access_modifier
@@ -153,8 +169,8 @@ func_return
 		;
 
 type_func
-		: EXTEND type_name '{' func_defns '}'		{ printf("[Type Function]"); }
-		| EXTEND type_name '{' '}'					{ printf("[Type Function]"); }
+		: EXTEND type_name '{' func_defns '}'		{ DEBUG("[Type Function]"); }
+		| EXTEND type_name '{' '}'					{ DEBUG("[Type Function]"); }
 		;
 
 func_defns
@@ -168,46 +184,209 @@ func_defns
 
 type
 		: storage_class type_qualifier type_name
+														{
+															Type t;
+															t.storage = &$1;
+															t.type_qualifier = &$2;
+															t.type_name = &$3;
+															$$ = t;
+															DEBUG("[Type->S::Q::T]");
+														}
 		| storage_class type_name
+														{
+															Type t;
+															t.storage = &$1;
+															t.type_qualifier = NULL;
+															t.type_name = &$2;
+															$$ = t;
+															DEBUG("[Type->S::T]");
+														}
 		| type_qualifier type_name
+														{
+															Type t;
+															t.storage = NULL;
+															t.type_qualifier = &$1;
+															t.type_name = &$2;
+															$$ = t;
+															DEBUG("[Type->Q::T]");
+														}
 		| type_name
+														{
+															Type t;
+															t.storage = NULL;
+															t.type_qualifier = NULL;
+															t.type_name = &$1;
+															$$ = t;
+															DEBUG("[Type->T]");
+														}
 		;
 
 storage_class
-		: REGISTER							{ printf("[Register]"); }
-		| STATIC							{ printf("[Static]"); }
+		: REGISTER							{
+															Storage s;
+															s.storage = Storage::storages::REGISTER;
+															$$ = s;
+															DEBUG("[Storage::Register]");
+														}
+		| STATIC								{
+															Storage s;
+															s.storage = Storage::storages::STATIC;
+															$$ = s;
+															DEBUG("[Storage::Static]");
+														}
 		;
 
 type_qualifier
-		: CONST								{ printf("[Const]"); }
-		| VOLATILE							{ printf("[Volatile]"); }
-		| RESTRICT							{ printf("[Restirct]"); }
-		| ATOMIC							{ printf("[Atomic]"); }
-		| CONST_RESTRICT					{ printf("[Const Restrict]"); }
+		: CONST									{
+															TypeQualifier t;
+															t.type_qualifier = TypeQualifier::type_qualifiers::CONST;
+															$$ = t;
+															DEBUG("[TypeQualifier::Const]");
+														}
+		| VOLATILE							{
+															TypeQualifier t;
+															t.type_qualifier = TypeQualifier::type_qualifiers::VOLATILE;
+															$$ = t;
+															DEBUG("[TypeQualifier::Volatile]");
+														}
+		| RESTRICT							{
+															TypeQualifier t;
+															t.type_qualifier = TypeQualifier::type_qualifiers::RESTRICT;
+															$$ = t;
+															DEBUG("[TypeQualifier::Restrict]");
+														}
+		| ATOMIC								{
+															TypeQualifier t;
+															t.type_qualifier = TypeQualifier::type_qualifiers::ATOMIC;
+															$$ = t;
+															DEBUG("[TypeQualifier::Atomic]");
+														}
+		| CONST_RESTRICT				{
+															TypeQualifier t;
+															t.type_qualifier = TypeQualifier::type_qualifiers::CONST_RESTRICT;
+															$$ = t;
+															DEBUG("[TypeQualifier::ConstRestrict]");
+														}
 		;
 
 type_name
-		: BOOL								{ printf("[Bool]"); }
-		| CHAR								{ printf("[Char]"); }
-		| BYTE								{ printf("[Byte]"); }
-		| INT								{ printf("[Int]"); }
-		| INT8								{ printf("[Int8]"); }
-		| INT16								{ printf("[Int16]"); }
-		| INT32								{ printf("[Int32]"); }
-		| INT64								{ printf("[Int64]"); }
-		| UINT								{ printf("[UInt]"); }
-		| UINT8								{ printf("[UInt8]"); }
-		| UINT16							{ printf("[UInt16]"); }
-		| UINT32							{ printf("[UInt32]"); }
-		| UINT64							{ printf("[UInt64]"); }
-		| FLOAT32							{ printf("[UInt32]"); }
-		| FLOAT64							{ printf("[UInt64]"); }
-		| FLOAT128							{ printf("[UInt128]"); }
-		| STRING							{ printf("[String]"); }
-		| POINTER ':' type_name				{ printf("[Pointer]"); }
-/*		| tupple_type						{ printf("[Tupple]"); } */
-/*		| function_type						{ printf("[Function]"); } */
-		| IDENTIFIER						{ printf("[CustomType]"); }
+		: BOOL									{
+															TypeName t;
+															t.type_name = TypeName::type_names::BOOL;
+															$$ = t;
+															DEBUG("[Type::Bool]");
+														}
+		| CHAR									{
+															TypeName t;
+															t.type_name = TypeName::type_names::CHAR;
+															$$ = t;
+															DEBUG("[Type::Char]");
+														}
+		| BYTE									{
+															TypeName t;
+															t.type_name = TypeName::type_names::BYTE;
+															$$ = t;
+															DEBUG("[Type::Byte]");
+														}
+		| INT										{
+															TypeName t;
+															t.type_name = TypeName::type_names::INT;
+															$$ = t;
+															DEBUG("[Type::Int]");
+														}
+		| INT8									{
+															TypeName t;
+															t.type_name = TypeName::type_names::INT8;
+															$$ = t;
+															DEBUG("[Type::Int8]");
+														}
+		| INT16									{
+															TypeName t;
+															t.type_name = TypeName::type_names::INT16;
+															$$ = t;
+															DEBUG("[Type::Int16]");
+														}
+		| INT32									{
+															TypeName t;
+															t.type_name = TypeName::type_names::INT32;
+															$$ = t;
+															DEBUG("[Type::Int32]");
+														}
+		| INT64									{
+															TypeName t;
+															t.type_name = TypeName::type_names::INT64;
+															$$ = t;
+															DEBUG("[Type::Int64]");
+														}
+		| UINT									{
+															TypeName t;
+															t.type_name = TypeName::type_names::UINT;
+															$$ = t;
+															DEBUG("[Type::UInt]");
+														}
+		| UINT8									{
+															TypeName t;
+															t.type_name = TypeName::type_names::UINT8;
+															$$ = t;
+															DEBUG("[Type::UInt8]");
+														}
+		| UINT16								{
+															TypeName t;
+															t.type_name = TypeName::type_names::UINT16;
+															$$ = t;
+															DEBUG("[Type::UInt16]");
+														}
+		| UINT32								{
+															TypeName t;
+															t.type_name = TypeName::type_names::UINT32;
+															$$ = t;
+															DEBUG("[Type::UInt32]");
+														}
+		| UINT64								{
+															TypeName t;
+															t.type_name = TypeName::type_names::UINT64;
+															$$ = t;
+															DEBUG("[Type::UInt64]");
+														}
+		| FLOAT32								{
+															TypeName t;
+															t.type_name = TypeName::type_names::FLOAT32;
+															$$ = t;
+															DEBUG("[Type::Float32]");
+														}
+		| FLOAT64								{
+															TypeName t;
+															t.type_name = TypeName::type_names::FLOAT64;
+															$$ = t;
+															DEBUG("[Type::Float64]");
+														}
+		| FLOAT128							{
+															TypeName t;
+															t.type_name = TypeName::type_names::FLOAT128;
+															$$ = t;
+															DEBUG("[Type::Float128]");
+														}
+		| STRING								{
+															TypeName t;
+															t.type_name = TypeName::type_names::STRING;
+															$$ = t;
+															DEBUG("[Type::String]");
+														}
+		| POINTER ':' type_name
+														{
+															TypeName t;
+															t.type_name = TypeName::type_names::POINTER;
+															$$ = t;
+															DEBUG("[Type::Pointer]");
+														}
+/*		| tupple_type					{ DEBUG("[Tupple]"); }   */
+/*		| function_type				{ DEBUG("[Function]"); } */
+		| IDENTIFIER						{
+															TypeName t;
+															t.type_name = TypeName::type_names::CUSTOM;
+															$$ = t;
+															DEBUG("[Type::CustomType]");
+														}
 		;
 
 /*
@@ -236,15 +415,15 @@ statements
 		;
 
 stmt
-		: var_decl							{ printf("[Var Decl]"); }
-		| type_defn							{ printf("[Type Defn]"); }
-		| expression_stmt					{ printf("[Expr Stmt]"); }
-		| assignment_stmt					{ printf("[Assign Stmt]"); }
-/*		| inc_dec_stmt						{ printf("[Inc Dec Stmt]"); } */
-		| selection							{ printf("[Selection]"); }
-		| iteration							{ printf("[Iteration]"); }
-		| jump_stmt							{ printf("[Jump stmt]"); }
-		| defer_stmt						{ printf("[Defer Stmt]"); }
+		: var_decl							{ DEBUG("[Var Decl]"); }
+		| composite_type_defn		{ DEBUG("[Type Defn]"); }
+		| expression_stmt					{ DEBUG("[Expr Stmt]"); }
+		| assignment_stmt					{ DEBUG("[Assign Stmt]"); }
+/*		| inc_dec_stmt						{ DEBUG("[Inc Dec Stmt]"); } */
+		| selection							{ DEBUG("[Selection]"); }
+		| iteration							{ DEBUG("[Iteration]"); }
+		| jump_stmt							{ DEBUG("[Jump stmt]"); }
+		| defer_stmt						{ DEBUG("[Defer Stmt]"); }
 		;
 
 /******************************************************************************************/
@@ -252,58 +431,197 @@ stmt
 /******************************************************************************************/
 
 literal
-		: bool_lit
-		| int_lit
-		| float_lit
-		| char_lit
-		| str_lit
-		| ptr_lit
-		| func_lit
-		| composite_lit
-		/* | tupple_lit */
+		: bool_lit								{
+																Literal l;
+																l.type = Literal::types::BOOL;
+																l.boolean = &$1;
+																$$ = l;
+																DEBUG("[Literal::Boolean]");
+															}
+		| int_lit									{
+																Literal l;
+																l.type = Literal::types::INT;
+																l.integer = &$1;
+																$$ = l;
+																DEBUG("[Literal::Integer]");
+															}
+		| float_lit								{
+																Literal l;
+																l.type = Literal::types::FLOAT;
+																l.floating = &$1;
+																$$ = l;
+																DEBUG("[Literal::Float]");
+															}
+		| char_lit								{
+																Literal l;
+																l.type = Literal::types::CHAR;
+																l.character = &$1;
+																$$ = l;
+																DEBUG("[Literal::Char]");
+															}
+		| str_lit									{
+																Literal l;
+																l.type = Literal::types::STRING;
+																l.string = &$1;
+																$$ = l;
+																DEBUG("[Literal::String]");
+															}
+		| ptr_lit									{
+																Literal l;
+																l.type = Literal::types::POINTER;
+																l.pointer = &$1;
+																$$ = l;
+																DEBUG("[Literal::Pointer]");
+															}
+		| func_lit								{
+																Literal l;
+																l.type = Literal::types::FUNCTION;
+																l.function = &$1;
+																$$ = l;
+																DEBUG("[Literal::Function]");
+															}
+		| composite_lit						{
+																Literal l;
+																l.type = Literal::types::COMPOSITE;
+																l.composite = &$1;
+																$$ = l;
+																DEBUG("[Literal::Composite]");
+															}
+		/* TODO: | tupple_lit */
 		;
 
 bool_lit
-		: TRUE								{ printf("[True]"); }
-		| FALSE								{ printf("[False]"); }
+		: TRUE										{
+																BooleanLiteral bl;
+																bl.type = BooleanLiteral::types::TRUE;
+																$$ = bl;
+																DEBUG("[Literal::Boolean::True]");
+															}
+		| FALSE										{
+																BooleanLiteral bl;
+																bl.type = BooleanLiteral::types::FALSE;
+																$$ = bl;
+																DEBUG("[Literal::Boolean::False]");
+															}
 		;
 
 int_lit
-		: BINARY_LIT						{ printf("[Binary Literal]"); }
-		| OCTAL_LIT							{ printf("[Octal Literal]"); }
-		| DECIMAL_LIT						{ printf("[Decimal Literal]"); }
-		| HEX_LIT							{ printf("[Hex Literal]"); }
+		: BINARY_LIT							{
+																IntegerLiteral il;
+																il.type = IntegerLiteral::types::BINARY;
+																$$ = il;
+																DEBUG("[Literal::Integer::Binary]");
+															}
+		| OCTAL_LIT								{
+																IntegerLiteral il;
+																il.type = IntegerLiteral::types::OCTAL;
+																$$ = il;
+																DEBUG("[Literal::Integer::Octal]");
+															}
+		| DECIMAL_LIT							{
+																IntegerLiteral il;
+																il.type = IntegerLiteral::types::DECIMAL;
+																$$ = il;
+																DEBUG("[Literal::Integer::Decimal]");
+															}
+		| HEX_LIT									{
+																IntegerLiteral il;
+																il.type = IntegerLiteral::types::HEX;
+																$$ = il;
+																DEBUG("[Literal::Integer::Hex]");
+															}
 		;
 
 float_lit
-		: FLOAT_LIT							{ printf("[Float Literal]"); }
+		: FLOAT_LIT								{
+																FloatLiteral fl;
+																$$ = fl;
+																DEBUG("[Literal::Float]");
+															}
 		;
 
 char_lit
-		: CHAR_LIT							{ printf("[Char Literal]"); }
+		: CHAR_LIT								{
+																CharLiteral cl;
+																$$ = cl;
+																DEBUG("[Literal::Char]");
+															}
 		;
 
 str_lit
-		: STR1_LITERAL						{ printf("[String1 Literal]"); }
-		| STR2_LITERAL						{ printf("[String2 Literal]"); }
-		| RSTR1_LITERAL						{ printf("[RString1 Literal]"); }
-		| RSTR2_LITERAL						{ printf("[RString2 Literal]"); }
-		| HSTR1_LITERAL						{ printf("[HString1 Literal]"); }
-		| HSTR2_LITERAL						{ printf("[HString2 Literal]"); }
-		| HRSTR1_LITERAL					{ printf("[HRString1 Literal]"); }
-		| HRSTR2_LITERAL					{ printf("[HRString2 Literal]"); }
+		: STR1_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::STR1;
+																$$ = sl;
+																DEBUG("[Literal::String::Str1]");
+															}
+		| STR2_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::STR2;
+																$$ = sl;
+																DEBUG("[Literal::String::Str2]");
+															}
+		| RSTR1_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::RSTR1;
+																$$ = sl;
+																DEBUG("[Literal::String::RStr1]");
+															}
+		| RSTR2_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::RSTR2;
+																$$ = sl;
+																DEBUG("[Literal::String::RStr2]");
+															}
+		| HSTR1_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::HSTR1;
+																$$ = sl;
+																DEBUG("[Literal::String::HStr1]");
+															}
+		| HSTR2_LITERAL						{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::HSTR2;
+																$$ = sl;
+																DEBUG("[Literal::String::HStr2]");
+															}
+		| HRSTR1_LITERAL					{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::HRSTR1;
+																$$ = sl;
+																DEBUG("[Literal::String::HRStr1]");
+															}
+		| HRSTR2_LITERAL					{
+																StringLiteral sl;
+																sl.type = StringLiteral::types::HRSTR2;
+																$$ = sl;
+																DEBUG("[Literal::String::HRStr2]");
+															}
 		;
 
 ptr_lit
-		: PTR_NULL							{ printf("[Null]"); }
+		: PTR_NULL								{
+																PointerLiteral pl;
+																$$ = pl;
+																DEBUG("[Literal::Pointer]");
+															}
 		;
 
 func_lit
-		: DEF func_sign block
+		: DEF func_sign block			{
+																FunctionLiteral fnl;
+																$$ = fnl;
+																DEBUG("[Literal::Function]");
+															}
 		;
 
 composite_lit
-		: IDENTIFIER '{' composite_list '}'	{ printf("[Composite Literal]"); }
+		: IDENTIFIER '{' composite_list '}'
+															{
+																CompositeLiteral complt;
+																$$ = complt;
+																DEBUG("[Literal::Composite]");
+															}
 		;
 
 composite_list
@@ -345,7 +663,7 @@ tupple_item
 /******************************* COMPOSITE TYPE DEFINITION ********************************/
 /******************************************************************************************/
 
-type_defn
+composite_type_defn
 		: struct_defn
 		| union_defn
 		| enum_defn
@@ -353,19 +671,19 @@ type_defn
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' field_decl '}'		{ printf("[Struct Defn]"); }
+		: STRUCT IDENTIFIER '{' field_decl '}'		{ DEBUG("[Struct Defn]"); }
 		;
 
 union_defn
-		: UNION IDENTIFIER '{' field_decl '}'		{ printf("[Union Defn]"); }
+		: UNION IDENTIFIER '{' field_decl '}'		{ DEBUG("[Union Defn]"); }
 		;
 
 enum_defn
-		: ENUM IDENTIFIER '{' enum_fields '}'		{ printf("[Enum Defn]"); }
+		: ENUM IDENTIFIER '{' enum_fields '}'		{ DEBUG("[Enum Defn]"); }
 		;
 
 option_defn
-		: OPTION IDENTIFIER '{' field_decl '}'		{ printf("[Option Defn]"); }
+		: OPTION IDENTIFIER '{' field_decl '}'		{ DEBUG("[Option Defn]"); }
 		;
 
 field_decl
@@ -383,30 +701,30 @@ enum_fields
 /******************************************************************************************/
 
 arith_op
-		: PLUS								{ printf("[+]"); }
-		| MINUS								{ printf("[-]"); }
-		| MULTIPLY							{ printf("[-]"); }
-		| DIVIDE							{ printf("[/]"); }
-		| MODULUS							{ printf("[%%]"); }
+		: PLUS								{ DEBUG("[+]"); }
+		| MINUS								{ DEBUG("[-]"); }
+		| MULTIPLY							{ DEBUG("[-]"); }
+		| DIVIDE							{ DEBUG("[/]"); }
+		| MODULUS							{ DEBUG("[%%]"); }
 		;
 
 shift_op
-		: RIGHT_SHIFT						{ printf("[<<]"); }
-		| LEFT_SHIFT						{ printf("[>>]"); }
-		| RIGHT_SHIFT_US					{ printf("[<<<]"); }
-		| LEFT_SHIFT_US						{ printf("[>>>]"); }
+		: RIGHT_SHIFT						{ DEBUG("[<<]"); }
+		| LEFT_SHIFT						{ DEBUG("[>>]"); }
+		| RIGHT_SHIFT_US					{ DEBUG("[<<<]"); }
+		| LEFT_SHIFT_US						{ DEBUG("[>>>]"); }
 		;
 
 logical_op
-		: LOGICAL_AND						{ printf("[&&]"); }
-		| LOGICAL_OR						{ printf("[||]"); }
+		: LOGICAL_AND						{ DEBUG("[&&]"); }
+		| LOGICAL_OR						{ DEBUG("[||]"); }
 		;
 
 assign_op
-		: EQUAL_TO							{ printf("[=]"); }
-		| arith_op EQUAL_TO					{ printf("[Arith =]"); }
-		| shift_op EQUAL_TO					{ printf("[Shift =]"); }
-		| logical_op EQUAL_TO				{ printf("[Logical =]"); }
+		: EQUAL_TO							{ DEBUG("[=]"); }
+		| arith_op EQUAL_TO					{ DEBUG("[Arith =]"); }
+		| shift_op EQUAL_TO					{ DEBUG("[Shift =]"); }
+		| logical_op EQUAL_TO				{ DEBUG("[Logical =]"); }
 		;
 
 /******************************************************************************************/
@@ -414,7 +732,7 @@ assign_op
 /******************************************************************************************/
 
 assignment_stmt
-		: l_value_list assign_op expression			{ printf("[Assign stmt]"); }
+		: l_value_list assign_op expression			{ DEBUG("[Assign stmt]"); }
 		;
 
 l_value_list
@@ -424,62 +742,62 @@ l_value_list
 
 l_value
 		: qualified_ident
-		| U_ADD_OF unary_expr				{ printf("[@]"); }
-		| U_POINTER unary_expr				{ printf("[$]"); }
-		| operand index						{ printf("[LHS Array Index]"); }
+		| U_ADD_OF unary_expr				{ DEBUG("[@]"); }
+		| U_POINTER unary_expr				{ DEBUG("[$]"); }
+		| operand index						{ DEBUG("[LHS Array Index]"); }
 		;
 
 expression
-		: unary_expr						{ printf("[Unary Expr]"); }
-		| binary_expr						{ printf("[Binary Expr]"); }
+		: unary_expr						{ DEBUG("[Unary Expr]"); }
+		| binary_expr						{ DEBUG("[Binary Expr]"); }
 		;
 
 binary_expr
-		: expression PLUS expression				{ printf("[+]"); }
-		| expression MINUS expression				{ printf("[-]"); }
-		| expression MULTIPLY expression			{ printf("[*]"); }
-		| expression DIVIDE expression				{ printf("[/]"); }
-		| expression MODULUS expression				{ printf("[%%]"); }
-		| expression RIGHT_SHIFT expression			{ printf("[>>]"); }
-		| expression LEFT_SHIFT expression			{ printf("[<<]"); }
-		| expression RIGHT_SHIFT_US expression		{ printf("[>>>]"); }
-		| expression LEFT_SHIFT_US expression		{ printf("[<<<]"); }
-		| expression LOGICAL_AND expression			{ printf("[&]"); }
-		| expression LOGICAL_OR expression			{ printf("[|]"); }
-		| expression IS_EQUAL expression			{ printf("[==]"); }
-		| expression IS_NOT_EQUAL expression		{ printf("[!=]"); }
-		| expression IS_LESS expression				{ printf("[<]"); }
-		| expression IS_GREATER expression			{ printf("[>]"); }
-		| expression IS_LESS_OR_EQ expression		{ printf("[<=]"); }
-		| expression IS_GREATER_OR_EQ expression	{ printf("[>=]"); }
-		| expression BITWISE_AND expression			{ printf("[&&]"); }
-		| expression BITWISE_OR expression			{ printf("[||]"); }
-		| expression BITWISE_NOT expression			{ printf("[^]"); }
-		| expression BITWISE_XOR expression			{ printf("[&^\n"); }
+		: expression PLUS expression				{ DEBUG("[+]"); }
+		| expression MINUS expression				{ DEBUG("[-]"); }
+		| expression MULTIPLY expression			{ DEBUG("[*]"); }
+		| expression DIVIDE expression				{ DEBUG("[/]"); }
+		| expression MODULUS expression				{ DEBUG("[%%]"); }
+		| expression RIGHT_SHIFT expression			{ DEBUG("[>>]"); }
+		| expression LEFT_SHIFT expression			{ DEBUG("[<<]"); }
+		| expression RIGHT_SHIFT_US expression		{ DEBUG("[>>>]"); }
+		| expression LEFT_SHIFT_US expression		{ DEBUG("[<<<]"); }
+		| expression LOGICAL_AND expression			{ DEBUG("[&]"); }
+		| expression LOGICAL_OR expression			{ DEBUG("[|]"); }
+		| expression IS_EQUAL expression			{ DEBUG("[==]"); }
+		| expression IS_NOT_EQUAL expression		{ DEBUG("[!=]"); }
+		| expression IS_LESS expression				{ DEBUG("[<]"); }
+		| expression IS_GREATER expression			{ DEBUG("[>]"); }
+		| expression IS_LESS_OR_EQ expression		{ DEBUG("[<=]"); }
+		| expression IS_GREATER_OR_EQ expression	{ DEBUG("[>=]"); }
+		| expression BITWISE_AND expression			{ DEBUG("[&&]"); }
+		| expression BITWISE_OR expression			{ DEBUG("[||]"); }
+		| expression BITWISE_NOT expression			{ DEBUG("[^]"); }
+		| expression BITWISE_XOR expression			{ DEBUG("[&^\n"); }
 		;
 
 unary_expr
-		: U_NOT unary_expr					{ printf("[!]"); }
-		| U_2COMP unary_expr				{ printf("[~]"); }
-		| U_ADD_OF unary_expr				{ printf("[@]"); }
-		| MULTIPLY unary_expr				{ printf("[$]"); }
-		| PLUS unary_expr					{ printf("[+a]"); }
-		| MINUS unary_expr					{ printf("[-a]"); }
-		| '(' expression ')'				{ printf("[( )]"); }
+		: U_NOT unary_expr					{ DEBUG("[!]"); }
+		| U_2COMP unary_expr				{ DEBUG("[~]"); }
+		| U_ADD_OF unary_expr				{ DEBUG("[@]"); }
+		| MULTIPLY unary_expr				{ DEBUG("[$]"); }
+		| PLUS unary_expr					{ DEBUG("[+a]"); }
+		| MINUS unary_expr					{ DEBUG("[-a]"); }
+		| '(' expression ')'				{ DEBUG("[( )]"); }
 		| operand
 		;
 
 operand
 		: literal
 		| qualified_ident
-		| operand index						{ printf("[Array Index]"); }
-		| operand arguments					{ printf("[Function Call]"); }
+		| operand index						{ DEBUG("[Array Index]"); }
+		| operand arguments					{ DEBUG("[Function Call]"); }
 		;
 
 qualified_ident
-		: IDENTIFIER								{ printf("[Identifier]"); }
-		| qualified_ident '.' IDENTIFIER			{ printf("[X.Y]"); }
-		| qualified_ident PTR_MEMBER IDENTIFIER		{ printf("[X~>Y]"); }
+		: IDENTIFIER								{ DEBUG("[Identifier]"); }
+		| qualified_ident '.' IDENTIFIER			{ DEBUG("[X.Y]"); }
+		| qualified_ident PTR_MEMBER IDENTIFIER		{ DEBUG("[X~>Y]"); }
 		;
 
 index
@@ -502,17 +820,33 @@ expression_list
 
 var_decl
 		: type IDENTIFIER
+														{
+															VarDecl v;
+															v.type = &$1;
+															v.ident = $2;
+															v.lit = NULL;
+															$$ = v;
+															DEBUG("[VarDecl::Identifier]");
+														}
 		| type IDENTIFIER EQUAL_TO literal
+														{
+															VarDecl v;
+															v.type = &$1;
+															v.ident = $2;
+															v.lit = &$4;
+															$$ = v;
+															DEBUG("[VarDecl::Literal::Identifier]");
+														}
 		;
 
 expression_stmt
-		: operand arguments					{ printf("[Function Call]"); }
+		: operand arguments					{ DEBUG("[Function Call]"); }
 		;
 
 iteration
-		: for_stmt							{ printf("[For Stmt]"); }
-		| while_stmt						{ printf("[While Stmt]"); }
-		| dowhile_stmt						{ printf("[DoWhile Stmt]"); }
+		: for_stmt							{ DEBUG("[For Stmt]"); }
+		| while_stmt						{ DEBUG("[While Stmt]"); }
+		| dowhile_stmt						{ DEBUG("[DoWhile Stmt]"); }
 		;
 
 for_stmt
@@ -551,8 +885,8 @@ defer_stmt
 		;
 
 selection
-		: if_stmt							{ printf("[If Stmt]"); }
-		| switch_stmt						{ printf("[Switch Stmt]"); }
+		: if_stmt							{ DEBUG("[If Stmt]"); }
+		| switch_stmt						{ DEBUG("[Switch Stmt]"); }
 		;
 
 if_stmt
@@ -593,20 +927,35 @@ case_cond
 		;
 
 jump_stmt
-		: GOTO IDENTIFIER					{ printf("[Goto]"); }
-		| CONTINUE							{ printf("[Continue]"); }
-		| BREAK								{ printf("[Break]"); }
-		| RETURN							{ printf("[Return]"); }
-/*		| RETURN expression_list			{ printf("[Return Expr]"); } */
+		: GOTO IDENTIFIER					{ DEBUG("[Goto]"); }
+		| CONTINUE							{ DEBUG("[Continue]"); }
+		| BREAK								{ DEBUG("[Break]"); }
+		| RETURN							{ DEBUG("[Return]"); }
+/*		| RETURN expression_list			{ DEBUG("[Return Expr]"); } */
 		;
 
 %%
 
 int main() {
+	llvm::LLVMContext TheContext;
+	llvm::IRBuilder<> Builder(TheContext); // Helper to generate LLVM instructions
+	std::unique_ptr<llvm::Module> TheModule; // Top level structure that contains functions and global variables
+	std::map<std::string, llvm::Value *> NamedValues; // Contains values defined in current scope
+
+	// Make the module, which holds all the code.
+  TheModule = std::make_unique<llvm::Module>("carbon module", TheContext);
+
+	//llvm::FunctionType *mainFunctionType = llvm::FunctionType::get(Builder.getVoidTy(), false);
+	//llvm::Function* mainFunction = llvm::Function::Create(mainFunctionType, llvm::GlobalValue::ExternalLinkage, "mainfunction", TheModule));
+
+	llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "start");
+	Builder.SetInsertPoint(BB);
+
 	yy::Lexer lexer(std::cin);
 	yy::parser parser(lexer);
 	parser.parse();
-	//programBlock.codeGen();
+	programBlock.codeGen(TheContext, Builder);
+	TheModule->print(llvm::errs(), nullptr);
 	return 0;
 }
 
