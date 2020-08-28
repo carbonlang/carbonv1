@@ -32,7 +32,7 @@ class SourceFile {
 
 class TopLevel {
 	public:
-		llvm::Value* codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
+		llvm::Value* codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, std::unique_ptr<llvm::Module>& module);
 };
 
 class ImportDecl {

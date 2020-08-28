@@ -19,7 +19,7 @@
 //void TopLevel::codeGen() {
 	//std::cout << "I am the king !";
 //}
-llvm::Value* TopLevel::codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder) {
+llvm::Value* TopLevel::codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, std::unique_ptr<llvm::Module>& module) {
 	llvm::Value *L = llvm::ConstantFP::get(context, llvm::APFloat(10.0));
 	llvm::Value *R = llvm::ConstantFP::get(context, llvm::APFloat(20.0));
 	return builder.CreateFAdd(L, R, "addtmp");

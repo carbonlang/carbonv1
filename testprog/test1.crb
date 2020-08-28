@@ -20,6 +20,7 @@ extend GlobalPerson {
 }
 
 def main(int a, bool b) -> (int) {
+	static atomic bool isActive = false
 	const bool b = false
 	register int i1 = 2x110011100
 	int i2 = 8x1237

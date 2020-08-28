@@ -3,13 +3,13 @@ CXX=c++
 all: carbon
 
 OBJS+= ast.o parser.o lexer.o
-LOCALBASE= /usr/local
-CFLAGS+= -Wall -I${LOCALBASE}/include
+LOCALBASE=/home/ps/git-repos/RE-flex
+CFLAGS+= -Wall -g -I${LOCALBASE}/include
 LDFLAGS+= -L${LOCALBASE}/lib -lreflex
-LLVMCONFIG=`llvm-config-10 --libs core native --cxxflags --ldflags` -fexceptions -O0 -Wno-unused-but-set-variable
+LLVMCONFIG=`llvm-config --libs core native --cxxflags --ldflags` -fexceptions -O0 -Wno-unused-but-set-variable
 
 carbon: ${OBJS}
-	${CXX} -o $@ ${OBJS} ${LDFLAGS} ${LLVMCONFIG}
+	${CXX} -g -o $@ ${OBJS} ${LDFLAGS} ${LLVMCONFIG}
 
 lexer.o: lexer.cc parser.cc
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<

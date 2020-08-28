@@ -49,14 +49,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> NAMESAPCE
 %token <int> IMPORT FROM AS
 %token <int> STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
-%token <std::string> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
+%token <int> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
 %token <int> FUNC_RETURN
-%token <std::string> IDENTIFIER
+%token <int> IDENTIFIER
 %token <int> DEF
-%token <std::string> BOOL CHAR BYTE
-%token <std::string> INT INT8 INT16 INT32 INT64 UINT UINT8 UINT16 UINT32 UINT64
-%token <std::string> FLOAT32 FLOAT64 FLOAT128
-%token <std::string> STRING
+%token <int> BOOL CHAR BYTE
+%token <int> INT INT8 INT16 INT32 INT64 UINT UINT8 UINT16 UINT32 UINT64
+%token <int> FLOAT32 FLOAT64 FLOAT128
+%token <int> STRING
 %token <int> POINTER
 %token <int> TYPE STRUCT UNION ENUM OPTION
 %token <int> EXTEND
@@ -86,21 +86,21 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
 
-%type <TopLevel> top_level
-%type <Storage> storage_class
-%type <TypeQualifier> type_qualifier
-%type <TypeName> type_name
-%type <Type> type
-%type <VarDecl> var_decl
-%type <Literal> literal
-%type <BooleanLiteral> bool_lit
-%type <IntegerLiteral> int_lit
-%type <FloatLiteral> float_lit
-%type <CharLiteral> char_lit
-%type <StringLiteral> str_lit
-%type <PointerLiteral> ptr_lit
-%type <FunctionLiteral> func_lit
-%type <CompositeLiteral> composite_lit
+%nterm <TopLevel> top_level
+%nterm <Storage> storage_class
+%nterm <TypeQualifier> type_qualifier
+%nterm <TypeName> type_name
+%nterm <Type> type
+%nterm <VarDecl> var_decl
+%nterm <Literal> literal
+%nterm <BooleanLiteral> bool_lit
+%nterm <IntegerLiteral> int_lit
+%nterm <FloatLiteral> float_lit
+%nterm <CharLiteral> char_lit
+%nterm <StringLiteral> str_lit
+%nterm <PointerLiteral> ptr_lit
+%nterm <FunctionLiteral> func_lit
+%nterm <CompositeLiteral> composite_lit
 
 %start source_file
 
@@ -937,25 +937,69 @@ jump_stmt
 %%
 
 int main() {
-	llvm::LLVMContext TheContext;
-	llvm::IRBuilder<> Builder(TheContext); // Helper to generate LLVM instructions
-	std::unique_ptr<llvm::Module> TheModule; // Top level structure that contains functions and global variables
+
+	//  LLVMContext owns a lot of core LLVM data structures, such as the type and constant value tables.
+	llvm::LLVMContext Context;
+
+	// IRBuilder is a helper to generate LLVM instructions
+	llvm::IRBuilder<> Builder(Context);
+
+	// Top level structure that contains functions and global variables
+	std::unique_ptr<llvm::Module> Module;
+
 	std::map<std::string, llvm::Value *> NamedValues; // Contains values defined in current scope
 
 	// Make the module, which holds all the code.
-  TheModule = std::make_unique<llvm::Module>("carbon module", TheContext);
+	Module = llvm::make_unique<llvm::Module>("carbon module", Context);
 
-	//llvm::FunctionType *mainFunctionType = llvm::FunctionType::get(Builder.getVoidTy(), false);
-	//llvm::Function* mainFunction = llvm::Function::Create(mainFunctionType, llvm::GlobalValue::ExternalLinkage, "mainfunction", TheModule));
+	// https://riptutorial.com/llvm/example/29450/compilation-of-a-simple-function-in-llvm-4-0
 
-	llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "start");
+	// Define function's signature
+	std::vector<llvm::Type *> arg_types = {
+			llvm::Type::getInt32Ty(Context),
+			llvm::Type::getInt32Ty(Context)};
+
+		llvm::FunctionType *funcType = llvm::FunctionType::get(
+			llvm::Type::getInt32Ty(Context), arg_types, false);
+
+	// create the function "sum" and bind it to the module with ExternalLinkage,
+	// so we can retrieve it later
+	auto *fooFunc = llvm::Function::Create(
+			funcType, llvm::Function::ExternalLinkage, "sum", Module.get()
+	);
+
+	// Define the entry block and fill it with an appropriate code
+	// auto *entry = BasicBlock::Create(context, "entry", fooFunc);
+	// builder.SetInsertPoint(entry);
+	llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
 	Builder.SetInsertPoint(BB);
+
+	// Add constant to itself, to visualize constant folding
+	llvm::Value *constant = llvm::ConstantInt::get(Builder.getInt32Ty(), 0x1);
+	auto *sum1 = Builder.CreateAdd(constant, constant, "sum1");
+
+	// Retrieve arguments and proceed with further adding...
+	auto args = fooFunc->arg_begin();
+	llvm::Value *arg1 = &(*args);
+	args = std::next(args);
+	llvm::Value *arg2 = &(*args);
+	auto *sum2 = Builder.CreateAdd(sum1, arg1, "sum2");
+	auto *result = Builder.CreateAdd(sum2, arg2, "result");
+
+	// ...and return
+	Builder.CreateRet(result);
+
+	// Verify at the end
+	verifyFunction(*fooFunc);
+
+	// llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "start");
+	// Builder.SetInsertPoint(BB);
 
 	yy::Lexer lexer(std::cin);
 	yy::parser parser(lexer);
 	parser.parse();
-	programBlock.codeGen(TheContext, Builder);
-	TheModule->print(llvm::errs(), nullptr);
+	programBlock.codeGen(Context, Builder, Module);
+	Module->print(llvm::errs(), nullptr);
 	return 0;
 }
 
