@@ -13,6 +13,15 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
 
+extern llvm::LLVMContext Context;
+extern llvm::IRBuilder<> Builder;
+extern std::unique_ptr<llvm::Module> Module;
+
+class TopLevel;
+
+class FunctionDefn;
+class Block;
+
 class Type;
 class Storage;
 class TypeQualifier;
@@ -27,12 +36,28 @@ class PointerLiteral;
 class FunctionLiteral;
 class CompositeLiteral;
 
+class Statements;
+class Statement;
+class VarDeclStmt;
+class CompositeTypeDefnStmt;
+class ExpressionStmt;
+class AssignmentStmt;
+class SelectionStmt;
+class IterationStmt;
+class JumpStmt;
+class DeferStmt;
+
 class SourceFile {
+	public:
+		std::list<TopLevel *> t;
+		void codeGen();
 };
 
 class TopLevel {
 	public:
-		llvm::Value* codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, std::unique_ptr<llvm::Module>& module);
+		enum types { IMPORT_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC, NAMESPACE_DEFN, FUNC_DEFN } type;
+		FunctionDefn *fd;
+		void codeGen();
 };
 
 class ImportDecl {
@@ -64,7 +89,9 @@ class NamespaceDefn {
 };
 
 class FunctionDefn {
-
+	public:
+		Block *b;
+		void codeGen();
 };
 
 class FunctionSign {
@@ -124,18 +151,33 @@ class AccessModifier {
 };
 
 class Block {
-
+	public:
+		Statements *s = NULL;
+		void codeGen();
 };
 
 class Statements {
-
+	public:
+		bool is_set = false;
+		std::list<Statement *> s;
+		void codeGen();
 };
 
 class Statement {
-
+	public:
+		enum types { VAR_DECL, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
+			ITERATION, JUMP, DEFER } type;
+		VarDeclStmt *vds;
+		CompositeTypeDefnStmt *ctds;
+		ExpressionStmt *es;
+		AssignmentStmt *as;
+		SelectionStmt *ss;
+		IterationStmt *is;
+		JumpStmt *js;
+		DeferStmt *ds;
 };
 
-class VarDecl {
+class VarDeclStmt {
 	public:
 		std::string ident;
 		Type *type;

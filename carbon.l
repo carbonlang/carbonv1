@@ -188,6 +188,6 @@ ident			  {letter}({letter}|{dec_digit})*
 "defer"						{ return yy::parser::token::DEFER; }
 "extend"					{ return yy::parser::token::EXTEND; }
 
-{ident}						{ return yy::parser::token::IDENTIFIER; }
+{ident}						{ yylval.build<std::string>(text()); return yy::parser::token::IDENTIFIER; }
 
 %%

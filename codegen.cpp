@@ -1,6 +1,5 @@
 CodeGen::generate() {
   public :
-		void generate() {
-
+		void generate(Ast& a) {
     }
 }

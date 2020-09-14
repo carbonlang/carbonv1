@@ -14,13 +14,38 @@
 
 #include "ast.h"
 
-//extern llvm::LLVMContext context;
+void SourceFile::codeGen() {
+	std::list<TopLevel *>::iterator tli;
+	for (tli = t.begin(); tli != t.end(); ++tli) {
+			(*tli)->codeGen();
+	}
+}
 
-//void TopLevel::codeGen() {
-	//std::cout << "I am the king !";
-//}
-llvm::Value* TopLevel::codeGen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, std::unique_ptr<llvm::Module>& module) {
-	llvm::Value *L = llvm::ConstantFP::get(context, llvm::APFloat(10.0));
-	llvm::Value *R = llvm::ConstantFP::get(context, llvm::APFloat(20.0));
-	return builder.CreateFAdd(L, R, "addtmp");
+void TopLevel::codeGen() {
+	if (type == TopLevel::types::FUNC_DEFN) {
+		fd->codeGen();
+	}
+}
+
+void FunctionDefn::codeGen() {
+	if (b) {
+		b->codeGen();
+	}
+}
+
+void Block::codeGen() {
+	if (s) {
+		s->codeGen();
+	}
+}
+
+void Statements::codeGen() {
+	//std::cout << "CG" << "\n";
+	//std::list<Statement *>::iterator si;
+	//for (si = s.begin(); si != s.end(); ++si){
+	    //if ((*si)->type == Statement::types::VAR_DECL) {
+			//	std::cout << "STMT"  << "\n";
+				//(*si)->vds->codeGen();
+			//}
+	//}
 }
