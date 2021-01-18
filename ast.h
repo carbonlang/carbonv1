@@ -16,6 +16,7 @@
 extern llvm::LLVMContext Context;
 extern llvm::IRBuilder<> Builder;
 extern std::unique_ptr<llvm::Module> Module;
+extern llvm::BasicBlock *BB;
 
 class TopLevel;
 
@@ -182,6 +183,7 @@ class VarDeclStmt {
 		std::string ident;
 		Type *type;
 		Literal *lit;
+		void codeGen();
 };
 
 class ExpressionStmt {
@@ -313,12 +315,14 @@ class BooleanLiteral {
 class IntegerLiteral {
 	public:
 		enum types { BINARY, OCTAL, DECIMAL, HEX } type;
-		int integer_literal;
+		long value = 0;
+		int reg_size = 0;
 };
 
 class FloatLiteral {
 	public:
-		double float_literal;
+		double value;
+		int reg_size = 0;
 };
 
 class CharLiteral {

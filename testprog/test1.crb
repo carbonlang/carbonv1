@@ -20,19 +20,23 @@ extend GlobalPerson {
 }
 
 def main(int a, bool b) -> (int) {
-	static atomic bool isActive = false
-	const bool b = false
-	register int i1 = 2x110011100
-	int i2 = 8x1237
-	int i3 = 10x233
-	int i4 = 16x1FF4ED
-	int i5 = 3454
-	int i6 = -12
-	int i7 = +12
-	int i8 = -16x1FF4ED
+	bool a
+	bool b = false
+	int in1
+	int in2 = 8x1237
+	int8 i3 = 10x233
+	int16 i4 = 16x1FF4ED
+	int32 i5 = 3454
+	int64 i6 = -12
+	uint i7 = +12
+	uint8 i8 = -16x1FF4ED
+	uint16 i9 = 16x1FF4ED
+	uint32 i10 = 3454
+	uint64 i11 = -12
+
 	float32 f1 = 123.45
-	float32 f1 = 123e7
-	float32 f1 = 123.456e-67
+	float64 f1 = 123e7
+	float128 f1 = 123.456e-67
 	char c1 = 'a'
 	char c2 = '\n'
 	char c3 = 25
@@ -45,6 +49,11 @@ def main(int a, bool b) -> (int) {
 	string s8 = '''this is a test'''
 	string s7 = """this is a test"""
 	ptr : int p1 = null
+
+	static atomic bool isActive = true
+	const int age = 200
+	register int i1 = 2x1100111011001110
+
 	struct Person {
 		int age
 		char gender
@@ -131,6 +140,7 @@ def main(int a, bool b) -> (int) {
 }
 
 public def run(int a, int b) -> () {
+	int z = 0
 	return
 }
 

@@ -44,6 +44,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	// #define DEBUG(str) std::cout << str
 	#define DEBUG(str) ;
+	#define ERR(str) std::cout << str
 
 	SourceFile sf;
 
@@ -53,6 +54,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	llvm::IRBuilder<> Builder(Context);
 	// Top level structure that contains functions and global variables
 	std::unique_ptr<llvm::Module> Module;
+	// Basic block
+	llvm::BasicBlock *BB;
 }
 
 %token <int> NAMESAPCE
@@ -73,7 +76,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> PTR_NULL
 %token <int> REGISTER STATIC
 %token <int> CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
-%token <int> BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT FLOAT_LIT CHAR_LIT
+%token <std::string> BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT
+%token <int> FLOAT_LIT CHAR_LIT
 
 %token <int> EQUAL_TO
 %token <int> PLUS MINUS MULTIPLY DIVIDE MODULUS
@@ -444,19 +448,14 @@ func_ret_type
 
 statements
 		: statements statement		{
-																$$ = new Statements();
-																//if (!$$) {
-																//	$$ = new Statements();
-																//}
-																//$$->s.push_back($2);
+																$1->s.push_back($2);
+																$$ = $1;
 																DEBUG("[Statements]");
 															}
 		| statement								{
 																$$ = new Statements();
-																//if (!$$) {
-																//	$$ = new Statements();
-																//}
-																//$$->s.push_back($1);
+																$$->is_set = true;
+																$$->s.push_back($1);
 																DEBUG("[Statements]");
 															}
 		;
@@ -586,21 +585,74 @@ int_lit
 		: BINARY_LIT							{
 																$$ = new IntegerLiteral();
 																$$->type = IntegerLiteral::types::BINARY;
+
+																std::string bin_str = $1;
+																bin_str.erase(0, 2);
+
+																int len = bin_str.length();
+																if (len <= 8) {
+																	$$->reg_size = 8;
+																} else if (len <= 16) {
+																	$$->reg_size = 16;
+																} else if (len <= 32) {
+																	$$->reg_size = 32;
+																} else if (len <= 64) {
+																	$$->reg_size = 64;
+																} else {
+																	ERR("Size of binary number is too large");
+																}
+
+																$$->value = stol(bin_str, nullptr, 2);
+
 																DEBUG("[Literal::Integer::Binary]");
 															}
 		| OCTAL_LIT								{
 																$$ = new IntegerLiteral();
 																$$->type = IntegerLiteral::types::OCTAL;
+
+																std::string oct_str = $1;
+																oct_str.erase(0, 2);
+
+																$$->reg_size = 64;
+
+																$$->value = stol(oct_str, nullptr, 8);
+
 																DEBUG("[Literal::Integer::Octal]");
 															}
 		| DECIMAL_LIT							{
 																$$ = new IntegerLiteral();
 																$$->type = IntegerLiteral::types::DECIMAL;
+
+																std::string dec_str = $1;
+
+																$$->reg_size = 64;
+
+																$$->value = stol(dec_str, nullptr, 10);
+
 																DEBUG("[Literal::Integer::Decimal]");
 															}
 		| HEX_LIT									{
 																$$ = new IntegerLiteral();
 																$$->type = IntegerLiteral::types::HEX;
+
+																std::string hex_str = $1;
+																hex_str.erase(0, 3);
+
+																int len = hex_str.length();
+																if (len <= 2) {
+																	$$->reg_size = 8;
+																} else if (len <= 4) {
+																	$$->reg_size = 16;
+																} else if (len <= 8) {
+																	$$->reg_size = 32;
+																} else if (len <= 16) {
+																	$$->reg_size = 64;
+																} else {
+																	ERR("Size of hex number is too large");
+																}
+
+																$$->value = stol(hex_str, nullptr, 16);
+
 																DEBUG("[Literal::Integer::Hex]");
 															}
 		;
@@ -882,17 +934,17 @@ var_decl_stmt
 		: type IDENTIFIER
 														{
 															$$ = new VarDeclStmt();
-															//$$->type = $1;
-															//$$->ident = $2;
+															$$->type = $1;
+															$$->ident = $2;
 															$$->lit = NULL;
 															DEBUG("[VarDeclStmt::Identifier]");
 														}
 		| type IDENTIFIER EQUAL_TO literal
 														{
-															VarDeclStmt v;
-															//$$->type = $1;
-															//$$->ident = $2;
-															//$$->lit = $4;
+															$$ = new VarDeclStmt();
+															$$->type = $1;
+															$$->ident = $2;
+															$$->lit = $4;
 															DEBUG("[VarDeclStmt::Literal::Identifier]");
 														}
 		;
@@ -1018,7 +1070,8 @@ int main() {
 	);
 
 	// Define the entry block and fill it with an appropriate code
-	llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
+	//llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
+	BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
 	Builder.SetInsertPoint(BB);
 
 	// Add constant to itself, to visualize constant folding
