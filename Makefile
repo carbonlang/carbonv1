@@ -6,7 +6,7 @@ OBJS+= ast.o parser.o lexer.o
 LOCALBASE= /usr/local
 CFLAGS+= -Wall -I${LOCALBASE}/include
 LDFLAGS+= -L${LOCALBASE}/lib -lreflex
-LLVMCONFIG=`llvm-config-10 --libs core native --cxxflags --ldflags` -fexceptions
+LLVMCONFIG=`llvm-config-11 --libs core native --cxxflags --ldflags` -fexceptions
 
 carbon: ${OBJS}
 	${CXX} -o $@ ${OBJS} ${LDFLAGS} ${LLVMCONFIG}
