@@ -29,6 +29,7 @@ ast.o: ast.cpp
 clean:
 	rm -f lexer.cc lexer.hh lex.yy.h
 	rm -f parser.cc parser.hh location.hh position.hh stack.hh
+	rm -f y.tab.c y.tab.h y.output lex.yy.cpp
 	rm -f ast.o
 	rm -f carbon *.o *~
 

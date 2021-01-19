@@ -42,7 +42,7 @@ void Block::codeGen() {
 void Statements::codeGen() {
 	std::list<Statement *>::iterator si;
 	for (si = s.begin(); si != s.end(); ++si) {
-    if ((*si)->type == Statement::types::VAR_DECL) {
+		if ((*si)->type == Statement::types::VAR_DECL) {
 			(*si)->vds->codeGen();
 		}
 	}

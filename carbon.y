@@ -126,70 +126,81 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 source_file
 		: source_file top_level		{
-																sf.t.push_back($2);
-																DEBUG("[SourceFile]");
-															}
-		| top_level								{
-																sf.t.push_back($1);
-																DEBUG("[SourceFile]");
-															}
+							sf.t.push_back($2);
+							DEBUG("[SourceFile]");
+						}
+		| top_level			{
+							sf.t.push_back($1);
+							DEBUG("[SourceFile]");
+						}
 		;
 
 top_level
-		: import_decl							{
-																$$ = new TopLevel();
-																$$->type = TopLevel::types::IMPORT_DECL;
-																// $$->fd = $1;
-																DEBUG("[TopLevel::ImportDecl]");
-															}
-		| composite_type_defn			{
-																$$ = new TopLevel();
-																$$->type = TopLevel::types::COMPOSITE_TYPE_DEFN;
-																// $$->fd = $1;
-																DEBUG("[TopLevel::CompositeTypeDefn]");
-															}
-		| type_func								{
-																$$ = new TopLevel();
-																$$->type = TopLevel::types::TYPE_FUNC;
-																// $$->fd = $1;
-																DEBUG("[TopLevel::TypeFunction]");
-															}
-		| namespace_defn					{
-																$$ = new TopLevel();
-																$$->type = TopLevel::types::NAMESPACE_DEFN;
-																// $$->fd = $1;
-																DEBUG("[TopLevel::NamespaceDefn]");
-															}
-		| func_defn								{
-																$$ = new TopLevel();
-																$$->type = TopLevel::types::FUNC_DEFN;
-																$$->fd = $1;
-																DEBUG("[TopLevel::FunctionDefn]");
-															}
+		: import_decl			{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::IMPORT_DECL;
+							// $$->fd = $1;
+							DEBUG("[TopLevel::ImportDecl]");
+						}
+		| composite_type_defn		{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::COMPOSITE_TYPE_DEFN;
+							// $$->fd = $1;
+							DEBUG("[TopLevel::CompositeTypeDefn]");
+						}
+		| type_func			{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::TYPE_FUNC;
+							// $$->fd = $1;
+							DEBUG("[TopLevel::TypeFunction]");
+						}
+		| namespace_defn		{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::NAMESPACE_DEFN;
+							// $$->fd = $1;
+							DEBUG("[TopLevel::NamespaceDefn]");
+						}
+		| func_defn			{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::FUNC_DEFN;
+							$$->fd = $1;
+							DEBUG("[TopLevel::FunctionDefn]");
+						}
 		;
 
 import_decl
-		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL		{ DEBUG("[Import From As]"); }
-		| IMPORT STR1_LITERAL FROM STR1_LITERAL						{ DEBUG("[Import From]"); }
-		| IMPORT STR1_LITERAL										{ DEBUG("[Import]"); }
+		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL
+						{
+							DEBUG("[Import From As]");
+						}
+		| IMPORT STR1_LITERAL FROM STR1_LITERAL
+						{
+							DEBUG("[Import From]");
+						}
+		| IMPORT STR1_LITERAL		{
+							DEBUG("[Import]");
+						}
 		;
 
 namespace_defn
-		: NAMESAPCE IDENTIFIER block 								{ DEBUG("[NS]"); }
+		: NAMESAPCE IDENTIFIER block 	{
+							DEBUG("[NS]");
+						}
+		;
 
 func_defn
 		: DEF IDENTIFIER func_sign block
-															{
-																$$ = new FunctionDefn();
-																$$->b = $4;
-																DEBUG("[FunctionDefn]");
-															}
+						{
+							$$ = new FunctionDefn();
+							$$->b = $4;
+							DEBUG("[FunctionDefn]");
+						}
 		| access_modifier DEF IDENTIFIER func_sign block
-															{
-																$$ = new FunctionDefn();
-																$$->b = $5;
-																DEBUG("[FunctionDefn]");
-															}
+						{
+							$$ = new FunctionDefn();
+							$$->b = $5;
+							DEBUG("[FunctionDefn]");
+						}
 		;
 
 access_modifier
@@ -202,16 +213,16 @@ func_sign
 		;
 
 block
-		: '{' statements '}'			{
-																$$ = new Block();
-																$$->s = $2;
-																DEBUG("[Block]");
-															}
-		| '{' '}'									{
-																$$ = new Block();
-																$$->s = NULL;
-																DEBUG("[Block]");
-															}
+		: '{' statements '}'		{
+							$$ = new Block();
+							$$->s = $2;
+							DEBUG("[Block]");
+						}
+		| '{' '}'			{
+							$$ = new Block();
+							$$->s = NULL;
+							DEBUG("[Block]");
+						}
 		;
 
 func_param_list
@@ -236,8 +247,13 @@ func_return
 		;
 
 type_func
-		: EXTEND type_name '{' func_defns '}'		{ DEBUG("[Type Function]"); }
-		| EXTEND type_name '{' '}'					{ DEBUG("[Type Function]"); }
+		: EXTEND type_name '{' func_defns '}'
+						{
+							DEBUG("[Type Function]");
+						}
+		| EXTEND type_name '{' '}'	{
+							DEBUG("[Type Function]");
+						}
 		;
 
 func_defns
@@ -251,179 +267,184 @@ func_defns
 
 type
 		: storage_class type_qualifier type_name
-														{
-															$$ = new Type();
-															$$->storage = $1;
-															$$->type_qualifier = $2;
-															$$->type_name = $3;
-															DEBUG("[Type->S::Q::T]");
-														}
+						{
+							$$ = new Type();
+							$$->storage = $1;
+							$$->type_qualifier = $2;
+							$$->type_name = $3;
+							DEBUG("[Type->S::Q::T]");
+						}
 		| storage_class type_name
-														{
-															$$ = new Type();
-															$$->storage = $1;
-															$$->type_qualifier = NULL;
-															$$->type_name = $2;
-															DEBUG("[Type->S::T]");
-														}
+						{
+							$$ = new Type();
+							$$->storage = $1;
+							$$->type_qualifier = NULL;
+							$$->type_name = $2;
+							DEBUG("[Type->S::T]");
+						}
 		| type_qualifier type_name
-														{
-															$$ = new Type();
-															$$->storage = NULL;
-															$$->type_qualifier = $1;
-															$$->type_name = $2;
-															DEBUG("[Type->Q::T]");
-														}
+						{
+							$$ = new Type();
+							$$->storage = NULL;
+							$$->type_qualifier = $1;
+							$$->type_name = $2;
+							DEBUG("[Type->Q::T]");
+						}
 		| type_name
-														{
-															$$ = new Type();
-															$$->storage = NULL;
-															$$->type_qualifier = NULL;
-															$$->type_name = $1;
-															DEBUG("[Type->T]");
-														}
+						{
+							$$ = new Type();
+							$$->storage = NULL;
+							$$->type_qualifier = NULL;
+							$$->type_name = $1;
+							DEBUG("[Type->T]");
+						}
 		;
 
 storage_class
-		: REGISTER							{
-															$$ = new Storage();
-															$$->storage = Storage::storages::REGISTER;
-															DEBUG("[Storage::Register]");
-														}
-		| STATIC								{
-															$$ = new Storage();
-															$$->storage = Storage::storages::STATIC;
-															DEBUG("[Storage::Static]");
-														}
+		: REGISTER			{
+							$$ = new Storage();
+							$$->storage = Storage::storages::REGISTER;
+							DEBUG("[Storage::Register]");
+						}
+		| STATIC			{
+							$$ = new Storage();
+							$$->storage = Storage::storages::STATIC;
+							DEBUG("[Storage::Static]");
+						}
 		;
 
 type_qualifier
-		: CONST									{
-															$$ = new TypeQualifier();
-															$$->type_qualifier = TypeQualifier::type_qualifiers::CONST;
-															DEBUG("[TypeQualifier::Const]");
-														}
-		| VOLATILE							{
-															$$ = new TypeQualifier();
-															$$->type_qualifier = TypeQualifier::type_qualifiers::VOLATILE;
-															DEBUG("[TypeQualifier::Volatile]");
-														}
-		| RESTRICT							{
-															$$ = new TypeQualifier();
-															$$->type_qualifier = TypeQualifier::type_qualifiers::RESTRICT;
-															DEBUG("[TypeQualifier::Restrict]");
-														}
-		| ATOMIC								{
-															$$ = new TypeQualifier();
-															$$->type_qualifier = TypeQualifier::type_qualifiers::ATOMIC;
-															DEBUG("[TypeQualifier::Atomic]");
-														}
-		| CONST_RESTRICT				{
-															$$ = new TypeQualifier();
-															$$->type_qualifier = TypeQualifier::type_qualifiers::CONST_RESTRICT;
-															DEBUG("[TypeQualifier::ConstRestrict]");
-														}
+		: CONST				{
+							$$ = new TypeQualifier();
+							$$->type_qualifier = TypeQualifier::type_qualifiers::CONST;
+							DEBUG("[TypeQualifier::Const]");
+						}
+		| VOLATILE			{
+							$$ = new TypeQualifier();
+							$$->type_qualifier = TypeQualifier::type_qualifiers::VOLATILE;
+							DEBUG("[TypeQualifier::Volatile]");
+						}
+		| RESTRICT			{
+							$$ = new TypeQualifier();
+							$$->type_qualifier = TypeQualifier::type_qualifiers::RESTRICT;
+							DEBUG("[TypeQualifier::Restrict]");
+						}
+		| ATOMIC			{
+							$$ = new TypeQualifier();
+							$$->type_qualifier = TypeQualifier::type_qualifiers::ATOMIC;
+							DEBUG("[TypeQualifier::Atomic]");
+						}
+		| CONST_RESTRICT		{
+							$$ = new TypeQualifier();
+							$$->type_qualifier = TypeQualifier::type_qualifiers::CONST_RESTRICT;
+							DEBUG("[TypeQualifier::ConstRestrict]");
+						}
 		;
 
 type_name
-		: BOOL									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::BOOL;
-															DEBUG("[Type::Bool]");
-														}
-		| CHAR									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::CHAR;
-															DEBUG("[Type::Char]");
-														}
-		| BYTE									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::BYTE;
-															DEBUG("[Type::Byte]");
-														}
-		| INT										{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::INT;
-															DEBUG("[Type::Int]");
-														}
-		| INT8									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::INT8;
-															DEBUG("[Type::Int8]");
-														}
-		| INT16									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::INT16;
-															DEBUG("[Type::Int16]");
-														}
-		| INT32									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::INT32;
-															DEBUG("[Type::Int32]");
-														}
-		| INT64									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::INT64;
-															DEBUG("[Type::Int64]");
-														}
-		| UINT									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::UINT;
-															DEBUG("[Type::UInt]");
-														}
-		| UINT8									{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::UINT8;
-															DEBUG("[Type::UInt8]");
-														}
-		| UINT16								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::UINT16;
-															DEBUG("[Type::UInt16]");
-														}
-		| UINT32								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::UINT32;
-															DEBUG("[Type::UInt32]");
-														}
-		| UINT64								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::UINT64;
-															DEBUG("[Type::UInt64]");
-														}
-		| FLOAT32								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::FLOAT32;
-															DEBUG("[Type::Float32]");
-														}
-		| FLOAT64								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::FLOAT64;
-															DEBUG("[Type::Float64]");
-														}
-		| FLOAT128							{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::FLOAT128;
-															DEBUG("[Type::Float128]");
-														}
-		| STRING								{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::STRING;
-															DEBUG("[Type::String]");
-														}
-		| POINTER ':' type_name
-														{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::POINTER;
-															DEBUG("[Type::Pointer]");
-														}
-/*		| tupple_type					{ DEBUG("[Tupple]"); }   */
-/*		| function_type				{ DEBUG("[Function]"); } */
-		| IDENTIFIER						{
-															$$ = new TypeName();
-															$$->type_name = TypeName::type_names::CUSTOM;
-															DEBUG("[Type::CustomType]");
-														}
+		: BOOL				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::BOOL;
+							DEBUG("[Type::Bool]");
+						}
+		| CHAR				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::CHAR;
+							DEBUG("[Type::Char]");
+						}
+		| BYTE				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::BYTE;
+							DEBUG("[Type::Byte]");
+						}
+		| INT				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT;
+							DEBUG("[Type::Int]");
+						}
+		| INT8				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT8;
+							DEBUG("[Type::Int8]");
+						}
+		| INT16				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT16;
+							DEBUG("[Type::Int16]");
+						}
+		| INT32				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT32;
+							DEBUG("[Type::Int32]");
+						}
+		| INT64				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT64;
+							DEBUG("[Type::Int64]");
+						}
+		| UINT				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT;
+							DEBUG("[Type::UInt]");
+						}
+		| UINT8				{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT8;
+							DEBUG("[Type::UInt8]");
+						}
+		| UINT16			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT16;
+							DEBUG("[Type::UInt16]");
+						}
+		| UINT32			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT32;
+							DEBUG("[Type::UInt32]");
+						}
+		| UINT64			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT64;
+							DEBUG("[Type::UInt64]");
+						}
+		| FLOAT32			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT32;
+							DEBUG("[Type::Float32]");
+						}
+		| FLOAT64			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT64;
+							DEBUG("[Type::Float64]");
+						}
+		| FLOAT128			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT128;
+							DEBUG("[Type::Float128]");
+						}
+		| STRING			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRING;
+							DEBUG("[Type::String]");
+						}
+		| POINTER ':' type_name		{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::POINTER;
+							DEBUG("[Type::Pointer]");
+						}
+/*		| tupple_type			{
+							DEBUG("[Tupple]");
+							}
+*/
+/*		| function_type			{
+							DEBUG("[Function]");
+						}
+*/
+		| IDENTIFIER			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::CUSTOM;
+							DEBUG("[Type::CustomType]");
+						}
 		;
 
 /*
@@ -448,292 +469,291 @@ func_ret_type
 
 statements
 		: statements statement		{
-																$1->s.push_back($2);
-																$$ = $1;
-																DEBUG("[Statements]");
-															}
-		| statement								{
-																$$ = new Statements();
-																$$->is_set = true;
-																$$->s.push_back($1);
-																DEBUG("[Statements]");
-															}
+							$1->s.push_back($2);
+							$$ = $1;
+							DEBUG("[Statements]");
+						}
+		| statement			{
+							$$ = new Statements();
+							$$->is_set = true;
+							$$->s.push_back($1);
+							DEBUG("[Statements]");
+						}
 		;
 
 statement
-		: var_decl_stmt						{
-																$$ = new Statement();
-																$$->type = Statement::types::VAR_DECL;
-																$$->vds = $1;
-																DEBUG("[Stmt:VarDecl]");
-															}
-
-		| composite_type_defn			{
-																$$ = new Statement();
-																$$->type = Statement::types::COMPOSITE_TYPE_DEFN;
-																// $$->ctds = &$1;
-																DEBUG("[Stmt:CompositeTypeDefn]");
-															}
-		| expression_stmt					{
-																$$ = new Statement();
-																$$->type = Statement::types::EXPRESSION;
-																// $$->es = &$1;
-																DEBUG("[Stmt:ExprStmt]");
-															}
-		| assignment_stmt					{
-																$$ = new Statement();
-																$$->type = Statement::types::ASSIGNMENT;
-																// $$->as = &$1;
-																DEBUG("[Stmt:AssignStmt]");
-															}
-/*	| inc_dec_stmt						*/
-		| selection								{
-																$$ = new Statement();
-																$$->type = Statement::types::SELECTION;
-																// $$->ss = &$1;
-																DEBUG("[Stmt:SelectionStmt]");
-															}
-		| iteration								{
-																$$ = new Statement();
-																$$->type = Statement::types::ITERATION;
-																// $$->is = &$1;
-																DEBUG("[Stmt:IterationStmt]");
-															}
-		| jump_stmt								{
-																$$ = new Statement();
-																$$->type = Statement::types::JUMP;
-																// $$->js = &$1;
-																DEBUG("[Stmt:JumpStmt]");
-															}
-		| defer_stmt							{
-																$$ = new Statement();
-																$$->type = Statement::types::DEFER;
-																// $$->ds = &$1;
-																DEBUG("[Stmt:DeferStmt]");
-															}
+		: var_decl_stmt			{
+							$$ = new Statement();
+							$$->type = Statement::types::VAR_DECL;
+							$$->vds = $1;
+							DEBUG("[Stmt:VarDecl]");
+						}
+		| composite_type_defn		{
+							$$ = new Statement();
+							$$->type = Statement::types::COMPOSITE_TYPE_DEFN;
+							// $$->ctds = &$1;
+							DEBUG("[Stmt:CompositeTypeDefn]");
+						}
+		| expression_stmt		{
+							$$ = new Statement();
+							$$->type = Statement::types::EXPRESSION;
+							// $$->es = &$1;
+							DEBUG("[Stmt:ExprStmt]");
+						}
+		| assignment_stmt		{
+							$$ = new Statement();
+							$$->type = Statement::types::ASSIGNMENT;
+							// $$->as = &$1;
+							DEBUG("[Stmt:AssignStmt]");
+						}
+/*	| inc_dec_stmt				*/
+		| selection			{
+							$$ = new Statement();
+							$$->type = Statement::types::SELECTION;
+							// $$->ss = &$1;
+							DEBUG("[Stmt:SelectionStmt]");
+						}
+		| iteration			{
+							$$ = new Statement();
+							$$->type = Statement::types::ITERATION;
+							// $$->is = &$1;
+							DEBUG("[Stmt:IterationStmt]");
+						}
+		| jump_stmt			{
+							$$ = new Statement();
+							$$->type = Statement::types::JUMP;
+							// $$->js = &$1;
+							DEBUG("[Stmt:JumpStmt]");
+						}
+		| defer_stmt			{
+							$$ = new Statement();
+							$$->type = Statement::types::DEFER;
+							// $$->ds = &$1;
+							DEBUG("[Stmt:DeferStmt]");
+						}
 
 /******************************************************************************************/
 /************************************** LITERAL *******************************************/
 /******************************************************************************************/
 
 literal
-		: bool_lit								{
-																$$ = new Literal();
-																$$->type = Literal::types::BOOL;
-																$$->boolean = $1;
-																DEBUG("[Literal::Boolean]");
-															}
-		| int_lit									{
-																$$ = new Literal();
-																$$->type = Literal::types::INT;
-																$$->integer = $1;
-																DEBUG("[Literal::Integer]");
-															}
-		| float_lit								{
-																$$ = new Literal();
-																$$->type = Literal::types::FLOAT;
-																$$->floating = $1;
-																DEBUG("[Literal::Float]");
-															}
-		| char_lit								{
-																$$ = new Literal();
-																$$->type = Literal::types::CHAR;
-																$$->character = $1;
-																DEBUG("[Literal::Char]");
-															}
-		| str_lit									{
-																$$ = new Literal();
-																$$->type = Literal::types::STRING;
-																$$->string = $1;
-																DEBUG("[Literal::String]");
-															}
-		| ptr_lit									{
-																$$ = new Literal();
-																$$->type = Literal::types::POINTER;
-																$$->pointer = $1;
-																DEBUG("[Literal::Pointer]");
-															}
-		| func_lit								{
-																$$ = new Literal();
-																$$->type = Literal::types::FUNCTION;
-																$$->function = $1;
-																DEBUG("[Literal::Function]");
-															}
-		| composite_lit						{
-																$$ = new Literal();
-																$$->type = Literal::types::COMPOSITE;
-																$$->composite = $1;
-																DEBUG("[Literal::Composite]");
-															}
+		: bool_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::BOOL;
+							$$->boolean = $1;
+							DEBUG("[Literal::Boolean]");
+						}
+		| int_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::INT;
+							$$->integer = $1;
+							DEBUG("[Literal::Integer]");
+						}
+		| float_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::FLOAT;
+							$$->floating = $1;
+							DEBUG("[Literal::Float]");
+						}
+		| char_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::CHAR;
+							$$->character = $1;
+							DEBUG("[Literal::Char]");
+						}
+		| str_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::STRING;
+							$$->string = $1;
+							DEBUG("[Literal::String]");
+						}
+		| ptr_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::POINTER;
+							$$->pointer = $1;
+							DEBUG("[Literal::Pointer]");
+						}
+		| func_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::FUNCTION;
+							$$->function = $1;
+							DEBUG("[Literal::Function]");
+						}
+		| composite_lit			{
+							$$ = new Literal();
+							$$->type = Literal::types::COMPOSITE;
+							$$->composite = $1;
+							DEBUG("[Literal::Composite]");
+						}
 		/* TODO: | tupple_lit */
 		;
 
 bool_lit
-		: TRUE										{
-																$$ = new BooleanLiteral();
-																$$->type = BooleanLiteral::types::TRUE;
-																DEBUG("[Literal::Boolean::True]");
-															}
-		| FALSE										{
-																$$ = new BooleanLiteral();
-																$$->type = BooleanLiteral::types::FALSE;
-																DEBUG("[Literal::Boolean::False]");
-															}
+		: TRUE				{
+							$$ = new BooleanLiteral();
+							$$->type = BooleanLiteral::types::TRUE;
+							DEBUG("[Literal::Boolean::True]");
+						}
+		| FALSE				{
+							$$ = new BooleanLiteral();
+							$$->type = BooleanLiteral::types::FALSE;
+							DEBUG("[Literal::Boolean::False]");
+						}
 		;
 
 int_lit
-		: BINARY_LIT							{
-																$$ = new IntegerLiteral();
-																$$->type = IntegerLiteral::types::BINARY;
+		: BINARY_LIT			{
+							$$ = new IntegerLiteral();
+							$$->type = IntegerLiteral::types::BINARY;
 
-																std::string bin_str = $1;
-																bin_str.erase(0, 2);
+							std::string bin_str = $1;
+							bin_str.erase(0, 2);
 
-																int len = bin_str.length();
-																if (len <= 8) {
-																	$$->reg_size = 8;
-																} else if (len <= 16) {
-																	$$->reg_size = 16;
-																} else if (len <= 32) {
-																	$$->reg_size = 32;
-																} else if (len <= 64) {
-																	$$->reg_size = 64;
-																} else {
-																	ERR("Size of binary number is too large");
-																}
+							int len = bin_str.length();
+							if (len <= 8) {
+								$$->reg_size = 8;
+							} else if (len <= 16) {
+								$$->reg_size = 16;
+							} else if (len <= 32) {
+								$$->reg_size = 32;
+							} else if (len <= 64) {
+								$$->reg_size = 64;
+							} else {
+								ERR("Size of binary number is too large");
+							}
 
-																$$->value = stol(bin_str, nullptr, 2);
+							$$->value = stol(bin_str, nullptr, 2);
 
-																DEBUG("[Literal::Integer::Binary]");
-															}
-		| OCTAL_LIT								{
-																$$ = new IntegerLiteral();
-																$$->type = IntegerLiteral::types::OCTAL;
+							DEBUG("[Literal::Integer::Binary]");
+						}
+		| OCTAL_LIT			{
+							$$ = new IntegerLiteral();
+							$$->type = IntegerLiteral::types::OCTAL;
 
-																std::string oct_str = $1;
-																oct_str.erase(0, 2);
+							std::string oct_str = $1;
+							oct_str.erase(0, 2);
 
-																$$->reg_size = 64;
+							$$->reg_size = 64;
 
-																$$->value = stol(oct_str, nullptr, 8);
+							$$->value = stol(oct_str, nullptr, 8);
 
-																DEBUG("[Literal::Integer::Octal]");
-															}
-		| DECIMAL_LIT							{
-																$$ = new IntegerLiteral();
-																$$->type = IntegerLiteral::types::DECIMAL;
+							DEBUG("[Literal::Integer::Octal]");
+						}
+		| DECIMAL_LIT			{
+							$$ = new IntegerLiteral();
+							$$->type = IntegerLiteral::types::DECIMAL;
 
-																std::string dec_str = $1;
+							std::string dec_str = $1;
 
-																$$->reg_size = 64;
+							$$->reg_size = 64;
 
-																$$->value = stol(dec_str, nullptr, 10);
+							$$->value = stol(dec_str, nullptr, 10);
 
-																DEBUG("[Literal::Integer::Decimal]");
-															}
-		| HEX_LIT									{
-																$$ = new IntegerLiteral();
-																$$->type = IntegerLiteral::types::HEX;
+							DEBUG("[Literal::Integer::Decimal]");
+						}
+		| HEX_LIT			{
+							$$ = new IntegerLiteral();
+							$$->type = IntegerLiteral::types::HEX;
 
-																std::string hex_str = $1;
-																hex_str.erase(0, 3);
+							std::string hex_str = $1;
+							hex_str.erase(0, 3);
 
-																int len = hex_str.length();
-																if (len <= 2) {
-																	$$->reg_size = 8;
-																} else if (len <= 4) {
-																	$$->reg_size = 16;
-																} else if (len <= 8) {
-																	$$->reg_size = 32;
-																} else if (len <= 16) {
-																	$$->reg_size = 64;
-																} else {
-																	ERR("Size of hex number is too large");
-																}
+							int len = hex_str.length();
+							if (len <= 2) {
+								$$->reg_size = 8;
+							} else if (len <= 4) {
+								$$->reg_size = 16;
+							} else if (len <= 8) {
+								$$->reg_size = 32;
+							} else if (len <= 16) {
+								$$->reg_size = 64;
+							} else {
+								ERR("Size of hex number is too large");
+							}
 
-																$$->value = stol(hex_str, nullptr, 16);
+							$$->value = stol(hex_str, nullptr, 16);
 
-																DEBUG("[Literal::Integer::Hex]");
-															}
+							DEBUG("[Literal::Integer::Hex]");
+						}
 		;
 
 float_lit
-		: FLOAT_LIT								{
-																$$ = new FloatLiteral();
-																DEBUG("[Literal::Float]");
-															}
+		: FLOAT_LIT			{
+							$$ = new FloatLiteral();
+							DEBUG("[Literal::Float]");
+						}
 		;
 
 char_lit
-		: CHAR_LIT								{
-																$$ = new CharLiteral();
-																DEBUG("[Literal::Char]");
-															}
+		: CHAR_LIT			{
+							$$ = new CharLiteral();
+							DEBUG("[Literal::Char]");
+						}
 		;
 
 str_lit
-		: STR1_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::STR1;
-																DEBUG("[Literal::String::Str1]");
-															}
-		| STR2_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::STR2;
-																DEBUG("[Literal::String::Str2]");
-															}
-		| RSTR1_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::RSTR1;
-																DEBUG("[Literal::String::RStr1]");
-															}
-		| RSTR2_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::RSTR2;
-																DEBUG("[Literal::String::RStr2]");
-															}
-		| HSTR1_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::HSTR1;
-																DEBUG("[Literal::String::HStr1]");
-															}
-		| HSTR2_LITERAL						{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::HSTR2;
-																DEBUG("[Literal::String::HStr2]");
-															}
-		| HRSTR1_LITERAL					{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::HRSTR1;
-																DEBUG("[Literal::String::HRStr1]");
-															}
-		| HRSTR2_LITERAL					{
-																$$ = new StringLiteral();
-																$$->type = StringLiteral::types::HRSTR2;
-																DEBUG("[Literal::String::HRStr2]");
-															}
+		: STR1_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::STR1;
+							DEBUG("[Literal::String::Str1]");
+						}
+		| STR2_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::STR2;
+							DEBUG("[Literal::String::Str2]");
+						}
+		| RSTR1_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::RSTR1;
+							DEBUG("[Literal::String::RStr1]");
+						}
+		| RSTR2_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::RSTR2;
+							DEBUG("[Literal::String::RStr2]");
+						}
+		| HSTR1_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::HSTR1;
+							DEBUG("[Literal::String::HStr1]");
+						}
+		| HSTR2_LITERAL			{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::HSTR2;
+							DEBUG("[Literal::String::HStr2]");
+						}
+		| HRSTR1_LITERAL		{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::HRSTR1;
+							DEBUG("[Literal::String::HRStr1]");
+						}
+		| HRSTR2_LITERAL		{
+							$$ = new StringLiteral();
+							$$->type = StringLiteral::types::HRSTR2;
+							DEBUG("[Literal::String::HRStr2]");
+						}
 		;
 
 ptr_lit
-		: PTR_NULL								{
-																$$ = new PointerLiteral();
-																DEBUG("[Literal::Pointer]");
-															}
+		: PTR_NULL			{
+							$$ = new PointerLiteral();
+							DEBUG("[Literal::Pointer]");
+						}
 		;
 
 func_lit
-		: DEF func_sign block			{
-																$$ = new FunctionLiteral();
-																DEBUG("[Literal::Function]");
-															}
+		: DEF func_sign block		{
+							$$ = new FunctionLiteral();
+							DEBUG("[Literal::Function]");
+						}
 		;
 
 composite_lit
 		: IDENTIFIER '{' composite_list '}'
-															{
-																$$ = new CompositeLiteral();
-																DEBUG("[Literal::Composite]");
-															}
+						{
+							$$ = new CompositeLiteral();
+							DEBUG("[Literal::Composite]");
+						}
 		;
 
 composite_list
@@ -783,19 +803,31 @@ composite_type_defn
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' field_decl '}'		{ DEBUG("[Struct Defn]"); }
+		: STRUCT IDENTIFIER '{' field_decl '}'
+						{
+							DEBUG("[Struct Defn]");
+						}
 		;
 
 union_defn
-		: UNION IDENTIFIER '{' field_decl '}'		{ DEBUG("[Union Defn]"); }
+		: UNION IDENTIFIER '{' field_decl '}'
+						{
+							DEBUG("[Union Defn]");
+						}
 		;
 
 enum_defn
-		: ENUM IDENTIFIER '{' enum_fields '}'		{ DEBUG("[Enum Defn]"); }
+		: ENUM IDENTIFIER '{' enum_fields '}'
+						{
+							DEBUG("[Enum Defn]");
+						}
 		;
 
 option_defn
-		: OPTION IDENTIFIER '{' field_decl '}'		{ DEBUG("[Option Defn]"); }
+		: OPTION IDENTIFIER '{' field_decl '}'
+						{
+							DEBUG("[Option Defn]");
+						}
 		;
 
 field_decl
@@ -813,30 +845,60 @@ enum_fields
 /******************************************************************************************/
 
 arith_op
-		: PLUS								{ DEBUG("[+]"); }
-		| MINUS								{ DEBUG("[-]"); }
-		| MULTIPLY							{ DEBUG("[-]"); }
-		| DIVIDE							{ DEBUG("[/]"); }
-		| MODULUS							{ DEBUG("[%%]"); }
+		: PLUS				{
+							DEBUG("[+]");
+						}
+		| MINUS				{
+							DEBUG("[-]");
+						}
+		| MULTIPLY			{
+							DEBUG("[-]");
+						}
+		| DIVIDE			{
+							DEBUG("[/]");
+						}
+		| MODULUS			{
+							DEBUG("[%%]");
+						}
 		;
 
 shift_op
-		: RIGHT_SHIFT						{ DEBUG("[<<]"); }
-		| LEFT_SHIFT						{ DEBUG("[>>]"); }
-		| RIGHT_SHIFT_US					{ DEBUG("[<<<]"); }
-		| LEFT_SHIFT_US						{ DEBUG("[>>>]"); }
+		: RIGHT_SHIFT			{
+							DEBUG("[<<]");
+						}
+		| LEFT_SHIFT			{
+							DEBUG("[>>]");
+						}
+		| RIGHT_SHIFT_US		{
+							DEBUG("[<<<]");
+						}
+		| LEFT_SHIFT_US			{
+							DEBUG("[>>>]");
+						}
 		;
 
 logical_op
-		: LOGICAL_AND						{ DEBUG("[&&]"); }
-		| LOGICAL_OR						{ DEBUG("[||]"); }
+		: LOGICAL_AND			{
+							DEBUG("[&&]");
+						}
+		| LOGICAL_OR			{
+							DEBUG("[||]");
+						}
 		;
 
 assign_op
-		: EQUAL_TO							{ DEBUG("[=]"); }
-		| arith_op EQUAL_TO					{ DEBUG("[Arith =]"); }
-		| shift_op EQUAL_TO					{ DEBUG("[Shift =]"); }
-		| logical_op EQUAL_TO				{ DEBUG("[Logical =]"); }
+		: EQUAL_TO			{
+							DEBUG("[=]");
+						}
+		| arith_op EQUAL_TO		{
+							DEBUG("[Arith =]");
+						}
+		| shift_op EQUAL_TO		{
+							DEBUG("[Shift =]");
+						}
+		| logical_op EQUAL_TO		{
+							DEBUG("[Logical =]");
+						}
 		;
 
 /******************************************************************************************/
@@ -844,7 +906,10 @@ assign_op
 /******************************************************************************************/
 
 assignment_stmt
-		: l_value_list assign_op expression			{ DEBUG("[Assign stmt]"); }
+		: l_value_list assign_op expression
+						{
+							DEBUG("[Assign stmt]");
+						}
 		;
 
 l_value_list
@@ -854,62 +919,162 @@ l_value_list
 
 l_value
 		: qualified_ident
-		| U_ADD_OF unary_expr				{ DEBUG("[@]"); }
-		| U_POINTER unary_expr				{ DEBUG("[$]"); }
-		| operand index						{ DEBUG("[LHS Array Index]"); }
+		| U_ADD_OF unary_expr		{
+							DEBUG("[@]");
+						}
+		| U_POINTER unary_expr		{
+							DEBUG("[$]");
+						}
+		| operand index			{
+							DEBUG("[LHS Array Index]");
+						}
 		;
 
 expression
-		: unary_expr						{ DEBUG("[Unary Expr]"); }
-		| binary_expr						{ DEBUG("[Binary Expr]"); }
+		: unary_expr			{
+							DEBUG("[Unary Expr]");
+						}
+		| binary_expr			{
+							DEBUG("[Binary Expr]");
+						}
 		;
 
 binary_expr
-		: expression PLUS expression				{ DEBUG("[+]"); }
-		| expression MINUS expression				{ DEBUG("[-]"); }
-		| expression MULTIPLY expression			{ DEBUG("[*]"); }
-		| expression DIVIDE expression				{ DEBUG("[/]"); }
-		| expression MODULUS expression				{ DEBUG("[%%]"); }
-		| expression RIGHT_SHIFT expression			{ DEBUG("[>>]"); }
-		| expression LEFT_SHIFT expression			{ DEBUG("[<<]"); }
-		| expression RIGHT_SHIFT_US expression		{ DEBUG("[>>>]"); }
-		| expression LEFT_SHIFT_US expression		{ DEBUG("[<<<]"); }
-		| expression LOGICAL_AND expression			{ DEBUG("[&]"); }
-		| expression LOGICAL_OR expression			{ DEBUG("[|]"); }
-		| expression IS_EQUAL expression			{ DEBUG("[==]"); }
-		| expression IS_NOT_EQUAL expression		{ DEBUG("[!=]"); }
-		| expression IS_LESS expression				{ DEBUG("[<]"); }
-		| expression IS_GREATER expression			{ DEBUG("[>]"); }
-		| expression IS_LESS_OR_EQ expression		{ DEBUG("[<=]"); }
-		| expression IS_GREATER_OR_EQ expression	{ DEBUG("[>=]"); }
-		| expression BITWISE_AND expression			{ DEBUG("[&&]"); }
-		| expression BITWISE_OR expression			{ DEBUG("[||]"); }
-		| expression BITWISE_NOT expression			{ DEBUG("[^]"); }
-		| expression BITWISE_XOR expression			{ DEBUG("[&^\n"); }
+		: expression PLUS expression
+						{
+							DEBUG("[+]");
+						}
+		| expression MINUS expression
+						{
+							DEBUG("[-]");
+						}
+		| expression MULTIPLY expression
+						{
+							DEBUG("[*]");
+						}
+		| expression DIVIDE expression
+						{
+							DEBUG("[/]");
+						}
+		| expression MODULUS expression
+						{
+							DEBUG("[%%]");
+						}
+		| expression RIGHT_SHIFT expression
+						{
+							DEBUG("[>>]");
+						}
+		| expression LEFT_SHIFT expression
+						{
+							DEBUG("[<<]");
+						}
+		| expression RIGHT_SHIFT_US expression
+						{
+							DEBUG("[>>>]");
+						}
+		| expression LEFT_SHIFT_US expression
+						{
+							DEBUG("[<<<]");
+						}
+		| expression LOGICAL_AND expression
+						{
+							DEBUG("[&]");
+						}
+		| expression LOGICAL_OR expression
+						{
+							DEBUG("[|]");
+						}
+		| expression IS_EQUAL expression
+						{
+							DEBUG("[==]");
+						}
+		| expression IS_NOT_EQUAL expression
+						{
+							DEBUG("[!=]");
+						}
+		| expression IS_LESS expression
+						{
+							DEBUG("[<]");
+						}
+		| expression IS_GREATER expression
+						{
+							DEBUG("[>]");
+						}
+		| expression IS_LESS_OR_EQ expression
+						{
+							DEBUG("[<=]");
+						}
+		| expression IS_GREATER_OR_EQ expression
+						{
+							DEBUG("[>=]");
+						}
+		| expression BITWISE_AND expression
+						{
+							DEBUG("[&&]");
+						}
+		| expression BITWISE_OR expression
+						{
+							DEBUG("[||]");
+						}
+		| expression BITWISE_NOT expression
+						{
+							DEBUG("[^]");
+						}
+		| expression BITWISE_XOR expression
+						{
+							DEBUG("[&^\n");
+						}
 		;
 
 unary_expr
-		: U_NOT unary_expr					{ DEBUG("[!]"); }
-		| U_2COMP unary_expr				{ DEBUG("[~]"); }
-		| U_ADD_OF unary_expr				{ DEBUG("[@]"); }
-		| MULTIPLY unary_expr				{ DEBUG("[$]"); }
-		| PLUS unary_expr					{ DEBUG("[+a]"); }
-		| MINUS unary_expr					{ DEBUG("[-a]"); }
-		| '(' expression ')'				{ DEBUG("[( )]"); }
+		: U_NOT unary_expr		{
+							DEBUG("[!]");
+						}
+		| U_2COMP unary_expr		{
+							DEBUG("[~]");
+						}
+		| U_ADD_OF unary_expr		{
+							DEBUG("[@]");
+						}
+		| MULTIPLY unary_expr		{
+							DEBUG("[$]");
+						}
+		| PLUS unary_expr		{
+							DEBUG("[+a]");
+						}
+		| MINUS unary_expr		{
+							DEBUG("[-a]");
+						}
+		| '(' expression ')'		{
+							DEBUG("[( )]");
+						}
 		| operand
 		;
 
 operand
 		: literal
 		| qualified_ident
-		| operand index						{ DEBUG("[Array Index]"); }
-		| operand arguments					{ DEBUG("[Function Call]"); }
+		| operand index			{
+							DEBUG("[Array Index]");
+						}
+		| operand arguments		{
+							DEBUG("[Function Call]");
+						}
 		;
 
 qualified_ident
-		: IDENTIFIER								{ DEBUG("[Identifier]"); }
-		| qualified_ident '.' IDENTIFIER			{ DEBUG("[X.Y]"); }
-		| qualified_ident PTR_MEMBER IDENTIFIER		{ DEBUG("[X~>Y]"); }
+		: IDENTIFIER
+						{
+							DEBUG("[Identifier]");
+						}
+		| qualified_ident '.' IDENTIFIER
+						{
+							DEBUG("[X.Y]");
+						}
+		| qualified_ident PTR_MEMBER IDENTIFIER
+						{
+							DEBUG("[X~>Y]");
+						}
 		;
 
 index
@@ -932,31 +1097,39 @@ expression_list
 
 var_decl_stmt
 		: type IDENTIFIER
-														{
-															$$ = new VarDeclStmt();
-															$$->type = $1;
-															$$->ident = $2;
-															$$->lit = NULL;
-															DEBUG("[VarDeclStmt::Identifier]");
-														}
+						{
+							$$ = new VarDeclStmt();
+							$$->type = $1;
+							$$->ident = $2;
+							$$->lit = NULL;
+							DEBUG("[VarDeclStmt::Identifier]");
+						}
 		| type IDENTIFIER EQUAL_TO literal
-														{
-															$$ = new VarDeclStmt();
-															$$->type = $1;
-															$$->ident = $2;
-															$$->lit = $4;
-															DEBUG("[VarDeclStmt::Literal::Identifier]");
-														}
+						{
+							$$ = new VarDeclStmt();
+							$$->type = $1;
+							$$->ident = $2;
+							$$->lit = $4;
+							DEBUG("[VarDeclStmt::Literal::Identifier]");
+						}
 		;
 
 expression_stmt
-		: operand arguments					{ DEBUG("[Function Call]"); }
+		: operand arguments		{
+							DEBUG("[Function Call]");
+						}
 		;
 
 iteration
-		: for_stmt							{ DEBUG("[For Stmt]"); }
-		| while_stmt						{ DEBUG("[While Stmt]"); }
-		| dowhile_stmt						{ DEBUG("[DoWhile Stmt]"); }
+		: for_stmt			{
+							DEBUG("[For Stmt]");
+						}
+		| while_stmt			{
+							DEBUG("[While Stmt]");
+						}
+		| dowhile_stmt			{
+							DEBUG("[DoWhile Stmt]");
+						}
 		;
 
 for_stmt
@@ -995,8 +1168,12 @@ defer_stmt
 		;
 
 selection
-		: if_stmt							{ DEBUG("[If Stmt]"); }
-		| switch_stmt						{ DEBUG("[Switch Stmt]"); }
+		: if_stmt			{
+							DEBUG("[If Stmt]");
+						}
+		| switch_stmt			{
+							DEBUG("[Switch Stmt]");
+						}
 		;
 
 if_stmt
@@ -1037,11 +1214,21 @@ case_cond
 		;
 
 jump_stmt
-		: GOTO IDENTIFIER					{ DEBUG("[Goto]"); }
-		| CONTINUE							{ DEBUG("[Continue]"); }
-		| BREAK								{ DEBUG("[Break]"); }
-		| RETURN							{ DEBUG("[Return]"); }
-/*		| RETURN expression_list			{ DEBUG("[Return Expr]"); } */
+		: GOTO IDENTIFIER		{
+							DEBUG("[Goto]");
+						}
+		| CONTINUE			{
+							DEBUG("[Continue]");
+						}
+		| BREAK				{
+							DEBUG("[Break]");
+						}
+		| RETURN			{
+							DEBUG("[Return]");
+						}
+/*		| RETURN expression_list	{
+							DEBUG("[Return Expr]");
+						} */
 		;
 
 %%
