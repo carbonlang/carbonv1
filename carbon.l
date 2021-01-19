@@ -117,10 +117,10 @@ ident			  {letter}({letter}|{dec_digit})*
 "enum"						{ return yy::parser::token::ENUM; }
 "option"					{ return yy::parser::token::OPTION; }
 
-{bin_lit}					{ return yy::parser::token::BINARY_LIT; }
-{oct_lit}					{ return yy::parser::token::OCTAL_LIT; }
-{dec_lit}					{ return yy::parser::token::DECIMAL_LIT; }
-{hex_lit}					{ return yy::parser::token::HEX_LIT; }
+{bin_lit}					{ yylval.build<std::string>(text()); return yy::parser::token::BINARY_LIT; }
+{oct_lit}					{ yylval.build<std::string>(text()); return yy::parser::token::OCTAL_LIT; }
+{dec_lit}					{ yylval.build<std::string>(text()); return yy::parser::token::DECIMAL_LIT; }
+{hex_lit}					{ yylval.build<std::string>(text()); return yy::parser::token::HEX_LIT; }
 
 {float_lit}				{ return yy::parser::token::FLOAT_LIT; }
 
