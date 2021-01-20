@@ -42,7 +42,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#undef yylex
 	#define yylex lexer.yylex  // Within bison's parse() we should invoke lexer.yylex(), not the global yylex()
 
-	// #define DEBUG(str) std::cout << str
+	//#define DEBUG(str) std::cout << str
 	#define DEBUG(str) ;
 	#define ERR(str) std::cout << str
 
@@ -77,7 +77,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> REGISTER STATIC
 %token <int> CONST VOLATILE RESTRICT ATOMIC CONST_RESTRICT
 %token <std::string> BINARY_LIT OCTAL_LIT DECIMAL_LIT HEX_LIT
-%token <int> FLOAT_LIT CHAR_LIT
+%token <std::string> FLOAT_LIT CHAR_LIT
 
 %token <int> EQUAL_TO
 %token <int> PLUS MINUS MULTIPLY DIVIDE MODULUS
@@ -1237,7 +1237,7 @@ int main() {
 	std::map<std::string, llvm::Value *> NamedValues; // Contains values defined in current scope
 
 	// Make the module, which holds all the code.
-	Module = llvm::make_unique<llvm::Module>("carbon module", Context);
+	Module = std::make_unique<llvm::Module>("carbon module", Context);
 
 	// https://riptutorial.com/llvm/example/29450/compilation-of-a-simple-function-in-llvm-4-0
 

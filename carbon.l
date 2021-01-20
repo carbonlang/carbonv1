@@ -122,9 +122,9 @@ ident				{letter}({letter}|{dec_digit})*
 {dec_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::DECIMAL_LIT; }
 {hex_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::HEX_LIT; }
 
-{float_lit}			{ return yy::parser::token::FLOAT_LIT; }
+{float_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::FLOAT_LIT; }
 
-{char_lit}			{ return yy::parser::token::CHAR_LIT; }
+{char_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
 
 \"[^"]*\"			{ return yy::parser::token::STR1_LITERAL; }
 \'[^']*\'			{ return yy::parser::token::STR2_LITERAL; }

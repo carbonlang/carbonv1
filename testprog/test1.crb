@@ -29,7 +29,6 @@ def main(int a, bool b) -> (int) {
 	int32 i5 = 3454
 	int64 i6 = -12
 	uint i7 = +12
-	uint8 i8 = -16x1FF4ED
 	uint16 i9 = 16x1FF4ED
 	uint32 i10 = 3454
 	uint64 i11 = -12
