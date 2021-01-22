@@ -48,6 +48,10 @@ class IterationStmt;
 class JumpStmt;
 class DeferStmt;
 
+class FunctionSign;
+class FunctionParam;
+class FunctionReturn;
+
 class SourceFile {
 	public:
 		std::list<TopLevel *> t;
@@ -92,27 +96,29 @@ class NamespaceDefn {
 class FunctionDefn {
 	public:
 		Block *b;
+		std::string fn;
+		FunctionSign *fs;
 		void codeGen();
 };
 
 class FunctionSign {
-
-};
-
-class FunctionParamList {
-
+	public:
+		std::list<FunctionParam *> pl;
+		std::list<FunctionReturn *> rl;
 };
 
 class FunctionParam {
-
-};
-
-class FunctionReturnList {
-
+	public:
+		std::string *n;
+		Type *t;
+		Literal *v;
 };
 
 class FunctionReturn {
-
+	public:
+		std::string *n;
+		Type *t;
+		Literal *v;
 };
 
 class TypeFunction {
@@ -140,11 +146,6 @@ class Type {
 		Storage *storage;
 		TypeQualifier *type_qualifier;
 		TypeName *type_name;
-};
-
-class Identifier {
-	public:
-		std::string name;
 };
 
 class AccessModifier {

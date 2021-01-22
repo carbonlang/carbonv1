@@ -45,6 +45,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//#define DEBUG(str) std::cout << str
 	#define DEBUG(str) ;
 	#define ERR(str) std::cout << str
+	#define ALERT(str) std::cout << "\n" \
+		<< "**********************************************" << "\n" \
+		<< "                   " << str << "\n" \
+		<< "**********************************************" << "\n";
 
 	SourceFile sf;
 
@@ -192,12 +196,14 @@ func_defn
 		: DEF IDENTIFIER func_sign block
 						{
 							$$ = new FunctionDefn();
+							$$->fn = $2;
 							$$->b = $4;
 							DEBUG("[FunctionDefn]");
 						}
 		| access_modifier DEF IDENTIFIER func_sign block
 						{
 							$$ = new FunctionDefn();
+							$$->fn = $3;
 							$$->b = $5;
 							DEBUG("[FunctionDefn]");
 						}
@@ -1238,49 +1244,6 @@ int main() {
 
 	// Make the module, which holds all the code.
 	Module = std::make_unique<llvm::Module>("carbon module", Context);
-
-	// https://riptutorial.com/llvm/example/29450/compilation-of-a-simple-function-in-llvm-4-0
-
-	// Define function's signature
-	std::vector<llvm::Type *> arg_types = {
-			llvm::Type::getInt32Ty(Context),
-			llvm::Type::getInt32Ty(Context)
-	};
-
-	llvm::FunctionType *funcType = llvm::FunctionType::get(
-	llvm::Type::getInt32Ty(Context), arg_types, false);
-
-	// create the function "sum" and bind it to the module with ExternalLinkage,
-	// so we can retrieve it later
-	auto *fooFunc = llvm::Function::Create(
-			funcType, llvm::Function::ExternalLinkage, "sum", Module.get()
-	);
-
-	// Define the entry block and fill it with an appropriate code
-	//llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
-	BB = llvm::BasicBlock::Create(Context, "entry", fooFunc);
-	Builder.SetInsertPoint(BB);
-
-	// Add constant to itself, to visualize constant folding
-	llvm::Value *constant = llvm::ConstantInt::get(Builder.getInt32Ty(), 0x1);
-	auto *sum1 = Builder.CreateAdd(constant, constant, "sum1");
-
-	// Retrieve arguments and proceed with further adding...
-	auto args = fooFunc->arg_begin();
-	llvm::Value *arg1 = &(*args);
-	args = std::next(args);
-	llvm::Value *arg2 = &(*args);
-	//auto *sum2 = Builder.CreateAdd(sum1, arg1, "sum2");
-	//auto *result = Builder.CreateAdd(sum2, arg2, "result");
-
-	// ...and return
-	//Builder.CreateRet(result);
-
-	// Verify at the end
-	verifyFunction(*fooFunc);
-
-	// llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "start");
-	// Builder.SetInsertPoint(BB);
 
 	yy::Lexer lexer(std::cin);
 	yy::parser parser(lexer);

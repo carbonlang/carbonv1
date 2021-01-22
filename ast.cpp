@@ -14,7 +14,7 @@
 
 #include "ast.h"
 
-#define DEBUG(str) std::cout << "\n" \
+#define ALERT(str) std::cout << "\n" \
 	<< "**********************************************" << "\n" \
 	<< "                   " << str << "\n" \
 	<< "**********************************************" << "\n";
@@ -33,9 +33,18 @@ void TopLevel::codeGen() {
 }
 
 void FunctionDefn::codeGen() {
+
+	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
+	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, fn, Module.get());
+
+	BB = llvm::BasicBlock::Create(Context, "", func);
+	Builder.SetInsertPoint(BB);
+
 	if (b) {
 		b->codeGen();
 	}
+
+	verifyFunction(*func);
 }
 
 void Block::codeGen() {
@@ -167,43 +176,4 @@ void VarDeclStmt::codeGen() {
 		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
 	}
 
-	//llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	//if (lit) {
-	//	llvm::StoreInst* stinst = new llvm::StoreInst(val, llvm_alloca_inst, false, BB);
-	//}
-
-	// if (lit) {
-	// 	// BOOL, INT, FLOAT, CHAR, STRING, POINTER, FUNCTION, COMPOSITE
-	// 		if (lit->type == Literal::types::BOOL) {
-	// 			if (type->type_name->type_name != TypeName::type_names::BOOL) {
-	// 				// ERROR
-	// 			}
-	// 			if (lit->boolean->type == BooleanLiteral::types::TRUE) {
-	// 				num = llvm::ConstantInt::get(Context, llvm::APInt(8, 1, true));
-	// 			} else {
-	// 				num = llvm::ConstantInt::get(Context, llvm::APInt(8, 0, true));
-	// 			}
-	// 			llvm::StoreInst* stinst = new llvm::StoreInst(num, llvm_alloca_inst, false, BB);
-	// 		} else if (lit->type == Literal::types::INT) {
-	// 			if (type->type_name->type_name != TypeName::type_names::INT) {
-	// 				num = llvm::ConstantInt::get(Context, llvm::APInt(8, 1, true));
-	// 			} else
-	// 					type->type_name->type_name != TypeName::type_names::INT8 ||
-	// 					type->type_name->type_name != TypeName::type_names::INT16 ||
-	// 					type->type_name->type_name != TypeName::type_names::INT32 ||
-	// 					type->type_name->type_name != TypeName::type_names::INT64 ||
-	// 					type->type_name->type_name != TypeName::type_names::UINT ||
-	// 					type->type_name->type_name != TypeName::type_names::UINT8 ||
-	// 					type->type_name->type_name != TypeName::type_names::UINT16 ||
-	// 					type->type_name->type_name != TypeName::type_names::UINT32 ||
-	// 					type->type_name->type_name != TypeName::type_names::UINT64) {
-	// 				// ERROR
-	// 			}
-	// 			num = llvm::ConstantInt::get(Context, llvm::APInt(8, 1, true));
-	// 			llvm::StoreInst* stinst = new llvm::StoreInst(num, llvm_alloca_inst, false, BB);
-	// 		}
-	// }
-
-	//llvm::Type *type = llvm::Type::getInt32Ty(Context);
-	//llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(type, 0, ident, BB);
 }
