@@ -21,6 +21,7 @@ extern llvm::BasicBlock *BB;
 class TopLevel;
 
 class FunctionDefn;
+class CompositeTypeDefn;
 class Block;
 
 class Type;
@@ -52,6 +53,14 @@ class FunctionSign;
 class FunctionParam;
 class FunctionReturn;
 
+class StructDefn;
+class UnionDefn;
+class EnumDefn;
+class OptionDefn;
+class StructUnionOptionFields;
+
+class TypeIdentifier;
+
 class SourceFile {
 	public:
 		std::list<TopLevel *> t;
@@ -62,6 +71,7 @@ class TopLevel {
 	public:
 		enum types { IMPORT_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC, NAMESPACE_DEFN, FUNC_DEFN } type;
 		FunctionDefn *fd;
+		CompositeTypeDefn *ctd;
 		void codeGen();
 };
 
@@ -70,23 +80,47 @@ class ImportDecl {
 };
 
 class CompositeTypeDefn {
-
+	public:
+		enum types { STRUCT, UNION, ENUM, OPTION } type;
+		StructDefn *s;
+		UnionDefn *u;
+		EnumDefn *e;
+		OptionDefn *o;
+		void codeGen();
 };
 
 class StructDefn {
-
-};
-
-class EnumDefn {
-
+	public:
+		std::string ident;
+		StructUnionOptionFields *f;
+		void codeGen();
 };
 
 class UnionDefn {
+	public:
+		std::string ident;
+		StructUnionOptionFields *f;
+		void codeGen();
+};
 
+class EnumDefn {
+	public:
+		std::string ident;
+		void codeGen();
 };
 
 class OptionDefn {
+	public:
+		std::string ident;
+		StructUnionOptionFields *f;
+		void codeGen();
+};
 
+class StructUnionOptionFields {
+	public:
+		bool is_set = false;
+		std::list<TypeIdentifier *> f;
+		void codeGen();
 };
 
 class NamespaceDefn {
@@ -177,6 +211,7 @@ class Statement {
 		IterationStmt *is;
 		JumpStmt *js;
 		DeferStmt *ds;
+		void codeGen();
 };
 
 class VarDeclStmt {
@@ -185,6 +220,10 @@ class VarDeclStmt {
 		Type *type;
 		Literal *lit;
 		void codeGen();
+};
+
+class CompositeTypeDefnStmt {
+
 };
 
 class ExpressionStmt {
@@ -347,6 +386,13 @@ class FunctionLiteral {
 
 class CompositeLiteral {
 	public:
+};
+
+class TypeIdentifier {
+	public:
+		Type *t;
+		std::string ident;
+		void codeGen();
 };
 
 #endif /* AST_H */

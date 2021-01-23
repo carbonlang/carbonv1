@@ -123,6 +123,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <PointerLiteral * > ptr_lit
 %nterm <FunctionLiteral *> func_lit
 %nterm <CompositeLiteral *> composite_lit
+%nterm <CompositeTypeDefn *> composite_type_defn
+%nterm <StructDefn *> struct_defn
+%nterm <UnionDefn *> union_defn
+%nterm <EnumDefn *> enum_defn
+%nterm <OptionDefn *> option_defn
+%nterm <StructUnionOptionFields *> struct_union_option_fields
+%nterm <TypeIdentifier *> type_identifier
 
 %start source_file
 
@@ -149,7 +156,7 @@ top_level
 		| composite_type_defn		{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::COMPOSITE_TYPE_DEFN;
-							// $$->fd = $1;
+							$$->ctd = $1;
 							DEBUG("[TopLevel::CompositeTypeDefn]");
 						}
 		| type_func			{
@@ -492,13 +499,13 @@ statement
 							$$ = new Statement();
 							$$->type = Statement::types::VAR_DECL;
 							$$->vds = $1;
-							DEBUG("[Stmt:VarDecl]");
+							DEBUG("[Stmt:VarDeclStmt]");
 						}
 		| composite_type_defn		{
 							$$ = new Statement();
-							$$->type = Statement::types::COMPOSITE_TYPE_DEFN;
+							$$->type = Statement::types::COMPOSITE_TYPE_DEFN
 							// $$->ctds = &$1;
-							DEBUG("[Stmt:CompositeTypeDefn]");
+							DEBUG("[Stmt:CompositeTypeDefnStmt]");
 						}
 		| expression_stmt		{
 							$$ = new Statement();
@@ -802,22 +809,45 @@ tupple_item
 /******************************************************************************************/
 
 composite_type_defn
-		: struct_defn
-		| union_defn
-		| enum_defn
-		| option_defn
+		: struct_defn			{
+							$$ = new CompositeTypeDefn();
+							$$->type = CompositeTypeDefn::types::STRUCT;
+							$$->s = $1;
+							DEBUG("[CompositeTypeDefn::Struct]");
+						}
+		| union_defn			{
+							$$ = new CompositeTypeDefn();
+							$$->type = CompositeTypeDefn::types::UNION;
+							$$->u = $1;
+							DEBUG("[CompositeTypeDefn::Union]");
+						}
+		| enum_defn			{
+							$$ = new CompositeTypeDefn();
+							$$->type = CompositeTypeDefn::types::ENUM;
+							$$->e = $1;
+							DEBUG("[CompositeTypeDefn::Enum]");
+						}
+		| option_defn			{
+							$$ = new CompositeTypeDefn();
+							$$->type = CompositeTypeDefn::types::OPTION;
+							$$->o = $1;
+							DEBUG("[CompositeTypeDefn::Option]");
+						}
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' field_decl '}'
+		: STRUCT IDENTIFIER '{' struct_union_option_fields '}'
 						{
+							$$ = new StructDefn();
+							$$->ident = $2;
 							DEBUG("[Struct Defn]");
 						}
 		;
 
 union_defn
-		: UNION IDENTIFIER '{' field_decl '}'
+		: UNION IDENTIFIER '{' struct_union_option_fields '}'
 						{
+							$$ = new UnionDefn();
 							DEBUG("[Union Defn]");
 						}
 		;
@@ -825,20 +855,40 @@ union_defn
 enum_defn
 		: ENUM IDENTIFIER '{' enum_fields '}'
 						{
+							$$ = new EnumDefn();
 							DEBUG("[Enum Defn]");
 						}
 		;
 
 option_defn
-		: OPTION IDENTIFIER '{' field_decl '}'
+		: OPTION IDENTIFIER '{' struct_union_option_fields '}'
 						{
+							$$ = new OptionDefn();
 							DEBUG("[Option Defn]");
 						}
 		;
 
-field_decl
-		: type IDENTIFIER
-		| field_decl type IDENTIFIER
+struct_union_option_fields
+		: struct_union_option_fields type_identifier
+						{
+							$1->f.push_back($2);
+							$$ = $1;
+							DEBUG("[StructUnionOptionFields]");
+						}
+		| type_identifier		{
+							$$ = new StructUnionOptionFields();
+							$$->is_set = true;
+							$$->f.push_back($1);
+							DEBUG("[StructUnionOptionFields::TypeIdentifier]");
+						}
+		;
+
+type_identifier : type IDENTIFIER		{
+							$$ = new TypeIdentifier();
+							$$->t = $1;
+							$$->ident = $2;
+							DEBUG("[TypeIdentifier]");
+						}
 		;
 
 enum_fields

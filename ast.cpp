@@ -14,10 +14,7 @@
 
 #include "ast.h"
 
-#define ALERT(str) std::cout << "\n" \
-	<< "**********************************************" << "\n" \
-	<< "                   " << str << "\n" \
-	<< "**********************************************" << "\n";
+#define ALERT(str) std::cout << "\033[42;31m" << str << "\033[0m\n"
 
 void SourceFile::codeGen() {
 	std::list<TopLevel *>::iterator tli;
@@ -29,6 +26,8 @@ void SourceFile::codeGen() {
 void TopLevel::codeGen() {
 	if (type == TopLevel::types::FUNC_DEFN) {
 		fd->codeGen();
+	} else if (type == TopLevel::types::COMPOSITE_TYPE_DEFN) {
+		ctd->codeGen();
 	}
 }
 
@@ -175,5 +174,33 @@ void VarDeclStmt::codeGen() {
 		llvm_type = llvm::Type::getInt64Ty(Context);
 		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
 	}
+
+}
+
+void CompositeTypeDefn::codeGen() {
+	if (type == CompositeTypeDefn::types::STRUCT) {
+		s->codeGen();
+	} else if (type == CompositeTypeDefn::types::UNION) {
+		u->codeGen();
+	} else if (type == CompositeTypeDefn::types::ENUM) {
+		e->codeGen();
+	} else if (type == CompositeTypeDefn::types::OPTION) {
+		o->codeGen();
+	}
+}
+
+void StructDefn::codeGen() {
+	ALERT(ident);
+}
+
+void UnionDefn::codeGen() {
+
+}
+
+void EnumDefn::codeGen() {
+
+}
+
+void OptionDefn::codeGen() {
 
 }
