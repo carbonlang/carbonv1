@@ -130,6 +130,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <OptionDefn *> option_defn
 %nterm <StructUnionOptionFields *> struct_union_option_fields
 %nterm <TypeIdentifier *> type_identifier
+%nterm <FunctionSign *> func_sign
+%nterm <FunctionParam *> func_param
 
 %start source_file
 
@@ -204,6 +206,7 @@ func_defn
 						{
 							$$ = new FunctionDefn();
 							$$->fn = $2;
+							$$->fs = $3;
 							$$->b = $4;
 							DEBUG("[FunctionDefn]");
 						}
@@ -211,6 +214,7 @@ func_defn
 						{
 							$$ = new FunctionDefn();
 							$$->fn = $3;
+							$$->fs = $4;
 							$$->b = $5;
 							DEBUG("[FunctionDefn]");
 						}
@@ -222,7 +226,12 @@ access_modifier
 		;
 
 func_sign
-		: '(' func_param_list ')' FUNC_RETURN '(' func_return_list ')'
+		: '(' func_param ')' FUNC_RETURN '(' func_return_list ')'
+						{
+							$$ = new FunctionSign();
+							$$->fp = $2;
+							DEBUG("[Block]");
+						}
 		;
 
 block
@@ -238,20 +247,30 @@ block
 						}
 		;
 
-func_param_list
+func_param
 		: /* empty */
-		| func_param
-		| func_param_list ',' func_param
+						{
+							$$ = new FunctionParam();
+							DEBUG("[FunctionParam]");
+						}
+		| func_param ',' type_identifier
+						{
+							$1->pl.push_back($3);
+							$$ = $1;
+							DEBUG("[FunctionParam]");
+						}
+		| type_identifier
+						{
+							$$ = new FunctionParam();
+							$$->pl.push_back($1);
+							DEBUG("[FunctionParam]");
+						}
 		;
 
 func_return_list
 		: /* empty */
 		| func_return
 		| func_return_list ',' func_return
-		;
-
-func_param
-		: type IDENTIFIER
 		;
 
 func_return

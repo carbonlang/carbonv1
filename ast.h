@@ -137,15 +137,13 @@ class FunctionDefn {
 
 class FunctionSign {
 	public:
-		std::list<FunctionParam *> pl;
+		FunctionParam *fp;
 		std::list<FunctionReturn *> rl;
 };
 
 class FunctionParam {
 	public:
-		std::string *n;
-		Type *t;
-		Literal *v;
+		std::list<TypeIdentifier *> pl;
 };
 
 class FunctionReturn {
