@@ -9,8 +9,18 @@ ns Global {
 }
 
 struct GlobalPerson {
-	int a
-	int b
+	int i1
+	char c1
+}
+
+struct EmptyStruct {
+
+}
+
+union Flags {
+	int i2
+	char c2
+	float32 f2
 }
 
 extend GlobalPerson {

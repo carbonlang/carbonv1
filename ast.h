@@ -119,7 +119,7 @@ class OptionDefn {
 class StructUnionOptionFields {
 	public:
 		bool is_set = false;
-		std::list<TypeIdentifier *> f;
+		std::list<TypeIdentifier *> ti;
 		void codeGen();
 };
 
@@ -392,7 +392,7 @@ class TypeIdentifier {
 	public:
 		Type *t;
 		std::string ident;
-		void codeGen();
+		llvm::Type *codeGen();
 };
 
 #endif /* AST_H */

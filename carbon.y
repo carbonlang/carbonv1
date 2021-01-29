@@ -840,6 +840,13 @@ struct_defn
 						{
 							$$ = new StructDefn();
 							$$->ident = $2;
+							$$->f = $4;
+							DEBUG("[Struct Defn]");
+						}
+		| STRUCT IDENTIFIER '{' '}'
+						{
+							$$ = new StructDefn();
+							$$->ident = $2;
 							DEBUG("[Struct Defn]");
 						}
 		;
@@ -848,6 +855,14 @@ union_defn
 		: UNION IDENTIFIER '{' struct_union_option_fields '}'
 						{
 							$$ = new UnionDefn();
+							$$->ident = $2;
+							$$->f = $4;
+							DEBUG("[Union Defn]");
+						}
+		| UNION IDENTIFIER '{' '}'
+						{
+							$$ = new UnionDefn();
+							$$->ident = $2;
 							DEBUG("[Union Defn]");
 						}
 		;
@@ -871,14 +886,14 @@ option_defn
 struct_union_option_fields
 		: struct_union_option_fields type_identifier
 						{
-							$1->f.push_back($2);
+							$1->ti.push_back($2);
 							$$ = $1;
 							DEBUG("[StructUnionOptionFields]");
 						}
 		| type_identifier		{
 							$$ = new StructUnionOptionFields();
 							$$->is_set = true;
-							$$->f.push_back($1);
+							$$->ti.push_back($1);
 							DEBUG("[StructUnionOptionFields::TypeIdentifier]");
 						}
 		;
@@ -1290,7 +1305,7 @@ jump_stmt
 %%
 
 int main() {
-	std::map<std::string, llvm::Value *> NamedValues; // Contains values defined in current scope
+	// std::map<std::string, llvm::Value *> NamedValues; // Contains values defined in current scope
 
 	// Make the module, which holds all the code.
 	Module = std::make_unique<llvm::Module>("carbon module", Context);
