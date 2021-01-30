@@ -143,7 +143,8 @@ class FunctionSign {
 
 class FunctionParam {
 	public:
-		std::list<TypeIdentifier *> pl;
+		bool is_set = false;
+		std::list<TypeIdentifier *> fpl;
 };
 
 class FunctionReturn {

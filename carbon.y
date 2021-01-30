@@ -251,6 +251,7 @@ func_param
 		: /* empty */
 						{
 							$$ = new FunctionParam();
+							$$->is_set = false;
 							DEBUG("[FunctionParam]");
 						}
 		| func_param ',' type_identifier
@@ -262,6 +263,7 @@ func_param
 		| type_identifier
 						{
 							$$ = new FunctionParam();
+							$$->is_set = true;
 							$$->pl.push_back($1);
 							DEBUG("[FunctionParam]");
 						}

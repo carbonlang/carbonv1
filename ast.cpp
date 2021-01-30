@@ -33,7 +33,20 @@ void TopLevel::codeGen() {
 
 void FunctionDefn::codeGen() {
 
-	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
+	llvm::FunctionType *func_type;
+
+	if (fs->fp->is_set) {
+		std::vector<llvm::Type *> func_param_vec;
+		std::list<TypeIdentifier *>::iterator tii;
+		for (tii = fs->fp->fpl.begin(); tii != fs->fp->fpl.end(); tii++) {
+			func_param_vec.push_back((*tii)->codeGen());
+		}
+		llvm::ArrayRef<llvm::Type *> func_param(func_param_vec);
+		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
+	} else {
+		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
+	}
+
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, fn, Module.get());
 
 	BB = llvm::BasicBlock::Create(Context, "", func);
@@ -234,19 +247,6 @@ void EnumDefn::codeGen() {
 
 void OptionDefn::codeGen() {
 
-}
-
-void StructUnionOptionFields::codeGen() {
-	//ALERT("OKK");
-	//llvm::ArrayRef<llvm::Type *> members (NULL, 10);
-	//if (is_set) {
-	//	std::vector<llvm::Type *> struct_fields;
-	//	std::list<TypeIdentifier *>::iterator tii;
-	//	for (tii = ti.begin(); tii != ti.end(); ++tii) {
-	//		struct_fields[0] = (*tii)->codeGen();
-	//	}
-	//	llvm::ArrayRef<llvm::Type *> members(struct_fields);
-	//}
 }
 
 llvm::Type *TypeIdentifier::codeGen() {
