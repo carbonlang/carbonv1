@@ -43,6 +43,16 @@ void FunctionDefn::codeGen() {
 		}
 		llvm::ArrayRef<llvm::Type *> func_param(func_param_vec);
 		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
+		// if (fs->fr->is_set) {
+		//	std::vector<llvm::Type *> func_return_vec;
+		//	std::list<TypeIdentifier *>::iterator tii;
+		//	for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
+		//		func_return_vec.push_back((*tii)->codeGen());
+		//	}
+		//	llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
+		//	func_type = llvm::FunctionType::get(func_return_vec, func_param, false);
+		// } else {
+		// }
 	} else {
 		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
 	}

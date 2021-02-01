@@ -132,6 +132,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <TypeIdentifier *> type_identifier
 %nterm <FunctionSign *> func_sign
 %nterm <FunctionParam *> func_param
+%nterm <FunctionReturn *> func_return
 
 %start source_file
 
@@ -226,10 +227,11 @@ access_modifier
 		;
 
 func_sign
-		: '(' func_param ')' FUNC_RETURN '(' func_return_list ')'
+		: '(' func_param ')' FUNC_RETURN '(' func_return ')'
 						{
 							$$ = new FunctionSign();
 							$$->fp = $2;
+							$$->fr = $6;
 							DEBUG("[Block]");
 						}
 		;
@@ -256,7 +258,7 @@ func_param
 						}
 		| func_param ',' type_identifier
 						{
-							$1->pl.push_back($3);
+							$1->fpl.push_back($3);
 							$$ = $1;
 							DEBUG("[FunctionParam]");
 						}
@@ -264,20 +266,53 @@ func_param
 						{
 							$$ = new FunctionParam();
 							$$->is_set = true;
-							$$->pl.push_back($1);
+							$$->fpl.push_back($1);
 							DEBUG("[FunctionParam]");
 						}
 		;
 
-func_return_list
-		: /* empty */
-		| func_return
-		| func_return_list ',' func_return
-		;
-
 func_return
-		: type IDENTIFIER
+		: /* empty */
+						{
+							$$ = new FunctionReturn();
+							$$->is_set = false;
+							DEBUG("[FunctionReturn]");
+						}
+		| func_return ',' type_identifier
+						{
+							$1->frl.push_back($3);
+							$$ = $1;
+							DEBUG("[FunctionReturn]");
+						}
+		| func_return ',' type
+						{
+							TypeIdentifier *ti = new TypeIdentifier();
+							ti->t = $3;
+							ti->ident = "";
+
+							$1->frl.push_back(ti);
+							$$ = $1;
+							DEBUG("[FunctionReturn]");
+						}
+		| type_identifier
+						{
+							$$ = new FunctionReturn();
+							$$->is_set = true;
+							$$->frl.push_back($1);
+							DEBUG("[FunctionReturn]");
+						}
 		| type
+						{
+							$$ = new FunctionReturn();
+							$$->is_set = true;
+
+							TypeIdentifier *ti = new TypeIdentifier();
+							ti->t = $1;
+							ti->ident = "";
+
+							$$->frl.push_back(ti);
+							DEBUG("[FunctionReturn]");
+						}
 		;
 
 type_func

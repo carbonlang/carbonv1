@@ -138,7 +138,7 @@ class FunctionDefn {
 class FunctionSign {
 	public:
 		FunctionParam *fp;
-		std::list<FunctionReturn *> rl;
+		FunctionReturn *fr;
 };
 
 class FunctionParam {
@@ -149,9 +149,8 @@ class FunctionParam {
 
 class FunctionReturn {
 	public:
-		std::string *n;
-		Type *t;
-		Literal *v;
+		bool is_set = false;
+		std::list<TypeIdentifier *> frl;
 };
 
 class TypeFunction {
