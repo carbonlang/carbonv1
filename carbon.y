@@ -160,6 +160,7 @@ top_level
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::COMPOSITE_TYPE_DEFN;
 							$$->ctd = $1;
+							$$->ctd->is_global = true;
 							DEBUG("[TopLevel::CompositeTypeDefn]");
 						}
 		| type_func			{
@@ -559,8 +560,9 @@ statement
 						}
 		| composite_type_defn		{
 							$$ = new Statement();
-							$$->type = Statement::types::COMPOSITE_TYPE_DEFN
-							// $$->ctds = &$1;
+							$$->type = Statement::types::COMPOSITE_TYPE_DEFN;
+							$$->ctds = $1;
+							$$->ctds->is_global = false;
 							DEBUG("[Stmt:CompositeTypeDefnStmt]");
 						}
 		| expression_stmt		{

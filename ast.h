@@ -41,7 +41,6 @@ class CompositeLiteral;
 class Statements;
 class Statement;
 class VarDeclStmt;
-class CompositeTypeDefnStmt;
 class ExpressionStmt;
 class AssignmentStmt;
 class SelectionStmt;
@@ -82,6 +81,7 @@ class ImportDecl {
 class CompositeTypeDefn {
 	public:
 		enum types { STRUCT, UNION, ENUM, OPTION } type;
+		bool is_global = false;
 		StructDefn *s;
 		UnionDefn *u;
 		EnumDefn *e;
@@ -93,27 +93,27 @@ class StructDefn {
 	public:
 		std::string ident;
 		StructUnionOptionFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class UnionDefn {
 	public:
 		std::string ident;
 		StructUnionOptionFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class EnumDefn {
 	public:
 		std::string ident;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class OptionDefn {
 	public:
 		std::string ident;
 		StructUnionOptionFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class StructUnionOptionFields {
@@ -202,7 +202,7 @@ class Statement {
 		enum types { VAR_DECL, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
 			ITERATION, JUMP, DEFER } type;
 		VarDeclStmt *vds;
-		CompositeTypeDefnStmt *ctds;
+		CompositeTypeDefn *ctds;
 		ExpressionStmt *es;
 		AssignmentStmt *as;
 		SelectionStmt *ss;
@@ -218,10 +218,6 @@ class VarDeclStmt {
 		Type *type;
 		Literal *lit;
 		void codeGen();
-};
-
-class CompositeTypeDefnStmt {
-
 };
 
 class ExpressionStmt {

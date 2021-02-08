@@ -63,12 +63,15 @@ def main(int a, bool b) -> (int) {
 	const int age = 200
 	register int i1 = 2x1100111011001110
 
-	struct Person {
+	struct Human {
 		int age
 		char gender
 		string name
 	}
-	union Person {
+	struct Zero {
+
+	}
+	union Bytes {
 		int age
 		char gender
 		string name
