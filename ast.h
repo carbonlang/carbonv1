@@ -47,6 +47,9 @@ class SelectionStmt;
 class IterationStmt;
 class JumpStmt;
 class DeferStmt;
+class IfElseStmt;
+class SwitchStmt;
+
 
 class FunctionSign;
 class FunctionParam;
@@ -273,7 +276,11 @@ class ExpressionList {
 };
 
 class SelectionStmt {
-
+	public:
+		enum types { IF_ELSE, SWITCH } type;
+		IfElseStmt *ies;
+		SwitchStmt *ss;
+		void codeGen();
 };
 
 class IfElseStmt {

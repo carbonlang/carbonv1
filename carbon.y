@@ -134,6 +134,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <FunctionParam *> func_param
 %nterm <FunctionReturn *> func_return
 
+%nterm <SelectionStmt *> selection_stmt
+%nterm <IfElseStmt *> if_else_stmt
+%nterm <SwitchStmt *> switch_stmt
+
 %start source_file
 
 %%
@@ -578,10 +582,10 @@ statement
 							DEBUG("[Stmt:AssignStmt]");
 						}
 /*	| inc_dec_stmt				*/
-		| selection			{
+		| selection_stmt		{
 							$$ = new Statement();
 							$$->type = Statement::types::SELECTION;
-							// $$->ss = &$1;
+							$$->ss = $1;
 							DEBUG("[Stmt:SelectionStmt]");
 						}
 		| iteration			{
@@ -1296,19 +1300,35 @@ defer_stmt
 		: DEFER block
 		;
 
-selection
-		: if_stmt			{
-							DEBUG("[If Stmt]");
+selection_stmt
+		: if_else_stmt			{
+							$$ = new SelectionStmt();
+							$$->type = SelectionStmt::types::IF_ELSE;
+							DEBUG("[SelectionStmt::IfElseStmt]");
 						}
 		| switch_stmt			{
-							DEBUG("[Switch Stmt]");
+							$$ = new SelectionStmt();
+							$$->type = SelectionStmt::types::SWITCH;
+							DEBUG("[SelectionStmt::SwitchStmt]");
 						}
 		;
 
-if_stmt
+if_else_stmt
 		: if_block
+						{
+							$$ = new IfElseStmt();
+							DEBUG("[IfElseStmt::If]");
+						}
 		| if_block else_block
+						{
+							$$ = new IfElseStmt();
+							DEBUG("[IfElseStmt::IfElse]");
+						}
 		| if_block else_if_block else_block
+						{
+							$$ = new IfElseStmt();
+							DEBUG("[IfElseStmt::IfElseIfElse]");
+						}
 		;
 
 if_block
@@ -1326,7 +1346,15 @@ else_if_block
 
 switch_stmt
 		: SWITCH '(' expression ')' '{' case_block '}'
+						{
+							$$ = new SwitchStmt();
+							DEBUG("[SwitchStmt::SwitchCase]");
+						}
 		| SWITCH '(' expression ')' '{' case_block case_default '}'
+						{
+							$$ = new SwitchStmt();
+							DEBUG("[SwitchStmt::SwitchCaseDefault]");
+						}
 		;
 
 case_block
