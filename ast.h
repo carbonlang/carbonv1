@@ -67,6 +67,7 @@ class Operand;
 class QualifiedIdent;
 class Index;
 class FunctionCall;
+class ExpressionList;
 
 class TypeIdentifier;
 
@@ -297,20 +298,33 @@ class Operand {
 };
 
 class QualifiedIdent {
-
+	public:
+		std::string ident;
+		bool is_dot_QualifiedIdent = false;
+		bool is_ptr_QualifiedIdent = false;
+		QualifiedIdent *dot_QualifiedIdent;
+		QualifiedIdent *ptr_QualifiedIdent;
+		void codeGen();
 };
 
 class Index {
 	public:
 		Expression *e;
+		void codeGen();
 };
 
 class FunctionCall {
-
+	public:
+		bool is_set = false;
+		ExpressionList *el;
+		void codeGen();
 };
 
 class ExpressionList {
-
+	public:
+		bool is_set = false;
+		std::list<Expression *> el;
+		void codeGen();
 };
 
 class SelectionStmt {

@@ -145,6 +145,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <QualifiedIdent *> qualified_ident
 %nterm <Index *> index
 %nterm <FunctionCall *> function_call
+%nterm <ExpressionList *> expression_list
 
 %start source_file
 
@@ -1339,41 +1340,66 @@ qualified_ident
 		: IDENTIFIER
 						{
 							$$ = new QualifiedIdent;
-							DEBUG("[Identifier]");
+							$$->ident = $1;
+							$$->is_dot_QualifiedIdent = false;
+							$$->is_ptr_QualifiedIdent = false;
+							DEBUG("Identifier");
 						}
 		| qualified_ident '.' IDENTIFIER
 						{
 							$$ = new QualifiedIdent;
-							DEBUG("[Identifier::X.Y");
+							$$->ident = $3;
+							$$->is_dot_QualifiedIdent = true;
+							$$->is_ptr_QualifiedIdent = false;
+							$$->dot_QualifiedIdent = $1;
+							DEBUG("Identifier::X.Y");
 						}
 		| qualified_ident PTR_MEMBER IDENTIFIER
 						{
 							$$ = new QualifiedIdent;
-							DEBUG("[Identifier::X~>Y");
+							$$->ident = $3;
+							$$->is_dot_QualifiedIdent = false;
+							$$->is_ptr_QualifiedIdent = true;
+							$$->ptr_QualifiedIdent = $1;
+							DEBUG("Identifier::X~>Y");
 						}
 		;
 
 index
 		: '[' expression ']'		{
 							$$ = new Index;
-							DEBUG("[Index");
+							$$->e = $2;
+							DEBUG("Index");
 						}
 		;
 
 function_call
 		: '(' ')'			{
 							$$ = new FunctionCall;
-							DEBUG("[Identifier]");
+							$$->el = NULL;
+							DEBUG("FunctionCallNoParam");
 						}
 		| '(' expression_list ')'	{
 							$$ = new FunctionCall;
-							DEBUG("[Identifier]");
+							$$->el = $2;
+							DEBUG("FunctionCall");
 						}
 		;
 
 expression_list
-		: expression
-		| expression_list ',' expression
+		: expression_list ',' expression
+						{
+							$1->el.push_back($3);
+							$$ = $1;
+							DEBUG("ExpressionList");
+						}
+		| expression
+						{
+							$$ = new ExpressionList;
+							$$->is_set = true;
+							$$->el.push_back($1);
+							DEBUG("ExpressionList");
+						}
 		;
 
 /******************************************************************************************/
