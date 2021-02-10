@@ -63,6 +63,10 @@ class StructUnionOptionFields;
 
 class UnaryExpression;
 class BinaryExpression;
+class Operand;
+class QualifiedIdent;
+class Index;
+class FunctionCall;
 
 class TypeIdentifier;
 
@@ -251,6 +255,7 @@ class UnaryExpression {
 		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY, PLUS, MINUS, BRACES, OPERAND } type;
 		UnaryExpression *ue;
 		Expression *e;
+		Operand *o;
 		void codeGen();
 };
 
@@ -282,10 +287,25 @@ class AssignOp {
 };
 
 class Operand {
-
+	public:
+		enum types { LITERAL, QUALIFIED_IDENT, INDEX, FUNCTION_CALL } type;
+		Literal *l;
+		QualifiedIdent *qi;
+		Index *i;
+		FunctionCall *fc;
+		void codeGen();
 };
 
 class QualifiedIdent {
+
+};
+
+class Index {
+	public:
+		Expression *e;
+};
+
+class FunctionCall {
 
 };
 

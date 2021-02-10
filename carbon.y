@@ -141,6 +141,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
+%nterm <Operand *> operand
+%nterm <QualifiedIdent *> qualified_ident
+%nterm <Index *> index
+%nterm <FunctionCall *> function_call
 
 %start source_file
 
@@ -1299,44 +1303,72 @@ unary_expr
 		| operand			{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::OPERAND;
-							// $$->ue = $1;
-							DEBUG("UnaryExpr::OPERAND");
+							$$->o = $1;
+							DEBUG("UnaryExpr::Operand");
 						}
 		;
 
 operand
-		: literal
-		| qualified_ident
-		| operand index			{
-							DEBUG("[Array Index]");
+		: literal			{
+							$$ = new Operand();
+							$$->type = Operand::types::LITERAL;
+							$$->l = $1;
+							DEBUG("Operand::Literal");
 						}
-		| operand arguments		{
-							DEBUG("[Function Call]");
+		| qualified_ident		{
+							$$ = new Operand();
+							$$->type = Operand::types::QUALIFIED_IDENT;
+							$$->qi = $1;
+							DEBUG("Operand::Literal");
+						}
+		| operand index			{
+							$$ = new Operand();
+							$$->type = Operand::types::INDEX;
+							$$->i = $2;
+							DEBUG("Operand::ArrayIndex");
+						}
+		| operand function_call		{
+							$$ = new Operand();
+							$$->type = Operand::types::FUNCTION_CALL;
+							$$->fc = $2;
+							DEBUG("Operand::FunctionCall");
 						}
 		;
 
 qualified_ident
 		: IDENTIFIER
 						{
+							$$ = new QualifiedIdent;
 							DEBUG("[Identifier]");
 						}
 		| qualified_ident '.' IDENTIFIER
 						{
-							DEBUG("[X.Y]");
+							$$ = new QualifiedIdent;
+							DEBUG("[Identifier::X.Y");
 						}
 		| qualified_ident PTR_MEMBER IDENTIFIER
 						{
-							DEBUG("[X~>Y]");
+							$$ = new QualifiedIdent;
+							DEBUG("[Identifier::X~>Y");
 						}
 		;
 
 index
-		: '[' expression ']'
+		: '[' expression ']'		{
+							$$ = new Index;
+							DEBUG("[Index");
+						}
 		;
 
-arguments
-		: '(' ')'
-		| '(' expression_list ')'
+function_call
+		: '(' ')'			{
+							$$ = new FunctionCall;
+							DEBUG("[Identifier]");
+						}
+		| '(' expression_list ')'	{
+							$$ = new FunctionCall;
+							DEBUG("[Identifier]");
+						}
 		;
 
 expression_list
@@ -1368,7 +1400,7 @@ var_decl_stmt
 		;
 
 expression_stmt
-		: operand arguments		{
+		: operand function_call		{
 							DEBUG("[Function Call]");
 						}
 		;
