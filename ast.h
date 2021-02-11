@@ -47,9 +47,12 @@ class SelectionStmt;
 class IterationStmt;
 class JumpStmt;
 class DeferStmt;
-class IfElseStmt;
-class SwitchStmt;
 
+class IfElseStmt;
+class IfBlock;
+class ElseBlock;
+
+class SwitchStmt;
 
 class FunctionSign;
 class FunctionParam;
@@ -336,7 +339,22 @@ class SelectionStmt {
 };
 
 class IfElseStmt {
+	public:
+		IfBlock *if_block;
+		ElseBlock *else_block;
+};
 
+class IfBlock {
+	public:
+		Expression *e;
+		Block *b;
+};
+
+class ElseBlock {
+	public:
+		bool is_set_if_else;
+		IfElseStmt *if_else;
+		Block *b;
 };
 
 class SwitchStmt {

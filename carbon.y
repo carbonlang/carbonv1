@@ -137,6 +137,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <SelectionStmt *> selection_stmt
 %nterm <IfElseStmt *> if_else_stmt
 %nterm <SwitchStmt *> switch_stmt
+%nterm <IfBlock *> if_block
+%nterm <ElseBlock *> else_block
 
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
@@ -1502,24 +1504,36 @@ if_else_stmt
 							$$ = new IfElseStmt();
 							DEBUG("[IfElseStmt::IfElse]");
 						}
-		| if_block else_if_block else_block
-						{
-							$$ = new IfElseStmt();
-							DEBUG("[IfElseStmt::IfElseIfElse]");
-						}
 		;
 
 if_block
 		: IF '(' expression ')' block
+						{
+							$$ = new IfBlock();
+							$$->e = $3;
+							$$->b = $5;
+							DEBUG("[IfElseStmt::IfBlock]");
+						}
 		;
 
 else_block
-		: ELSE block
-		;
+		: ELSE if_else_stmt
+						{
+							$$ = new ElseBlock();
+							$$->is_set_if_else = true;
+							$$->if_else = $2;
+							$$->b = NULL;
+							DEBUG("[IfElseStmt::ElseIfBlock]");
 
-else_if_block
-		: ELSE IF '(' expression ')' block
-		| else_if_block ELSE IF '(' expression ')' block
+						}
+		| ELSE block
+						{
+							$$ = new ElseBlock();
+							$$->is_set_if_else = false;
+							$$->if_else = NULL;
+							$$->b = $2;
+							DEBUG("[IfElseStmt::ElseBlock]");
+						}
 		;
 
 switch_stmt
