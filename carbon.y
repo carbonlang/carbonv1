@@ -150,6 +150,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <ExpressionList *> expression_list
 %nterm <CaseBlock *> case_block
 
+%nterm <JumpStmt *> jump_stmt
+
 %start source_file
 
 %%
@@ -1581,15 +1583,24 @@ case_block
 
 jump_stmt
 		: GOTO IDENTIFIER		{
+							$$ = new JumpStmt();
+							$$->type = JumpStmt::types::GOTO;
+							$$->goto_ident = $2;
 							DEBUG("[Goto]");
 						}
 		| CONTINUE			{
+							$$ = new JumpStmt();
+							$$->type = JumpStmt::types::CONTINUE;
 							DEBUG("[Continue]");
 						}
 		| BREAK				{
+							$$ = new JumpStmt();
+							$$->type = JumpStmt::types::BREAK;
 							DEBUG("[Break]");
 						}
 		| RETURN			{
+							$$ = new JumpStmt();
+							$$->type = JumpStmt::types::RETURN;
 							DEBUG("[Return]");
 						}
 /*		| RETURN expression_list	{

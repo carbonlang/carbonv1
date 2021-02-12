@@ -403,23 +403,9 @@ class DoWhileStmt {
 };
 
 class JumpStmt {
-
-};
-
-class GotoStmt {
-
-};
-
-class ContinueStmt {
-
-};
-
-class BreakStmt {
-
-};
-
-class ReturnStmt {
-
+	public:
+		enum types { GOTO, CONTINUE, BREAK, RETURN } type;
+		std::string goto_ident;
 };
 
 class DeferStmt {
