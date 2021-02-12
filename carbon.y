@@ -148,6 +148,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Index *> index
 %nterm <FunctionCall *> function_call
 %nterm <ExpressionList *> expression_list
+%nterm <CaseBlock *> case_block
 
 %start source_file
 
@@ -201,11 +202,11 @@ top_level
 import_decl
 		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL
 						{
-							DEBUG("[Import From As]");
+							DEBUG("[ImportFromAs]");
 						}
 		| IMPORT STR1_LITERAL FROM STR1_LITERAL
 						{
-							DEBUG("[Import From]");
+							DEBUG("[ImportFrom]");
 						}
 		| IMPORT STR1_LITERAL		{
 							DEBUG("[Import]");
@@ -914,13 +915,13 @@ struct_defn
 							$$ = new StructDefn();
 							$$->ident = $2;
 							$$->f = $4;
-							DEBUG("[Struct Defn]");
+							DEBUG("[StructDefn]");
 						}
 		| STRUCT IDENTIFIER '{' '}'
 						{
 							$$ = new StructDefn();
 							$$->ident = $2;
-							DEBUG("[Struct Defn]");
+							DEBUG("[StructDefn]");
 						}
 		;
 
@@ -930,13 +931,13 @@ union_defn
 							$$ = new UnionDefn();
 							$$->ident = $2;
 							$$->f = $4;
-							DEBUG("[Union Defn]");
+							DEBUG("[UnionDefn]");
 						}
 		| UNION IDENTIFIER '{' '}'
 						{
 							$$ = new UnionDefn();
 							$$->ident = $2;
-							DEBUG("[Union Defn]");
+							DEBUG("[UnionDefn]");
 						}
 		;
 
@@ -944,7 +945,7 @@ enum_defn
 		: ENUM IDENTIFIER '{' enum_fields '}'
 						{
 							$$ = new EnumDefn();
-							DEBUG("[Enum Defn]");
+							DEBUG("[EnumDefn]");
 						}
 		;
 
@@ -952,7 +953,7 @@ option_defn
 		: OPTION IDENTIFIER '{' struct_union_option_fields '}'
 						{
 							$$ = new OptionDefn();
-							DEBUG("[Option Defn]");
+							DEBUG("[OptionDefn]");
 						}
 		;
 
@@ -1096,7 +1097,7 @@ binary_expr
 							$$->type = BinaryExpression::types::PLUS;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::+");
+							DEBUG("[BinaryExpr::+]");
 						}
 		| expression MINUS expression
 						{
@@ -1104,7 +1105,7 @@ binary_expr
 							$$->type = BinaryExpression::types::MINUS;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::-");
+							DEBUG("[BinaryExpr::-]");
 						}
 		| expression MULTIPLY expression
 						{
@@ -1112,7 +1113,7 @@ binary_expr
 							$$->type = BinaryExpression::types::MULTIPLY;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::*");
+							DEBUG("[BinaryExpr::*]");
 						}
 		| expression DIVIDE expression
 						{
@@ -1120,7 +1121,7 @@ binary_expr
 							$$->type = BinaryExpression::types::DIVIDE;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::/");
+							DEBUG("[BinaryExpr::/]");
 						}
 		| expression MODULUS expression
 						{
@@ -1128,7 +1129,7 @@ binary_expr
 							$$->type = BinaryExpression::types::MODULUS;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::%%");
+							DEBUG("[BinaryExpr::%%]");
 						}
 		| expression RIGHT_SHIFT expression
 						{
@@ -1136,7 +1137,7 @@ binary_expr
 							$$->type = BinaryExpression::types::RIGHT_SHIFT;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::>>");
+							DEBUG("[BinaryExpr::>>]");
 						}
 		| expression LEFT_SHIFT expression
 						{
@@ -1144,7 +1145,7 @@ binary_expr
 							$$->type = BinaryExpression::types::LEFT_SHIFT;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::<<");
+							DEBUG("[BinaryExpr::<<]");
 						}
 		| expression RIGHT_SHIFT_US expression
 						{
@@ -1152,7 +1153,7 @@ binary_expr
 							$$->type = BinaryExpression::types::RIGHT_SHIFT_US;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::>>>");
+							DEBUG("[BinaryExpr::>>>]");
 						}
 		| expression LEFT_SHIFT_US expression
 						{
@@ -1160,7 +1161,7 @@ binary_expr
 							$$->type = BinaryExpression::types::LEFT_SHIFT_US;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::<<<");
+							DEBUG("[BinaryExpr::<<<]");
 						}
 		| expression LOGICAL_AND expression
 						{
@@ -1168,7 +1169,7 @@ binary_expr
 							$$->type = BinaryExpression::types::LOGICAL_AND;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::&");
+							DEBUG("[BinaryExpr::&]");
 						}
 		| expression LOGICAL_OR expression
 						{
@@ -1176,7 +1177,7 @@ binary_expr
 							$$->type = BinaryExpression::types::LOGICAL_OR;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::|");
+							DEBUG("[BinaryExpr::|]");
 						}
 		| expression IS_EQUAL expression
 						{
@@ -1184,7 +1185,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_EQUAL;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::==");
+							DEBUG("[BinaryExpr::==]");
 						}
 		| expression IS_NOT_EQUAL expression
 						{
@@ -1192,7 +1193,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_NOT_EQUAL;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::!=");
+							DEBUG("[BinaryExpr::!=]");
 						}
 		| expression IS_LESS expression
 						{
@@ -1200,7 +1201,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_LESS;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::<");
+							DEBUG("[BinaryExpr::<]");
 						}
 		| expression IS_GREATER expression
 						{
@@ -1208,7 +1209,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_GREATER;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::>");
+							DEBUG("[BinaryExpr::>]");
 						}
 		| expression IS_LESS_OR_EQ expression
 						{
@@ -1216,7 +1217,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_LESS_OR_EQ;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::<=");
+							DEBUG("[BinaryExpr::<=]");
 						}
 		| expression IS_GREATER_OR_EQ expression
 						{
@@ -1224,7 +1225,7 @@ binary_expr
 							$$->type = BinaryExpression::types::IS_GREATER_OR_EQ;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::>=");
+							DEBUG("[BinaryExpr::>=]");
 						}
 		| expression BITWISE_AND expression
 						{
@@ -1232,7 +1233,7 @@ binary_expr
 							$$->type = BinaryExpression::types::BITWISE_AND;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::&&");
+							DEBUG("[BinaryExpr::&&]");
 						}
 		| expression BITWISE_OR expression
 						{
@@ -1240,7 +1241,7 @@ binary_expr
 							$$->type = BinaryExpression::types::BITWISE_OR;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::||");
+							DEBUG("[BinaryExpr::||]");
 						}
 		| expression BITWISE_NOT expression
 						{
@@ -1248,7 +1249,7 @@ binary_expr
 							$$->type = BinaryExpression::types::BITWISE_NOT;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::^");
+							DEBUG("[BinaryExpr::^]");
 						}
 		| expression BITWISE_XOR expression
 						{
@@ -1256,7 +1257,7 @@ binary_expr
 							$$->type = BinaryExpression::types::BITWISE_XOR;
 							$$->le = $1;
 							$$->re = $3;
-							DEBUG("BinaryExpr::&^");
+							DEBUG("[BinaryExpr::&^]");
 						}
 		;
 
@@ -1265,49 +1266,49 @@ unary_expr
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_NOT;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::!");
+							DEBUG("[UnaryExpr::!]");
 						}
 		| U_2COMP unary_expr		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_2COMP;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::~");
+							DEBUG("[UnaryExpr::~]");
 						}
 		| U_ADD_OF unary_expr		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_ADD_OF;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::@");
+							DEBUG("[UnaryExpr::@]");
 						}
 		| MULTIPLY unary_expr		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MULTIPLY;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::$");
+							DEBUG("[UnaryExpr::$]");
 						}
 		| PLUS unary_expr		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::PLUS;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::+a");
+							DEBUG("[UnaryExpr::+a]");
 						}
 		| MINUS unary_expr		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MINUS;
 							$$->ue = $2;
-							DEBUG("UnaryExpr::-a");
+							DEBUG("[UnaryExpr::-a]");
 						}
 		| '(' expression ')'		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::BRACES;
 							$$->e = $2;
-							DEBUG("UnaryExpr::()");
+							DEBUG("[UnaryExpr::()]");
 						}
 		| operand			{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::OPERAND;
 							$$->o = $1;
-							DEBUG("UnaryExpr::Operand");
+							DEBUG("[UnaryExpr::Operand]");
 						}
 		;
 
@@ -1316,25 +1317,25 @@ operand
 							$$ = new Operand();
 							$$->type = Operand::types::LITERAL;
 							$$->l = $1;
-							DEBUG("Operand::Literal");
+							DEBUG("[Operand::Literal]");
 						}
 		| qualified_ident		{
 							$$ = new Operand();
 							$$->type = Operand::types::QUALIFIED_IDENT;
 							$$->qi = $1;
-							DEBUG("Operand::Literal");
+							DEBUG("[Operand::Literal]");
 						}
 		| operand index			{
 							$$ = new Operand();
 							$$->type = Operand::types::INDEX;
 							$$->i = $2;
-							DEBUG("Operand::ArrayIndex");
+							DEBUG("[Operand::ArrayIndex]");
 						}
 		| operand function_call		{
 							$$ = new Operand();
 							$$->type = Operand::types::FUNCTION_CALL;
 							$$->fc = $2;
-							DEBUG("Operand::FunctionCall");
+							DEBUG("[Operand::FunctionCall]");
 						}
 		;
 
@@ -1345,7 +1346,7 @@ qualified_ident
 							$$->ident = $1;
 							$$->is_dot_QualifiedIdent = false;
 							$$->is_ptr_QualifiedIdent = false;
-							DEBUG("Identifier");
+							DEBUG("[Identifier]");
 						}
 		| qualified_ident '.' IDENTIFIER
 						{
@@ -1354,7 +1355,7 @@ qualified_ident
 							$$->is_dot_QualifiedIdent = true;
 							$$->is_ptr_QualifiedIdent = false;
 							$$->dot_QualifiedIdent = $1;
-							DEBUG("Identifier::X.Y");
+							DEBUG("[Identifier::X.Y]");
 						}
 		| qualified_ident PTR_MEMBER IDENTIFIER
 						{
@@ -1363,7 +1364,7 @@ qualified_ident
 							$$->is_dot_QualifiedIdent = false;
 							$$->is_ptr_QualifiedIdent = true;
 							$$->ptr_QualifiedIdent = $1;
-							DEBUG("Identifier::X~>Y");
+							DEBUG("[Identifier::X~>Y]");
 						}
 		;
 
@@ -1371,7 +1372,7 @@ index
 		: '[' expression ']'		{
 							$$ = new Index;
 							$$->e = $2;
-							DEBUG("Index");
+							DEBUG("[Index]");
 						}
 		;
 
@@ -1379,12 +1380,12 @@ function_call
 		: '(' ')'			{
 							$$ = new FunctionCall;
 							$$->el = NULL;
-							DEBUG("FunctionCallNoParam");
+							DEBUG("[FunctionCallNoParam]");
 						}
 		| '(' expression_list ')'	{
 							$$ = new FunctionCall;
 							$$->el = $2;
-							DEBUG("FunctionCall");
+							DEBUG("[FunctionCall]");
 						}
 		;
 
@@ -1393,14 +1394,14 @@ expression_list
 						{
 							$1->el.push_back($3);
 							$$ = $1;
-							DEBUG("ExpressionList");
+							DEBUG("[ExpressionList]");
 						}
 		| expression
 						{
 							$$ = new ExpressionList;
 							$$->is_set = true;
 							$$->el.push_back($1);
-							DEBUG("ExpressionList");
+							DEBUG("[ExpressionList]");
 						}
 		;
 
@@ -1540,26 +1541,42 @@ switch_stmt
 		: SWITCH '(' expression ')' '{' case_block '}'
 						{
 							$$ = new SwitchStmt();
+							$$->e = $3;
+							$$->c = $6;
+							$$->is_set_default = false;
 							DEBUG("[SwitchStmt::SwitchCase]");
 						}
-		| SWITCH '(' expression ')' '{' case_block case_default '}'
+		| SWITCH '(' expression ')' '{' case_block DEFAULT ':' statements '}'
 						{
 							$$ = new SwitchStmt();
+							$$->e = $3;
+							$$->c = $6;
+							$$->is_set_default = true;
+							$$->default_s = $9;
 							DEBUG("[SwitchStmt::SwitchCaseDefault]");
 						}
 		;
 
 case_block
-		: CASE case_cond ':' statements
-		| case_block CASE case_cond ':' statements
-		;
-
-case_default
-		: DEFAULT ':' statements
-		;
-
-case_cond
-		: expression
+		: case_block CASE expression ':' statements
+						{
+							CaseExpressionStmt *ce = new CaseExpressionStmt();
+							ce->e = $3;
+							ce->s = $5;
+							$1->case_expression_stmt.push_back(ce);
+							$$ = $1;
+							DEBUG("[CaseBlock]");
+						}
+		| CASE expression ':' statements
+						{
+							$$ = new CaseBlock();
+							$$->is_set = true;
+							CaseExpressionStmt *ce = new CaseExpressionStmt();
+							ce->e = $2;
+							ce->s = $4;
+							$$->case_expression_stmt.push_back(ce);
+							DEBUG("[CaseBlock]");
+						}
 		;
 
 jump_stmt

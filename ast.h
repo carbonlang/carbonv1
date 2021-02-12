@@ -53,6 +53,8 @@ class IfBlock;
 class ElseBlock;
 
 class SwitchStmt;
+class CaseBlock;
+class CaseExpressionStmt;
 
 class FunctionSign;
 class FunctionParam;
@@ -342,12 +344,14 @@ class IfElseStmt {
 	public:
 		IfBlock *if_block;
 		ElseBlock *else_block;
+		void codeGen();
 };
 
 class IfBlock {
 	public:
 		Expression *e;
 		Block *b;
+		void codeGen();
 };
 
 class ElseBlock {
@@ -355,14 +359,31 @@ class ElseBlock {
 		bool is_set_if_else;
 		IfElseStmt *if_else;
 		Block *b;
+		void codeGen();
 };
 
 class SwitchStmt {
+	public:
+		Expression *e;
+		CaseBlock *c;
+		bool is_set_default = false;
+		Statements *default_s;
+		void codeGen();
 
 };
 
-class CaseStmt {
+class CaseBlock {
+	public:
+		bool is_set = false;
+		std::list<CaseExpressionStmt *> case_expression_stmt;
+		void codeGen();
+};
 
+class CaseExpressionStmt {
+	public:
+		Expression *e;
+		Statements *s;
+		void codeGen();
 };
 
 class IterationStmt {
