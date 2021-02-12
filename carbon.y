@@ -111,9 +111,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <TypeName *> type_name
 %nterm <Type *> type
 %nterm <Block *> block
+
 %nterm <Statements *> statements
 %nterm <Statement *> statement
 %nterm <VarDeclStmt *> var_decl_stmt
+%nterm <IterationStmt *> iteration
+%nterm <ForStmt *> for_stmt
+%nterm <ForInit *> for_init
+%nterm <ForCondition *> for_cond
+%nterm <ForPost *> for_post
+%nterm <WhileStmt *> while_stmt
+%nterm <DoWhileStmt *> dowhile_stmt
+
 %nterm <Literal *> literal
 %nterm <BooleanLiteral *> bool_lit
 %nterm <IntegerLiteral *> int_lit
@@ -1432,39 +1441,79 @@ var_decl_stmt
 
 expression_stmt
 		: operand function_call		{
-							DEBUG("[Function Call]");
+							DEBUG("[FunctionCall]");
 						}
 		;
 
 iteration
 		: for_stmt			{
-							DEBUG("[For Stmt]");
+							$$ = new IterationStmt();
+							$$->type = IterationStmt::types::FOR;
+							$$->f = $1;
+							DEBUG("[Iteration::ForStmt]");
 						}
 		| while_stmt			{
-							DEBUG("[While Stmt]");
+							$$ = new IterationStmt();
+							$$->type = IterationStmt::types::WHILE;
+							$$->w = $1;
+							DEBUG("[Iteration::WhileStmt]");
 						}
 		| dowhile_stmt			{
-							DEBUG("[DoWhile Stmt]");
+							$$ = new IterationStmt();
+							$$->type = IterationStmt::types::DO_WHILE;
+							$$->dw = $1;
+							DEBUG("[Iteration::DoWhileStmt]");
 						}
 		;
 
 for_stmt
 		: FOR '(' for_init for_cond for_post ')' block
+						{
+							$$ = new ForStmt();
+							$$->i = $3;
+							$$->c = $4;
+							$$->p = $5;
+							DEBUG("[ForStmt]");
+						}
 		;
 
 for_init
 		: ';'
+						{
+							$$ = new ForInit();
+							DEBUG("[ForStmt::Init]");
+						}
 		| simple_stmt ';'
+						{
+							$$ = new ForInit();
+							DEBUG("[ForStmt::Init]");
+						}
 		;
 
 for_cond
 		: ';'
+						{
+							$$ = new ForCondition();
+							DEBUG("[ForStmt::Condition]");
+						}
 		| expression ';'
+						{
+							$$ = new ForCondition();
+							DEBUG("[ForStmt::Condition]");
+						}
 		;
 
 for_post
 		: /* empty */
+						{
+							$$ = new ForPost();
+							DEBUG("[ForStmt::Post]");
+						}
 		| simple_stmt
+						{
+							$$ = new ForPost();
+							DEBUG("[ForStmt::Post]");
+						}
 		;
 
 simple_stmt
@@ -1473,10 +1522,18 @@ simple_stmt
 
 while_stmt
 		: WHILE '(' expression ')' block
+						{
+							$$ = new WhileStmt();
+							DEBUG("[WhileStmt]");
+						}
 		;
 
 dowhile_stmt
 		: DO block WHILE '(' expression ')'
+						{
+							$$ = new DoWhileStmt();
+							DEBUG("[DoWhileStmt]");
+						}
 		;
 
 defer_stmt

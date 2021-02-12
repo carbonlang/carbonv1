@@ -56,6 +56,13 @@ class SwitchStmt;
 class CaseBlock;
 class CaseExpressionStmt;
 
+class ForStmt;
+class ForInit;
+class ForCondition;
+class ForPost;
+class WhileStmt;
+class DoWhileStmt;
+
 class FunctionSign;
 class FunctionParam;
 class FunctionReturn;
@@ -387,10 +394,32 @@ class CaseExpressionStmt {
 };
 
 class IterationStmt {
+	public:
+		enum types { FOR, WHILE, DO_WHILE } type;
+		ForStmt *f;
+		WhileStmt *w;
+		DoWhileStmt *dw;
+		void codeGen();
 
 };
 
 class ForStmt {
+	public:
+		ForInit *i;
+		ForCondition *c;
+		ForPost *p;
+		void codeGen();
+};
+
+class ForInit {
+
+};
+
+class ForCondition {
+
+};
+
+class ForPost {
 
 };
 
