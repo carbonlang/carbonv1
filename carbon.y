@@ -120,6 +120,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <ForInit *> for_init
 %nterm <ForCondition *> for_cond
 %nterm <ForPost *> for_post
+%nterm <SimpleStmt *> simple_stmt
 %nterm <WhileStmt *> while_stmt
 %nterm <DoWhileStmt *> dowhile_stmt
 
@@ -1481,11 +1482,14 @@ for_init
 		: ';'
 						{
 							$$ = new ForInit();
+							$$->is_set = false;
 							DEBUG("[ForStmt::Init]");
 						}
 		| simple_stmt ';'
 						{
 							$$ = new ForInit();
+							$$->is_set = true;
+							$$->ss = $1;
 							DEBUG("[ForStmt::Init]");
 						}
 		;
@@ -1494,11 +1498,14 @@ for_cond
 		: ';'
 						{
 							$$ = new ForCondition();
+							$$->is_set = false;
 							DEBUG("[ForStmt::Condition]");
 						}
 		| expression ';'
 						{
 							$$ = new ForCondition();
+							$$->is_set = true;
+							$$->e = $1;
 							DEBUG("[ForStmt::Condition]");
 						}
 		;
@@ -1507,23 +1514,31 @@ for_post
 		: /* empty */
 						{
 							$$ = new ForPost();
+							$$->is_set = false;
 							DEBUG("[ForStmt::Post]");
 						}
 		| simple_stmt
 						{
 							$$ = new ForPost();
+							$$->is_set = true;
+							$$->ss = $1;
 							DEBUG("[ForStmt::Post]");
 						}
 		;
 
 simple_stmt
-		: assignment_stmt
+		: assignment_stmt		{
+							$$ = new SimpleStmt();
+							DEBUG("[ForStmt::SimpleStmt]");
+						}
 		;
 
 while_stmt
 		: WHILE '(' expression ')' block
 						{
 							$$ = new WhileStmt();
+							$$->e = $3;
+							$$->b = $5;
 							DEBUG("[WhileStmt]");
 						}
 		;
@@ -1532,6 +1547,8 @@ dowhile_stmt
 		: DO block WHILE '(' expression ')'
 						{
 							$$ = new DoWhileStmt();
+							$$->b = $2;
+							$$->e = $5;
 							DEBUG("[DoWhileStmt]");
 						}
 		;

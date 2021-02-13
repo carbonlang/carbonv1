@@ -62,6 +62,7 @@ class ForCondition;
 class ForPost;
 class WhileStmt;
 class DoWhileStmt;
+class SimpleStmt;
 
 class FunctionSign;
 class FunctionParam;
@@ -412,23 +413,43 @@ class ForStmt {
 };
 
 class ForInit {
-
+	public:
+		bool is_set = false;
+		SimpleStmt *ss;
+		void codeGen();
 };
 
 class ForCondition {
-
+	public:
+		bool is_set = false;
+		Expression *e;
+		void codeGen();
 };
 
 class ForPost {
+	public:
+		bool is_set = false;
+		SimpleStmt *ss;
+		void codeGen();
+};
 
+class SimpleStmt {
+	public:
+		void codeGen();
 };
 
 class WhileStmt {
-
+	public:
+		Expression *e;
+		Block *b;
+		void codeGen();
 };
 
 class DoWhileStmt {
-
+	public:
+		Expression *e;
+		Block *b;
+		void codeGen();
 };
 
 class JumpStmt {
