@@ -123,6 +123,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <SimpleStmt *> simple_stmt
 %nterm <WhileStmt *> while_stmt
 %nterm <DoWhileStmt *> dowhile_stmt
+%nterm <DeferStmt *> defer_stmt
 
 %nterm <Literal *> literal
 %nterm <BooleanLiteral *> bool_lit
@@ -615,19 +616,19 @@ statement
 		| iteration			{
 							$$ = new Statement();
 							$$->type = Statement::types::ITERATION;
-							// $$->is = &$1;
+							$$->is = $1;
 							DEBUG("[Stmt:IterationStmt]");
 						}
 		| jump_stmt			{
 							$$ = new Statement();
 							$$->type = Statement::types::JUMP;
-							// $$->js = &$1;
+							$$->js = $1;
 							DEBUG("[Stmt:JumpStmt]");
 						}
 		| defer_stmt			{
 							$$ = new Statement();
 							$$->type = Statement::types::DEFER;
-							// $$->ds = &$1;
+							$$->ds = $1;
 							DEBUG("[Stmt:DeferStmt]");
 						}
 
@@ -1554,7 +1555,11 @@ dowhile_stmt
 		;
 
 defer_stmt
-		: DEFER block
+		: DEFER block			{
+							$$ = new DeferStmt();
+							$$->b = $2;
+							DEBUG("[Defer]");
+						}
 		;
 
 selection_stmt

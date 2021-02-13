@@ -459,7 +459,9 @@ class JumpStmt {
 };
 
 class DeferStmt {
-
+	public:
+		Block *b;
+		void codeGen();
 };
 
 class Literal {
