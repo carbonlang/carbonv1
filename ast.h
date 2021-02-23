@@ -21,7 +21,10 @@ extern llvm::BasicBlock *BB;
 class TopLevel;
 
 class FunctionDefn;
+class AccessModifier;
 class CompositeTypeDefn;
+class TypeFunction;
+class FunctionDefnList;
 class Block;
 
 class Type;
@@ -153,6 +156,7 @@ class NamespaceDefn {
 
 class FunctionDefn {
 	public:
+		AccessModifier *am;
 		Block *b;
 		std::string fn;
 		FunctionSign *fs;
@@ -178,7 +182,14 @@ class FunctionReturn {
 };
 
 class TypeFunction {
+	public:
+		FunctionDefnList * fdl;
+};
 
+class FunctionDefnList {
+	public:
+		bool is_set = false;
+		std::list<FunctionDefn *> fdl;
 };
 
 class Storage {
@@ -205,7 +216,8 @@ class Type {
 };
 
 class AccessModifier {
-
+	public:
+		enum types { PUBLIC, PRIVATE } type;
 };
 
 class Block {

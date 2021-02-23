@@ -106,6 +106,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
 %nterm <FunctionDefn *> func_defn
+%nterm <AccessModifier *> access_modifier
+%nterm <TypeFunction *> type_func
+%nterm <FunctionDefnList *> func_defn_list
+
 %nterm <Storage *> storage_class
 %nterm <TypeQualifier *> type_qualifier
 %nterm <TypeName *> type_name
@@ -236,6 +240,9 @@ func_defn
 		: DEF IDENTIFIER func_sign block
 						{
 							$$ = new FunctionDefn();
+							// Default type is PUBLIC if not specified
+							$$->am = new AccessModifier();
+							$$->am->type = AccessModifier::types::PUBLIC;
 							$$->fn = $2;
 							$$->fs = $3;
 							$$->b = $4;
@@ -244,6 +251,7 @@ func_defn
 		| access_modifier DEF IDENTIFIER func_sign block
 						{
 							$$ = new FunctionDefn();
+							$$->am = $1;
 							$$->fn = $3;
 							$$->fs = $4;
 							$$->b = $5;
@@ -252,8 +260,14 @@ func_defn
 		;
 
 access_modifier
-		: PUBLIC
-		| PRIVATE
+		: PUBLIC			{
+							$$ = new AccessModifier();
+							$$->type = AccessModifier::types::PUBLIC;
+						}
+		| PRIVATE			{
+							$$ = new AccessModifier();
+							$$->type = AccessModifier::types::PRIVATE;
+						}
 		;
 
 func_sign
@@ -346,18 +360,33 @@ func_return
 		;
 
 type_func
-		: EXTEND type_name '{' func_defns '}'
+		: EXTEND type_name '{' func_defn_list '}'
 						{
-							DEBUG("[Type Function]");
+							$$ = new TypeFunction();
+							$$->fdl = $4;
+							DEBUG("[TypeFunction]");
 						}
-		| EXTEND type_name '{' '}'	{
-							DEBUG("[Type Function]");
+		| EXTEND type_name '{' '}'
+						{
+							$$ = new TypeFunction();
+							$$->fdl = new FunctionDefnList();
+							$$->fdl->is_set = false;
+							DEBUG("[TypeFunction]");
 						}
 		;
 
-func_defns
-		: func_defn
-		| func_defns func_defn
+func_defn_list
+		: func_defn_list func_defn	{
+							$$ = $1;
+							$$->fdl.push_back($2);
+							DEBUG("[TypeFunction::FunctionDefn]");
+						}
+		| func_defn			{
+							$$ = new FunctionDefnList();
+							$$->is_set = true;
+							$$->fdl.push_back($1);
+							DEBUG("[TypeFunction::FunctionDefn]");
+						}
 		;
 
 /******************************************************************************************/
