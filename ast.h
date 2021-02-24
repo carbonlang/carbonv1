@@ -20,6 +20,7 @@ extern llvm::BasicBlock *BB;
 
 class TopLevel;
 
+class ImportDecl;
 class FunctionDefn;
 class AccessModifier;
 class CompositeTypeDefn;
@@ -96,13 +97,18 @@ class SourceFile {
 class TopLevel {
 	public:
 		enum types { IMPORT_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC, NAMESPACE_DEFN, FUNC_DEFN } type;
+		ImportDecl *id;
 		FunctionDefn *fd;
 		CompositeTypeDefn *ctd;
+		TypeFunction *tf;
 		void codeGen();
 };
 
 class ImportDecl {
-
+	public:
+		std::string import;
+		std::string from;
+		std::string as;
 };
 
 class CompositeTypeDefn {
@@ -205,7 +211,7 @@ class TypeQualifier {
 class TypeName {
 	public:
 		enum type_names { BOOL, CHAR, BYTE, INT, INT8, INT16, INT32, INT64, UINT, UINT8,
-			UINT16, UINT32, UINT64, FLOAT32, FLOAT64, FLOAT128, STRING, POINTER, CUSTOM } type_name;
+			UINT16, UINT32, UINT64, FLOAT32, FLOAT64, FLOAT128, STRING, POINTER, FUNCTION, CUSTOM } type_name;
 };
 
 class Type {

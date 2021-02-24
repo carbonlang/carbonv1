@@ -105,6 +105,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
+%nterm <ImportDecl *> import_decl
 %nterm <FunctionDefn *> func_defn
 %nterm <AccessModifier *> access_modifier
 %nterm <TypeFunction *> type_func
@@ -186,7 +187,7 @@ top_level
 		: import_decl			{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::IMPORT_DECL;
-							// $$->fd = $1;
+							$$->id = $1;
 							DEBUG("[TopLevel::ImportDecl]");
 						}
 		| composite_type_defn		{
@@ -199,7 +200,7 @@ top_level
 		| type_func			{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::TYPE_FUNC;
-							// $$->fd = $1;
+							$$->tf = $1;
 							DEBUG("[TopLevel::TypeFunction]");
 						}
 		| namespace_defn		{
@@ -219,13 +220,23 @@ top_level
 import_decl
 		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL
 						{
+							$$ = new ImportDecl();
+							$$->import = $2;
+							$$->from = $4;
+							$$->as = $6;
 							DEBUG("[ImportFromAs]");
 						}
 		| IMPORT STR1_LITERAL FROM STR1_LITERAL
 						{
+							$$ = new ImportDecl();
+							$$->import = $2;
+							$$->from = $4;
 							DEBUG("[ImportFrom]");
 						}
-		| IMPORT STR1_LITERAL		{
+		| IMPORT STR1_LITERAL
+						{
+							$$ = new ImportDecl();
+							$$->import = $2;
 							DEBUG("[Import]");
 						}
 		;
@@ -562,9 +573,11 @@ type_name
 						}
 /*		| tupple_type			{
 							DEBUG("[Tupple]");
-							}
+						}
 */
 /*		| function_type			{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FUNCTION;
 							DEBUG("[Function]");
 						}
 */
@@ -574,7 +587,6 @@ type_name
 							DEBUG("[Type::CustomType]");
 						}
 		;
-
 /*
 function_type
 		: '(' func_param_type ')' FUNC_RETURN '(' func_ret_type ')'
