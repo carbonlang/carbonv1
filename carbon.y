@@ -160,6 +160,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <CompoundOp *> compound_op
 %nterm <LValue *> l_value
 %nterm <LValueList *> l_value_list
+%nterm <AssignmentStmt *> assignment_stmt
 
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
@@ -1127,7 +1128,11 @@ assign_op
 assignment_stmt
 		: l_value_list assign_op expression
 						{
-							DEBUG("[Assign stmt]");
+							$$ = new AssignmentStmt();
+							$$->lvl = $1;
+							$$->ao = $2;
+							$$->e = $3;
+							DEBUG("[AssignmentStmt]");
 						}
 		;
 

@@ -84,6 +84,7 @@ class CompoundOp;
 class LValue;
 class LValueList;
 
+class Expression;
 class UnaryExpression;
 class BinaryExpression;
 class Operand;
@@ -273,7 +274,11 @@ class ExpressionStmt {
 };
 
 class AssignmentStmt {
-
+	public:
+		LValueList *lvl;
+		AssignOp *ao;
+		Expression *e;
+		void codeGen();
 };
 
 class LValue {
