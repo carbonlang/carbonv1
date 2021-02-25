@@ -156,6 +156,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <IfBlock *> if_block
 %nterm <ElseBlock *> else_block
 
+%nterm <AssignOp *> assign_op
+%nterm <CompoundOp *> compound_op
+%nterm <LValue *> l_value
+%nterm <LValueList *> l_value_list
+
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
@@ -1043,60 +1048,75 @@ enum_fields
 /************************************** OPERATORS *****************************************/
 /******************************************************************************************/
 
-arith_op
+compound_op
 		: PLUS				{
-							DEBUG("[+]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::PLUS;
+							DEBUG("[+=]");
 						}
 		| MINUS				{
-							DEBUG("[-]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::MINUS;
+							DEBUG("[-=]");
 						}
 		| MULTIPLY			{
-							DEBUG("[-]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::MULTIPLY;
+							DEBUG("[-=]");
 						}
 		| DIVIDE			{
-							DEBUG("[/]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::DIVIDE;
+							DEBUG("[/=]");
 						}
 		| MODULUS			{
-							DEBUG("[%%]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::MODULUS;
+							DEBUG("[%%=]");
 						}
-		;
-
-shift_op
-		: RIGHT_SHIFT			{
-							DEBUG("[<<]");
+		| RIGHT_SHIFT			{
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::RIGHT_SHIFT;
+							DEBUG("[<<=]");
 						}
 		| LEFT_SHIFT			{
-							DEBUG("[>>]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::LEFT_SHIFT;
+							DEBUG("[>>=]");
 						}
 		| RIGHT_SHIFT_US		{
-							DEBUG("[<<<]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::RIGHT_SHIFT_US;
+							DEBUG("[<<<=]");
 						}
 		| LEFT_SHIFT_US			{
-							DEBUG("[>>>]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::LEFT_SHIFT_US;
+							DEBUG("[>>>=]");
 						}
-		;
-
-logical_op
-		: LOGICAL_AND			{
-							DEBUG("[&&]");
+		| LOGICAL_AND			{
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::LOGICAL_AND;
+							DEBUG("[&&=]");
 						}
 		| LOGICAL_OR			{
-							DEBUG("[||]");
+							$$ = new CompoundOp();
+							$$->type = CompoundOp::types::LOGICAL_OR;
+							DEBUG("[||=]");
 						}
 		;
 
 assign_op
 		: EQUAL_TO			{
+							$$ = new AssignOp();
+							$$->is_compound = false;
 							DEBUG("[=]");
 						}
-		| arith_op EQUAL_TO		{
-							DEBUG("[Arith =]");
-						}
-		| shift_op EQUAL_TO		{
-							DEBUG("[Shift =]");
-						}
-		| logical_op EQUAL_TO		{
-							DEBUG("[Logical =]");
+		| compound_op EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = false;
+							$$->co = $1;
+							DEBUG("[Compound=]");
 						}
 		;
 
@@ -1112,20 +1132,43 @@ assignment_stmt
 		;
 
 l_value_list
-		: l_value
-		| l_value_list ',' l_value
+		: l_value_list ',' l_value	{
+							$1->lvl.push_back($3);
+							$$ = $1;
+							DEBUG("[LValueList]");
+						}
+		| l_value			{
+							$$ = new LValueList();
+							$$->lvl.push_back($1);
+							DEBUG("[LValueList]");
+						}
 		;
 
 l_value
-		: qualified_ident
+		: qualified_ident		{
+							$$ = new LValue();
+							$$->type = LValue::types::QUALIFIED_IDENT;
+							$$->qi = $1;
+							DEBUG("[LValue::QualifiedIdent]");
+						}
 		| U_ADD_OF unary_expr		{
-							DEBUG("[@]");
+							$$ = new LValue();
+							$$->type = LValue::types::ADDR_OF_UNARY_EXP;
+							$$->ue = $2;
+							DEBUG("[LValue::AddrOfUnaryExpr]");
 						}
 		| U_POINTER unary_expr		{
-							DEBUG("[$]");
+							$$ = new LValue();
+							$$->type = LValue::types::PTR_TO_UNARY_EXP;
+							$$->ue = $2;
+							DEBUG("[LValue::PtrToUnaryExpr]");
 						}
 		| operand index			{
-							DEBUG("[LHS Array Index]");
+							$$ = new LValue();
+							$$->type = LValue::types::OPERAND_INDEX;
+							$$->o = $1;
+							$$->i = $2;
+							DEBUG("[LValue::OperandIndex]");
 						}
 		;
 

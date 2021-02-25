@@ -78,6 +78,12 @@ class EnumDefn;
 class OptionDefn;
 class StructUnionOptionFields;
 
+class AssignOp;
+class CompoundOp;
+
+class LValue;
+class LValueList;
+
 class UnaryExpression;
 class BinaryExpression;
 class Operand;
@@ -270,8 +276,19 @@ class AssignmentStmt {
 
 };
 
-class LValueList {
+class LValue {
+	public:
+		enum types { QUALIFIED_IDENT, ADDR_OF_UNARY_EXP, PTR_TO_UNARY_EXP, OPERAND_INDEX } type;
+		QualifiedIdent *qi;
+		UnaryExpression *ue;
+		Operand *o;
+		Index *i;
+};
 
+class LValueList {
+	public:
+		std::list<LValue *> lvl;
+		void codeGen();
 };
 
 class Expression {
@@ -302,20 +319,16 @@ class BinaryExpression {
 		void codeGen();
 };
 
-class ArithOp {
-
-};
-
-class ShiftOp {
-
-};
-
-class LogicalOp {
-
-};
-
 class AssignOp {
+	public:
+		bool is_compound = false;
+		CompoundOp *co;
+};
 
+class CompoundOp {
+	public:
+		enum types { PLUS, MINUS, MULTIPLY, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
+			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR } type;
 };
 
 class Operand {
