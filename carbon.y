@@ -1615,6 +1615,8 @@ for_post
 simple_stmt
 		: assignment_stmt		{
 							$$ = new SimpleStmt();
+							$$->type = SimpleStmt::types::ASSIGNMENT;
+							$$->as = $1;
 							DEBUG("[ForStmt::SimpleStmt]");
 						}
 		;

@@ -469,6 +469,8 @@ class ForPost {
 
 class SimpleStmt {
 	public:
+		enum types { ASSIGNMENT } type;
+		AssignmentStmt *as;
 		void codeGen();
 };
 
