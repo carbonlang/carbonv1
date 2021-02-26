@@ -74,7 +74,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> FLOAT32 FLOAT64 FLOAT128
 %token <int> STRING
 %token <int> POINTER
-%token <int> TYPE STRUCT UNION ENUM OPTION
+%token <int> TYPE STRUCT UNION ENUM
 %token <int> EXTEND
 %token <int> TRUE FALSE
 %token <int> PTR_NULL
@@ -143,8 +143,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <StructDefn *> struct_defn
 %nterm <UnionDefn *> union_defn
 %nterm <EnumDefn *> enum_defn
-%nterm <OptionDefn *> option_defn
-%nterm <StructUnionOptionFields *> struct_union_option_fields
+%nterm <StructUnionFields *> struct_union_fields
+%nterm <EnumFields *> enum_fields
 %nterm <TypeIdentifier *> type_identifier
 %nterm <FunctionSign *> func_sign
 %nterm <FunctionParam *> func_param
@@ -961,16 +961,10 @@ composite_type_defn
 							$$->e = $1;
 							DEBUG("[CompositeTypeDefn::Enum]");
 						}
-		| option_defn			{
-							$$ = new CompositeTypeDefn();
-							$$->type = CompositeTypeDefn::types::OPTION;
-							$$->o = $1;
-							DEBUG("[CompositeTypeDefn::Option]");
-						}
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' struct_union_option_fields '}'
+		: STRUCT IDENTIFIER '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
 							$$->ident = $2;
@@ -986,7 +980,7 @@ struct_defn
 		;
 
 union_defn
-		: UNION IDENTIFIER '{' struct_union_option_fields '}'
+		: UNION IDENTIFIER '{' struct_union_fields '}'
 						{
 							$$ = new UnionDefn();
 							$$->ident = $2;
@@ -1005,30 +999,24 @@ enum_defn
 		: ENUM IDENTIFIER '{' enum_fields '}'
 						{
 							$$ = new EnumDefn();
+							$$->ident = $2;
+							$$->f = $4;
 							DEBUG("[EnumDefn]");
 						}
 		;
 
-option_defn
-		: OPTION IDENTIFIER '{' struct_union_option_fields '}'
-						{
-							$$ = new OptionDefn();
-							DEBUG("[OptionDefn]");
-						}
-		;
-
-struct_union_option_fields
-		: struct_union_option_fields type_identifier
+struct_union_fields
+		: struct_union_fields type_identifier
 						{
 							$1->ti.push_back($2);
 							$$ = $1;
-							DEBUG("[StructUnionOptionFields]");
+							DEBUG("[StructUnionFields]");
 						}
 		| type_identifier		{
-							$$ = new StructUnionOptionFields();
+							$$ = new StructUnionFields();
 							$$->is_set = true;
 							$$->ti.push_back($1);
-							DEBUG("[StructUnionOptionFields::TypeIdentifier]");
+							DEBUG("[StructUnionFields::TypeIdentifier]");
 						}
 		;
 
@@ -1041,8 +1029,16 @@ type_identifier : type IDENTIFIER		{
 		;
 
 enum_fields
-		: IDENTIFIER
-		| enum_fields IDENTIFIER
+		: enum_fields IDENTIFIER	{							
+							$1->i.push_back($2);
+							$$ = $1;
+							DEBUG("[EnumFields]");
+						}
+		| IDENTIFIER			{
+							$$ = new EnumFields();
+							$$->i.push_back($1);
+							DEBUG("[EnumFields]");
+						}
 		;
 
 /******************************************************************************************/

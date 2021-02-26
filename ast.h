@@ -75,8 +75,8 @@ class FunctionReturn;
 class StructDefn;
 class UnionDefn;
 class EnumDefn;
-class OptionDefn;
-class StructUnionOptionFields;
+class StructUnionFields;
+class EnumFields;
 
 class AssignOp;
 class CompoundOp;
@@ -120,47 +120,45 @@ class ImportDecl {
 
 class CompositeTypeDefn {
 	public:
-		enum types { STRUCT, UNION, ENUM, OPTION } type;
+		enum types { STRUCT, UNION, ENUM } type;
 		bool is_global = false;
 		StructDefn *s;
 		UnionDefn *u;
 		EnumDefn *e;
-		OptionDefn *o;
 		void codeGen();
 };
 
 class StructDefn {
 	public:
 		std::string ident;
-		StructUnionOptionFields *f;
+		StructUnionFields *f;
 		void codeGen(bool);
 };
 
 class UnionDefn {
 	public:
 		std::string ident;
-		StructUnionOptionFields *f;
+		StructUnionFields *f;
 		void codeGen(bool);
 };
 
 class EnumDefn {
 	public:
 		std::string ident;
+		EnumFields *f;
 		void codeGen(bool);
 };
 
-class OptionDefn {
-	public:
-		std::string ident;
-		StructUnionOptionFields *f;
-		void codeGen(bool);
-};
-
-class StructUnionOptionFields {
+class StructUnionFields {
 	public:
 		bool is_set = false;
 		std::list<TypeIdentifier *> ti;
 		void codeGen();
+};
+
+class EnumFields {
+	public:
+		std::list<std::string> i;
 };
 
 class NamespaceDefn {

@@ -209,8 +209,6 @@ void CompositeTypeDefn::codeGen() {
 		u->codeGen(is_global);
 	} else if (type == CompositeTypeDefn::types::ENUM) {
 		e->codeGen(is_global);
-	} else if (type == CompositeTypeDefn::types::OPTION) {
-		o->codeGen(is_global);
 	}
 }
 
@@ -274,10 +272,6 @@ void UnionDefn::codeGen(bool is_global = false) {
 }
 
 void EnumDefn::codeGen(bool is_global = false) {
-
-}
-
-void OptionDefn::codeGen(bool is_global = false) {
 
 }
 

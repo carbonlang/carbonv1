@@ -115,7 +115,6 @@ ident				{letter}({letter}|{dec_digit})*
 "struct"			{ return yy::parser::token::STRUCT; }
 "union"				{ return yy::parser::token::UNION; }
 "enum"				{ return yy::parser::token::ENUM; }
-"option"			{ return yy::parser::token::OPTION; }
 
 {bin_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::BINARY_LIT; }
 {oct_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::OCTAL_LIT; }

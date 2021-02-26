@@ -81,10 +81,6 @@ def main(int a, bool b) -> (int) {
 		GREEN
 		BLUE
 	}
-	option Result {
-		int ok
-		string result
-	}
 
 	a = b
 	a = (b + c) - d
