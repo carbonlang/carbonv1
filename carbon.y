@@ -1651,11 +1651,13 @@ selection_stmt
 		: if_else_stmt			{
 							$$ = new SelectionStmt();
 							$$->type = SelectionStmt::types::IF_ELSE;
+							$$->ies = $1;
 							DEBUG("[SelectionStmt::IfElseStmt]");
 						}
 		| switch_stmt			{
 							$$ = new SelectionStmt();
 							$$->type = SelectionStmt::types::SWITCH;
+							$$->ss = $1;
 							DEBUG("[SelectionStmt::SwitchStmt]");
 						}
 		;
@@ -1664,11 +1666,15 @@ if_else_stmt
 		: if_block
 						{
 							$$ = new IfElseStmt();
+							$$->if_block = $1;
+							$$->else_block = NULL;
 							DEBUG("[IfElseStmt::If]");
 						}
 		| if_block else_block
 						{
 							$$ = new IfElseStmt();
+							$$->if_block = $1;
+							$$->else_block = $2;
 							DEBUG("[IfElseStmt::IfElse]");
 						}
 		;
