@@ -390,25 +390,17 @@ type_func
 							$$->fdl = $4;
 							DEBUG("[TypeFunction]");
 						}
-		| EXTEND type_name '{' '}'
-						{
-							$$ = new TypeFunction();
-							$$->fdl = new FunctionDefnList();
-							$$->fdl->is_set = false;
-							DEBUG("[TypeFunction]");
-						}
 		;
 
 func_defn_list
-		: func_defn_list func_defn	{
+		: /* empty */			{ /* WARNING ! UNTEST CODE */ }
+		| func_defn_list func_defn	{
+							if (!$1) {
+								$1 = new FunctionDefnList();
+								$1->is_set = true;
+							}
 							$$ = $1;
 							$$->fdl.push_back($2);
-							DEBUG("[TypeFunction::FunctionDefn]");
-						}
-		| func_defn			{
-							$$ = new FunctionDefnList();
-							$$->is_set = true;
-							$$->fdl.push_back($1);
 							DEBUG("[TypeFunction::FunctionDefn]");
 						}
 		;

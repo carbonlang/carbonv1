@@ -26,9 +26,21 @@ union Flags {
 }
 
 extend GlobalPerson {
+	def stand(int a) -> (int) {
+		int x
+	}
+	def sit(int a) -> (int) {
+		int x
+	}
 	def run(int a) -> (int) {
 		int x
 	}
+	def jump(int a) -> (int) {
+		int x
+	}
+}
+
+extend GlobalPerson1 {
 }
 
 def main(int a, bool b) -> (int) {
