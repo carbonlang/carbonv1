@@ -44,7 +44,7 @@ class CompositeLiteral;
 
 class Statements;
 class Statement;
-class VarDeclStmt;
+class VariableDecl;
 class ExpressionStmt;
 class AssignmentStmt;
 class SelectionStmt;
@@ -103,8 +103,10 @@ class SourceFile {
 
 class TopLevel {
 	public:
-		enum types { IMPORT_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC, NAMESPACE_DEFN, FUNC_DEFN } type;
+		enum types { IMPORT_DECL, VARIABLE_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC,
+			NAMESPACE_DEFN, FUNC_DEFN } type;
 		ImportDecl *id;
+		VariableDecl *vd;
 		FunctionDefn *fd;
 		CompositeTypeDefn *ctd;
 		TypeFunction *tf;
@@ -246,9 +248,9 @@ class Statements {
 
 class Statement {
 	public:
-		enum types { VAR_DECL, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
+		enum types { VARIABLE_DECL, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
 			ITERATION, JUMP, DEFER } type;
-		VarDeclStmt *vds;
+		VariableDecl *vds;
 		CompositeTypeDefn *ctds;
 		ExpressionStmt *es;
 		AssignmentStmt *as;
@@ -259,8 +261,9 @@ class Statement {
 		void codeGen();
 };
 
-class VarDeclStmt {
+class VariableDecl {
 	public:
+		bool is_global = false;
 		std::string ident;
 		Type *type;
 		Literal *lit;

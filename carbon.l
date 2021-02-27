@@ -51,7 +51,7 @@ float_lit			("+"|"-")?{float_1}|{float_2}|{float_3}
 escape_char			\\("a"|"b"|"f"|"n"|"r"|"t"|"v")
 char_lit			"'"([a-zA-z]|{escape_char})"'"|[0-255]
 
-letter				[a-zA-Z]
+letter				[a-zA-Z_]
 ident				{letter}({letter}|{dec_digit})*
 
 

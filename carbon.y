@@ -119,7 +119,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <Statements *> statements
 %nterm <Statement *> statement
-%nterm <VarDeclStmt *> var_decl_stmt
+%nterm <VariableDecl *> variable_decl
 %nterm <IterationStmt *> iteration
 %nterm <ForStmt *> for_stmt
 %nterm <ForInit *> for_init
@@ -195,6 +195,13 @@ top_level
 							$$->type = TopLevel::types::IMPORT_DECL;
 							$$->id = $1;
 							DEBUG("[TopLevel::ImportDecl]");
+						}
+		| variable_decl			{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::VARIABLE_DECL;
+							$$->vd = $1;
+							$$->vd->is_global = true;
+							DEBUG("[TopLevel::VariableDecl]");
 						}
 		| composite_type_defn		{
 							$$ = new TopLevel();
@@ -628,11 +635,12 @@ statements
 		;
 
 statement
-		: var_decl_stmt			{
+		: variable_decl			{
 							$$ = new Statement();
-							$$->type = Statement::types::VAR_DECL;
+							$$->type = Statement::types::VARIABLE_DECL;
 							$$->vds = $1;
-							DEBUG("[Stmt:VarDeclStmt]");
+							$$->vds->is_global = false;
+							DEBUG("[Stmt:VariableDecl]");
 						}
 		| composite_type_defn		{
 							$$ = new Statement();
@@ -1507,22 +1515,22 @@ expression_list
 /************************************** STATEMENTS ****************************************/
 /******************************************************************************************/
 
-var_decl_stmt
+variable_decl
 		: type IDENTIFIER
 						{
-							$$ = new VarDeclStmt();
+							$$ = new VariableDecl();
 							$$->type = $1;
 							$$->ident = $2;
 							$$->lit = NULL;
-							DEBUG("[VarDeclStmt::Identifier]");
+							DEBUG("[VariableDecl::Identifier]");
 						}
 		| type IDENTIFIER EQUAL_TO literal
 						{
-							$$ = new VarDeclStmt();
+							$$ = new VariableDecl();
 							$$->type = $1;
 							$$->ident = $2;
 							$$->lit = $4;
-							DEBUG("[VarDeclStmt::Literal::Identifier]");
+							DEBUG("[VariableDecl::Literal::Identifier]");
 						}
 		;
 

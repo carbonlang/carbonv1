@@ -4,6 +4,8 @@ import "print" from "io" as "cout"
 import "print" from "io"
 import "math"
 
+int g_status = 1
+
 ns Global {
 	int g
 }
