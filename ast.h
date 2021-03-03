@@ -27,6 +27,9 @@ class CompositeTypeDefn;
 class TypeFunction;
 class FunctionDefnList;
 class Block;
+class NamespaceDefn;
+class NamespaceBlockList;
+class NamespaceBlock;
 
 class Type;
 class Storage;
@@ -107,9 +110,10 @@ class TopLevel {
 			NAMESPACE_DEFN, FUNC_DEFN } type;
 		ImportDecl *id;
 		VariableDecl *vd;
-		FunctionDefn *fd;
 		CompositeTypeDefn *ctd;
 		TypeFunction *tf;
+		NamespaceDefn *nd;
+		FunctionDefn *fd;
 		void codeGen();
 };
 
@@ -164,7 +168,28 @@ class EnumFields {
 };
 
 class NamespaceDefn {
+	public:
+		std::string ident;
+		NamespaceBlockList *nsbl;
+		void codeGen();
 
+};
+
+class NamespaceBlockList {
+	public:
+		std::list<NamespaceBlock *> nsbl;
+};
+
+class NamespaceBlock {
+	public:
+		enum types { VARIABLE_DECL, COMPOSITE_TYPE_DEFN, TYPE_FUNC,
+			NAMESPACE_DEFN, FUNC_DEFN } type;
+		VariableDecl *vd;
+		CompositeTypeDefn *ctd;
+		TypeFunction *tf;
+		NamespaceDefn *nd;
+		FunctionDefn *fd;
+		void codeGen();
 };
 
 class FunctionDefn {

@@ -109,6 +109,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <FunctionDefn *> func_defn
 %nterm <AccessModifier *> access_modifier
 %nterm <TypeFunction *> type_func
+%nterm <NamespaceDefn *> namespace_defn
+%nterm <NamespaceBlockList *> namespace_block_list
+%nterm <NamespaceBlock *> namespace_block
+
 %nterm <FunctionDefnList *> func_defn_list
 
 %nterm <Storage *> storage_class
@@ -255,8 +259,63 @@ import_decl
 		;
 
 namespace_defn
-		: NAMESAPCE IDENTIFIER block 	{
+		: NAMESAPCE IDENTIFIER '{' namespace_block_list '}'
+						{
+							$$ = new NamespaceDefn();
+							$$->ident = $2;
+							$$->nsbl = $4;
 							DEBUG("[NS]");
+						}
+		;
+
+namespace_block_list
+		: /* empty */			{ /* WARNING ! UNTEST CODE */ }
+		| namespace_block_list namespace_block
+						{
+							if (!$1) {
+								$1 = new NamespaceBlockList();
+							}
+							$1->nsbl.push_back($2);
+							$$ = $1;
+							DEBUG("[NS::BlockList]");
+						}
+		;
+
+namespace_block
+		: variable_decl
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::VARIABLE_DECL;
+							$$->vd = $1;
+							DEBUG("[NS::VariableDecl]");
+						}
+		| composite_type_defn
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::COMPOSITE_TYPE_DEFN;
+							$$->ctd = $1;
+							DEBUG("[NS::CompositeTypeDefn]");
+						}
+		| type_func
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::TYPE_FUNC;
+							$$->tf = $1;
+							DEBUG("[NS::TypeFunction]");
+						}
+		| namespace_defn
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::NAMESPACE_DEFN;
+							$$->nd = $1;
+							DEBUG("[NS::NamespaceDefn]");
+						}
+		| func_defn
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::FUNC_DEFN;
+							$$->fd = $1;
+							DEBUG("[NS::FunctionDefn]");
 						}
 		;
 
@@ -399,8 +458,8 @@ func_defn_list
 								$1 = new FunctionDefnList();
 								$1->is_set = true;
 							}
+							$1->fdl.push_back($2);
 							$$ = $1;
-							$$->fdl.push_back($2);
 							DEBUG("[TypeFunction::FunctionDefn]");
 						}
 		;
