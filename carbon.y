@@ -32,6 +32,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 }
 
 %defines
+%locations
 %parse-param { yy::Lexer& lexer }  // Construct parser object with lexer
 %define api.value.type variant
 
@@ -1857,6 +1858,6 @@ int main() {
 	return 0;
 }
 
-void yy::parser::error(const std::string& msg) {
-	std::cerr << msg << std::endl;
+void yy::parser::error(const location_type& loc, const std::string& msg) {
+	std::cerr << msg << " @ " << "line=" << loc.begin.line << " col=" << loc.begin.column << std::endl;
 }

@@ -26,6 +26,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %}
 
 %option bison-cc
+%option bison-locations
 %option noyywrap
 %option namespace="yy"
 %option lexer="Lexer"
