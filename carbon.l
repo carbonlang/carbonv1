@@ -58,6 +58,7 @@ ident				{letter}({letter}|{dec_digit})*
 
 %%
 "/*".*"*/"			; /* Ignore all comments */
+[ \t\r\n]			; /* Ignore all whitespaces */
 
 "ns"				{ return yy::parser::token::NAMESAPCE; }
 "import"			{ return yy::parser::token::IMPORT; }
@@ -168,6 +169,8 @@ ident				{letter}({letter}|{dec_digit})*
 "--"				{ return yy::parser::token::U_DEC; }
 
 "="				{ return yy::parser::token::EQUAL_TO; }
+
+"::"				{ return yy::parser::token::SCOPE_R; }
 
 "public"			{ return yy::parser::token::PUBLIC; }
 "private"			{ return yy::parser::token::PRIVATE; }

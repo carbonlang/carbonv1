@@ -44,7 +44,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#define yylex lexer.yylex  // Within bison's parse() we should invoke lexer.yylex(), not the global yylex()
 
 	//#define DEBUG(str) std::cout << str
-	#define DEBUG(str) ;
+	#define DEBUG(str)
 	#define ERR(str) std::cout << str
 	#define ALERT(str) std::cout << "\n" \
 		<< "**********************************************" << "\n" \
@@ -103,6 +103,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
+%left SCOPE_R
 
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
@@ -170,9 +171,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
-%nterm <Operand *> operand
 %nterm <QualifiedIdent *> qualified_ident
-%nterm <Index *> index
 %nterm <FunctionCall *> function_call
 %nterm <ExpressionList *> expression_list
 %nterm <CaseBlock *> case_block
@@ -1212,24 +1211,11 @@ l_value
 							$$->qi = $1;
 							DEBUG("[LValue::QualifiedIdent]");
 						}
-		| U_ADD_OF unary_expr		{
-							$$ = new LValue();
-							$$->type = LValue::types::ADDR_OF_UNARY_EXP;
-							$$->ue = $2;
-							DEBUG("[LValue::AddrOfUnaryExpr]");
-						}
 		| U_POINTER unary_expr		{
 							$$ = new LValue();
 							$$->type = LValue::types::PTR_TO_UNARY_EXP;
 							$$->ue = $2;
 							DEBUG("[LValue::PtrToUnaryExpr]");
-						}
-		| operand index			{
-							$$ = new LValue();
-							$$->type = LValue::types::OPERAND_INDEX;
-							$$->o = $1;
-							$$->i = $2;
-							DEBUG("[LValue::OperandIndex]");
 						}
 		;
 
@@ -1245,6 +1231,9 @@ expression
 							$$->type = Expression::types::BINARY;
 							$$->be = $1;
 							DEBUG("[BinaryExpr]");
+						}
+		| '(' expression ')'		{
+							$$ = new Expression();
 						}
 		;
 
@@ -1420,81 +1409,57 @@ binary_expr
 		;
 
 unary_expr
-		: U_NOT unary_expr		{
+		: U_NOT expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_NOT;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::!]");
 						}
-		| U_2COMP unary_expr		{
+		| U_2COMP expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_2COMP;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::~]");
 						}
-		| U_ADD_OF unary_expr		{
+		| U_ADD_OF expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_ADD_OF;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::@]");
 						}
-		| MULTIPLY unary_expr		{
+		| MULTIPLY expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MULTIPLY;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::$]");
 						}
-		| PLUS unary_expr		{
+		| PLUS expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::PLUS;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::+a]");
 						}
-		| MINUS unary_expr		{
+		| MINUS expression		{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MINUS;
-							$$->ue = $2;
+							//$$->ue = $2;
 							DEBUG("[UnaryExpr::-a]");
 						}
-		| '(' expression ')'		{
+		| postfix_expr			{
 							$$ = new UnaryExpression();
-							$$->type = UnaryExpression::types::BRACES;
-							$$->e = $2;
+							//$$->type = UnaryExpression::types::BRACES;
+							//$$->e = $2;
 							DEBUG("[UnaryExpr::()]");
-						}
-		| operand			{
-							$$ = new UnaryExpression();
-							$$->type = UnaryExpression::types::OPERAND;
-							$$->o = $1;
-							DEBUG("[UnaryExpr::Operand]");
 						}
 		;
 
-operand
-		: literal			{
-							$$ = new Operand();
-							$$->type = Operand::types::LITERAL;
-							$$->l = $1;
-							DEBUG("[Operand::Literal]");
-						}
-		| qualified_ident		{
-							$$ = new Operand();
-							$$->type = Operand::types::QUALIFIED_IDENT;
-							$$->qi = $1;
-							DEBUG("[Operand::Literal]");
-						}
-		| operand index			{
-							$$ = new Operand();
-							$$->type = Operand::types::INDEX;
-							$$->i = $2;
-							DEBUG("[Operand::ArrayIndex]");
-						}
-		| operand function_call		{
-							$$ = new Operand();
-							$$->type = Operand::types::FUNCTION_CALL;
-							$$->fc = $2;
-							DEBUG("[Operand::FunctionCall]");
-						}
+postfix_expr
+		: literal
+		| qualified_ident
+		| postfix_expr '[' expression ']'
+		| postfix_expr function_call
+		| postfix_expr '.' IDENTIFIER
+		| postfix_expr PTR_MEMBER IDENTIFIER
 		;
 
 qualified_ident
@@ -1506,31 +1471,14 @@ qualified_ident
 							$$->is_ptr_QualifiedIdent = false;
 							DEBUG("[Identifier]");
 						}
-		| qualified_ident '.' IDENTIFIER
+		| qualified_ident SCOPE_R IDENTIFIER
 						{
 							$$ = new QualifiedIdent;
 							$$->ident = $3;
 							$$->is_dot_QualifiedIdent = true;
 							$$->is_ptr_QualifiedIdent = false;
 							$$->dot_QualifiedIdent = $1;
-							DEBUG("[Identifier::X.Y]");
-						}
-		| qualified_ident PTR_MEMBER IDENTIFIER
-						{
-							$$ = new QualifiedIdent;
-							$$->ident = $3;
-							$$->is_dot_QualifiedIdent = false;
-							$$->is_ptr_QualifiedIdent = true;
-							$$->ptr_QualifiedIdent = $1;
-							DEBUG("[Identifier::X~>Y]");
-						}
-		;
-
-index
-		: '[' expression ']'		{
-							$$ = new Index;
-							$$->e = $2;
-							DEBUG("[Index]");
+							DEBUG("[Identifier::X::Y]");
 						}
 		;
 
@@ -1587,7 +1535,7 @@ variable_decl
 		;
 
 expression_stmt
-		: operand function_call		{
+		: qualified_ident function_call	{
 							DEBUG("[FunctionCall]");
 						}
 		;

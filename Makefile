@@ -21,7 +21,7 @@ parser.o: parser.cc lexer.cc
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
 
 parser.cc: carbon.y
-	bison -o $@ $<
+	bison -v -o $@ $<
 
 ast.o: ast.cpp
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
