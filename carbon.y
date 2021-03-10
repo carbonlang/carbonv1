@@ -1451,11 +1451,13 @@ unary_expr
 							//$$->e = $2;
 							DEBUG("[UnaryExpr::()]");
 						}
+		| literal			{
+							$$ = new UnaryExpression();
+						}
 		;
 
 postfix_expr
-		: literal
-		| qualified_ident
+		: qualified_ident
 		| postfix_expr '[' expression ']'
 		| postfix_expr function_call
 		| postfix_expr '.' IDENTIFIER
@@ -1535,7 +1537,7 @@ variable_decl
 		;
 
 expression_stmt
-		: qualified_ident function_call	{
+		: postfix_expr function_call	{
 							DEBUG("[FunctionCall]");
 						}
 		;
