@@ -122,9 +122,9 @@ def main(int a, bool b) -> (int) {
 	b = -c + a.b~>c
 	a = b[10][100][20]
 
-	io.Print()
+	/* io.Print() */
 
-	io.Print(a, b)
+	/* io.Print(a, b) */
 
 	if (x > y)
 	{
@@ -141,7 +141,7 @@ def main(int a, bool b) -> (int) {
 	}
 
 	for (c = 0; c < 100; c += 1) {
-		math.inc(x)
+		/* math.inc(x) */
 	}
 
 	switch (x) {

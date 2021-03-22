@@ -97,13 +97,17 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> PUBLIC PRIVATE
 
+%token <int> U_POINTER U_INC U_DEC
+%token <int> SCOPE_R
+
 %left PLUS MINUS MULTIPLY DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
-%left U_NOT U_2COMP U_ADD_OF U_POINTER U_INC U_DEC
-%left SCOPE_R
+%precedence U_NOT
+%precedence U_2COMP
+%precedence U_ADD_OF
 
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
@@ -269,7 +273,7 @@ namespace_defn
 		;
 
 namespace_block_list
-		: /* empty */			{ /* WARNING ! UNTEST CODE */ }
+		: %empty			{ /* empty */ }
 		| namespace_block_list namespace_block
 						{
 							if (!$1) {
@@ -377,7 +381,7 @@ block
 		;
 
 func_param
-		: /* empty */
+		: %empty
 						{
 							$$ = new FunctionParam();
 							$$->is_set = false;
@@ -399,7 +403,7 @@ func_param
 		;
 
 func_return
-		: /* empty */
+		: %empty
 						{
 							$$ = new FunctionReturn();
 							$$->is_set = false;
@@ -452,7 +456,7 @@ type_func
 		;
 
 func_defn_list
-		: /* empty */			{ /* WARNING ! UNTEST CODE */ }
+		: %empty			{ /* empty */ }
 		| func_defn_list func_defn	{
 							if (!$1) {
 								$1 = new FunctionDefnList();
@@ -1607,7 +1611,7 @@ for_cond
 		;
 
 for_post
-		: /* empty */
+		: %empty
 						{
 							$$ = new ForPost();
 							$$->is_set = false;

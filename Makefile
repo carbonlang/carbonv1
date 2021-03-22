@@ -21,7 +21,9 @@ parser.o: parser.cc lexer.cc
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
 
 parser.cc: carbon.y
-	bison -v -o $@ $<
+	bison -Wall -v -o $@ $<
+	bison -x $<
+	xsltproc /usr/share/bison/xslt/xml2xhtml.xsl carbon.xml > carbon.html
 
 ast.o: ast.cpp
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
