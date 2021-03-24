@@ -373,11 +373,6 @@ block
 							$$->s = $2;
 							DEBUG("[Block]");
 						}
-		| '{' '}'			{
-							$$ = new Block();
-							$$->s = NULL;
-							DEBUG("[Block]");
-						}
 		;
 
 func_param
@@ -676,15 +671,13 @@ func_ret_type
 /******************************************************************************************/
 
 statements
-		: statements statement		{
+		: %empty			{ /* empty */ }
+		| statements statement		{
+							if (!$1) {
+								$1 = new Statements();
+							}
 							$1->s.push_back($2);
 							$$ = $1;
-							DEBUG("[Statements]");
-						}
-		| statement			{
-							$$ = new Statements();
-							$$->is_set = true;
-							$$->s.push_back($1);
 							DEBUG("[Statements]");
 						}
 		;
@@ -1034,12 +1027,6 @@ struct_defn
 							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
-		| STRUCT IDENTIFIER '{' '}'
-						{
-							$$ = new StructDefn();
-							$$->ident = $2;
-							DEBUG("[StructDefn]");
-						}
 		;
 
 union_defn
@@ -1048,12 +1035,6 @@ union_defn
 							$$ = new UnionDefn();
 							$$->ident = $2;
 							$$->f = $4;
-							DEBUG("[UnionDefn]");
-						}
-		| UNION IDENTIFIER '{' '}'
-						{
-							$$ = new UnionDefn();
-							$$->ident = $2;
 							DEBUG("[UnionDefn]");
 						}
 		;
@@ -1069,17 +1050,15 @@ enum_defn
 		;
 
 struct_union_fields
-		: struct_union_fields type_identifier
+		: %empty			{ /* empty */ }
+		| struct_union_fields type_identifier
 						{
+							if (!$1) {
+								$1 = new StructUnionFields();
+							}
 							$1->ti.push_back($2);
 							$$ = $1;
 							DEBUG("[StructUnionFields]");
-						}
-		| type_identifier		{
-							$$ = new StructUnionFields();
-							$$->is_set = true;
-							$$->ti.push_back($1);
-							DEBUG("[StructUnionFields::TypeIdentifier]");
 						}
 		;
 
@@ -1092,14 +1071,13 @@ type_identifier : type IDENTIFIER		{
 		;
 
 enum_fields
-		: enum_fields IDENTIFIER	{							
+		: %empty			{ /* empty */ }
+		| enum_fields IDENTIFIER	{
+							if (!$1) {
+								$1 = new EnumFields();
+							}
 							$1->i.push_back($2);
 							$$ = $1;
-							DEBUG("[EnumFields]");
-						}
-		| IDENTIFIER			{
-							$$ = new EnumFields();
-							$$->i.push_back($1);
 							DEBUG("[EnumFields]");
 						}
 		;
