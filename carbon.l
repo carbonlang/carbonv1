@@ -33,6 +33,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %option lex="yylex"
 %option unicode
 
+%{
+	// global variable to set a flag to insert ';' if its 1 and token is \n
+	int ins_eol = 0;
+%}
+
 bin_digit			[0-1]
 oct_digit			[0-7]
 dec_digit			[0-9]
@@ -58,139 +63,140 @@ ident				{letter}({letter}|{dec_digit})*
 
 %%
 "/*".*"*/"			; /* Ignore all comments */
-[ \t\r\n]			; /* Ignore all whitespaces */
+[ \t\r]				; /* Ignore all whitespaces */
+[\n]				{ if (ins_eol == 1) { ins_eol = 0; return yy::parser::token::EOL; } }
 
-"ns"				{ return yy::parser::token::NAMESAPCE; }
-"import"			{ return yy::parser::token::IMPORT; }
-"from"				{ return yy::parser::token::FROM; }
-"as"				{ return yy::parser::token::AS; }
+"ns"				{ ins_eol = 0; return yy::parser::token::NAMESAPCE; }
+"import"			{ ins_eol = 0; return yy::parser::token::IMPORT; }
+"from"				{ ins_eol = 0; return yy::parser::token::FROM; }
+"as"				{ ins_eol = 0; return yy::parser::token::AS; }
 
-"def"				{ return yy::parser::token::DEF; }
+"def"				{ ins_eol = 0; return yy::parser::token::DEF; }
 
-"("				{ return '('; }
-")"				{ return ')'; }
-"["				{ return '['; }
-"]"				{ return ']'; }
-"{"				{ return '{'; }
-"}"				{ return '}'; }
-"->"				{ return yy::parser::token::FUNC_RETURN; }
-"~>"				{ return yy::parser::token::PTR_MEMBER; }
-"."				{ return '.'; }
-":"				{ return ':'; }
-";"				{ return ';'; }
-","				{ return ','; }
-"..."				{ printf("[ ... ]"); }
+"("				{ ins_eol = 0; return '('; }
+")"				{ ins_eol = 1; return ')'; }
+"["				{ ins_eol = 0; return '['; }
+"]"				{ ins_eol = 1; return ']'; }
+"{"				{ ins_eol = 0; return '{'; }
+"}"				{ ins_eol = 0; return '}'; }
+"->"				{ ins_eol = 0; return yy::parser::token::FUNC_RETURN; }
+"~>"				{ ins_eol = 0; return yy::parser::token::PTR_MEMBER; }
+"."				{ ins_eol = 0; return '.'; }
+":"				{ ins_eol = 0; return ':'; }
+";"				{ ins_eol = 0; return ';'; }
+","				{ ins_eol = 0; return ','; }
+"..."				{ ins_eol = 0; }
 
-"register"			{ return yy::parser::token::REGISTER; }
-"static"			{ return yy::parser::token::STATIC; }
-"const"				{ return yy::parser::token::CONST; }
-"volatile"			{ return yy::parser::token::VOLATILE; }
-"restrict"			{ return yy::parser::token::RESTRICT; }
-"atomic"			{ return yy::parser::token::ATOMIC; }
-"const restrict"		{ return yy::parser::token::CONST_RESTRICT; }
+"register"			{ ins_eol = 0; return yy::parser::token::REGISTER; }
+"static"			{ ins_eol = 0; return yy::parser::token::STATIC; }
+"const"				{ ins_eol = 0; return yy::parser::token::CONST; }
+"volatile"			{ ins_eol = 0; return yy::parser::token::VOLATILE; }
+"restrict"			{ ins_eol = 0; return yy::parser::token::RESTRICT; }
+"atomic"			{ ins_eol = 0; return yy::parser::token::ATOMIC; }
+"const restrict"		{ ins_eol = 0; return yy::parser::token::CONST_RESTRICT; }
 
-"bool"				{ return yy::parser::token::BOOL; }
-"char"				{ return yy::parser::token::CHAR; }
-"byte"				{ return yy::parser::token::BYTE; }
-"int"				{ return yy::parser::token::INT; }
-"int8"				{ return yy::parser::token::INT8; }
-"int16"				{ return yy::parser::token::INT16; }
-"int32"				{ return yy::parser::token::INT32; }
-"int64"				{ return yy::parser::token::INT64; }
-"uint"				{ return yy::parser::token::UINT; }
-"uint8"				{ return yy::parser::token::UINT8; }
-"uint16"			{ return yy::parser::token::UINT16; }
-"uint32"			{ return yy::parser::token::UINT32; }
-"uint64"			{ return yy::parser::token::UINT64; }
-"float32"			{ return yy::parser::token::FLOAT32; }
-"float64"			{ return yy::parser::token::FLOAT64; }
-"float128"			{ return yy::parser::token::FLOAT128; }
+"bool"				{ ins_eol = 0; return yy::parser::token::BOOL; }
+"char"				{ ins_eol = 0; return yy::parser::token::CHAR; }
+"byte"				{ ins_eol = 0; return yy::parser::token::BYTE; }
+"int"				{ ins_eol = 0; return yy::parser::token::INT; }
+"int8"				{ ins_eol = 0; return yy::parser::token::INT8; }
+"int16"				{ ins_eol = 0; return yy::parser::token::INT16; }
+"int32"				{ ins_eol = 0; return yy::parser::token::INT32; }
+"int64"				{ ins_eol = 0; return yy::parser::token::INT64; }
+"uint"				{ ins_eol = 0; return yy::parser::token::UINT; }
+"uint8"				{ ins_eol = 0; return yy::parser::token::UINT8; }
+"uint16"			{ ins_eol = 0; return yy::parser::token::UINT16; }
+"uint32"			{ ins_eol = 0; return yy::parser::token::UINT32; }
+"uint64"			{ ins_eol = 0; return yy::parser::token::UINT64; }
+"float32"			{ ins_eol = 0; return yy::parser::token::FLOAT32; }
+"float64"			{ ins_eol = 0; return yy::parser::token::FLOAT64; }
+"float128"			{ ins_eol = 0; return yy::parser::token::FLOAT128; }
 
-"string"			{ return yy::parser::token::STRING; }
+"string"			{ ins_eol = 0; return yy::parser::token::STRING; }
 
-"ptr"				{ return yy::parser::token::POINTER; }
+"ptr"				{ ins_eol = 0; return yy::parser::token::POINTER; }
 
-"true"				{ return yy::parser::token::TRUE; }
-"false"				{ return yy::parser::token::FALSE; }
+"true"				{ ins_eol = 1; return yy::parser::token::TRUE; }
+"false"				{ ins_eol = 1; return yy::parser::token::FALSE; }
 
-"type"				{ return yy::parser::token::TYPE; }
-"struct"			{ return yy::parser::token::STRUCT; }
-"union"				{ return yy::parser::token::UNION; }
-"enum"				{ return yy::parser::token::ENUM; }
+"type"				{ ins_eol = 0; return yy::parser::token::TYPE; }
+"struct"			{ ins_eol = 0; return yy::parser::token::STRUCT; }
+"union"				{ ins_eol = 0; return yy::parser::token::UNION; }
+"enum"				{ ins_eol = 0; return yy::parser::token::ENUM; }
 
-{bin_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::BINARY_LIT; }
-{oct_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::OCTAL_LIT; }
-{dec_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::DECIMAL_LIT; }
-{hex_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::HEX_LIT; }
+{bin_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::BINARY_LIT; }
+{oct_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::OCTAL_LIT; }
+{dec_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::DECIMAL_LIT; }
+{hex_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HEX_LIT; }
 
-{float_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::FLOAT_LIT; }
+{float_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::FLOAT_LIT; }
 
-{char_lit}			{ yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
+{char_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
 
-\"[^"]*\"			{ return yy::parser::token::STR1_LITERAL; }
-\'[^']*\'			{ return yy::parser::token::STR2_LITERAL; }
-"r"\"[^"]*\"			{ return yy::parser::token::RSTR1_LITERAL; }
-"r"\'[^']*\'			{ return yy::parser::token::RSTR2_LITERAL; }
+\"[^"]*\"			{ ins_eol = 1; return yy::parser::token::STR1_LITERAL; }
+\'[^']*\'			{ ins_eol = 1; return yy::parser::token::STR2_LITERAL; }
+"r"\"[^"]*\"			{ ins_eol = 1; return yy::parser::token::RSTR1_LITERAL; }
+"r"\'[^']*\'			{ ins_eol = 1; return yy::parser::token::RSTR2_LITERAL; }
 
-\"\"\"[^"""]*\"\"\"		{ return yy::parser::token::HSTR1_LITERAL; }
-\'\'\'[^''']*\'\'\'		{ return yy::parser::token::HSTR2_LITERAL; }
-"r"\"\"\"[^"""]*\"\"\"		{ return yy::parser::token::HRSTR1_LITERAL; }
-"r"\'\'\'[^''']*\'\'\'		{ return yy::parser::token::HRSTR2_LITERAL; }
+\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; return yy::parser::token::HSTR1_LITERAL; }
+\'\'\'[^''']*\'\'\'		{ ins_eol = 1; return yy::parser::token::HSTR2_LITERAL; }
+"r"\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; return yy::parser::token::HRSTR1_LITERAL; }
+"r"\'\'\'[^''']*\'\'\'		{ ins_eol = 1; return yy::parser::token::HRSTR2_LITERAL; }
 
-"null"				{ return yy::parser::token::PTR_NULL; }
+"null"				{ ins_eol = 1; return yy::parser::token::PTR_NULL; }
 
-"+"				{ return yy::parser::token::PLUS; }
-"-"				{ return yy::parser::token::MINUS; }
-"*"				{ return yy::parser::token::MULTIPLY; }
-"/"				{ return yy::parser::token::DIVIDE; }
-"%"				{ return yy::parser::token::MODULUS; }
-"=="				{ return yy::parser::token::IS_EQUAL; }
-"!="				{ return yy::parser::token::IS_NOT_EQUAL; }
-"<"				{ return yy::parser::token::IS_LESS; }
-">"				{ return yy::parser::token::IS_GREATER; }
-"<="				{ return yy::parser::token::IS_LESS_OR_EQ; }
-">="				{ return yy::parser::token::IS_GREATER_OR_EQ; }
-">>"				{ return yy::parser::token::RIGHT_SHIFT; }
-"<<"				{ return yy::parser::token::LEFT_SHIFT; }
-">>>"				{ return yy::parser::token::RIGHT_SHIFT_US; }
-"<<<"				{ return yy::parser::token::LEFT_SHIFT_US; }
-"||"				{ return yy::parser::token::LOGICAL_OR; }
-"&&"				{ return yy::parser::token::LOGICAL_AND; }
-"&"				{ return yy::parser::token::BITWISE_AND; }
-"|"				{ return yy::parser::token::BITWISE_OR; }
-"^"				{ return yy::parser::token::BITWISE_NOT; }
-"&^"				{ return yy::parser::token::BITWISE_XOR; }
+"+"				{ ins_eol = 0; return yy::parser::token::PLUS; }
+"-"				{ ins_eol = 0; return yy::parser::token::MINUS; }
+"*"				{ ins_eol = 0; return yy::parser::token::MULTIPLY; }
+"/"				{ ins_eol = 0; return yy::parser::token::DIVIDE; }
+"%"				{ ins_eol = 0; return yy::parser::token::MODULUS; }
+"=="				{ ins_eol = 0; return yy::parser::token::IS_EQUAL; }
+"!="				{ ins_eol = 0; return yy::parser::token::IS_NOT_EQUAL; }
+"<"				{ ins_eol = 0; return yy::parser::token::IS_LESS; }
+">"				{ ins_eol = 0; return yy::parser::token::IS_GREATER; }
+"<="				{ ins_eol = 0; return yy::parser::token::IS_LESS_OR_EQ; }
+">="				{ ins_eol = 0; return yy::parser::token::IS_GREATER_OR_EQ; }
+">>"				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT; }
+"<<"				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT; }
+">>>"				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT_US; }
+"<<<"				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_US; }
+"||"				{ ins_eol = 0; return yy::parser::token::LOGICAL_OR; }
+"&&"				{ ins_eol = 0; return yy::parser::token::LOGICAL_AND; }
+"&"				{ ins_eol = 0; return yy::parser::token::BITWISE_AND; }
+"|"				{ ins_eol = 0; return yy::parser::token::BITWISE_OR; }
+"^"				{ ins_eol = 0; return yy::parser::token::BITWISE_NOT; }
+"&^"				{ ins_eol = 0; return yy::parser::token::BITWISE_XOR; }
 
-"!"				{ return yy::parser::token::U_NOT; }
-"~"				{ return yy::parser::token::U_2COMP; }
-"$"				{ return yy::parser::token::U_POINTER; }
-"@"				{ return yy::parser::token::U_ADD_OF; }
-"++"				{ return yy::parser::token::U_INC; }
-"--"				{ return yy::parser::token::U_DEC; }
+"!"				{ ins_eol = 0; return yy::parser::token::U_NOT; }
+"~"				{ ins_eol = 0; return yy::parser::token::U_2COMP; }
+"$"				{ ins_eol = 0; return yy::parser::token::U_POINTER; }
+"@"				{ ins_eol = 0; return yy::parser::token::U_ADD_OF; }
+"++"				{ ins_eol = 1; return yy::parser::token::U_INC; }
+"--"				{ ins_eol = 1; return yy::parser::token::U_DEC; }
 
-"="				{ return yy::parser::token::EQUAL_TO; }
+"="				{ ins_eol = 0; return yy::parser::token::EQUAL_TO; }
 
-"::"				{ return yy::parser::token::SCOPE_R; }
+"::"				{ ins_eol = 0; return yy::parser::token::SCOPE_R; }
 
-"public"			{ return yy::parser::token::PUBLIC; }
-"private"			{ return yy::parser::token::PRIVATE; }
+"public"			{ ins_eol = 0; return yy::parser::token::PUBLIC; }
+"private"			{ ins_eol = 0; return yy::parser::token::PRIVATE; }
 
-"return"			{ return yy::parser::token::RETURN; }
-"break"				{ return yy::parser::token::BREAK; }
-"continue"			{ return yy::parser::token::CONTINUE; }
-"goto"				{ return yy::parser::token::GOTO; }
-"fallthrough"			{ return yy::parser::token::FALLTHROUGH; }
-"if"				{ return yy::parser::token::IF; }
-"else"				{ return yy::parser::token::ELSE; }
-"for"				{ return yy::parser::token::FOR; }
-"while"				{ return yy::parser::token::WHILE; }
-"do"				{ return yy::parser::token::DO; }
-"switch"			{ return yy::parser::token::SWITCH; }
-"case"				{ return yy::parser::token::CASE; }
-"default"			{ return yy::parser::token::DEFAULT; }
-"defer"				{ return yy::parser::token::DEFER; }
-"extend"			{ return yy::parser::token::EXTEND; }
+"return"			{ ins_eol = 1; return yy::parser::token::RETURN; }
+"break"				{ ins_eol = 1; return yy::parser::token::BREAK; }
+"continue"			{ ins_eol = 1; return yy::parser::token::CONTINUE; }
+"goto"				{ ins_eol = 0; return yy::parser::token::GOTO; }
+"fallthrough"			{ ins_eol = 1; return yy::parser::token::FALLTHROUGH; }
+"if"				{ ins_eol = 0; return yy::parser::token::IF; }
+"else"				{ ins_eol = 0; return yy::parser::token::ELSE; }
+"for"				{ ins_eol = 0; return yy::parser::token::FOR; }
+"while"				{ ins_eol = 0; return yy::parser::token::WHILE; }
+"do"				{ ins_eol = 0; return yy::parser::token::DO; }
+"switch"			{ ins_eol = 0; return yy::parser::token::SWITCH; }
+"case"				{ ins_eol = 0; return yy::parser::token::CASE; }
+"default"			{ ins_eol = 0; return yy::parser::token::DEFAULT; }
+"defer"				{ ins_eol = 0; return yy::parser::token::DEFER; }
+"extend"			{ ins_eol = 0; return yy::parser::token::EXTEND; }
 
-{ident}				{ yylval.build<std::string>(text()); return yy::parser::token::IDENTIFIER; }
+{ident}				{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::IDENTIFIER; }
 
 %%

@@ -126,8 +126,7 @@ def main(int a, bool b) -> (int) {
 
 	/* io.Print(a, b) */
 
-	if (x > y)
-	{
+	if (x > y) {
 		x = y
 	} else if (x < y) {
 		x = x - y

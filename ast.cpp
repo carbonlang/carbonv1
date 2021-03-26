@@ -216,9 +216,9 @@ void StructDefn::codeGen(bool is_global = false) {
 	if (f) {
 		if (f->is_set) {
 			std::vector<llvm::Type *> struct_fields_vec;
-			std::list<TypeIdentifier *>::iterator tii;
-			for (tii = f->ti.begin(); tii != f->ti.end(); tii++) {
-				struct_fields_vec.push_back((*tii)->codeGen());
+			std::list<StructUnionField *>::iterator sufi;
+			for (sufi = f->suf.begin(); sufi != f->suf.end(); sufi++) {
+				struct_fields_vec.push_back((*sufi)->codeGen());
 			}
 			llvm::ArrayRef<llvm::Type *> struct_fields(struct_fields_vec);
 			llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, ident);
@@ -245,9 +245,9 @@ void UnionDefn::codeGen(bool is_global = false) {
 	if (f) {
 		if (f->is_set) {
 			std::vector<llvm::Type *> union_fields_vec;
-			std::list<TypeIdentifier *>::iterator tii;
-			for (tii = f->ti.begin(); tii != f->ti.end(); tii++) {
-				union_fields_vec.push_back((*tii)->codeGen());
+			std::list<StructUnionField *>::iterator sufi;
+			for (sufi = f->suf.begin(); sufi != f->suf.end(); sufi++) {
+				union_fields_vec.push_back((*sufi)->codeGen());
 			}
 			llvm::ArrayRef<llvm::Type *> union_fields(union_fields_vec);
 			llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
@@ -276,6 +276,72 @@ void EnumDefn::codeGen(bool is_global = false) {
 }
 
 llvm::Type *TypeIdentifier::codeGen() {
+	// REFER https://llvm.org/docs/LangRef.html#type-system
+	llvm::Type *llvm_type;
+
+	if (t->type_name->type_name == TypeName::type_names::BOOL) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::CHAR) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::BYTE) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::INT) {
+		llvm_type = llvm::Type::getInt64Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::INT8) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::INT16) {
+		llvm_type = llvm::Type::getInt16Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::INT32) {
+		llvm_type = llvm::Type::getInt32Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::INT64) {
+		llvm_type = llvm::Type::getInt64Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::UINT) {
+		llvm_type = llvm::Type::getInt64Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::UINT8) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::UINT16) {
+		llvm_type = llvm::Type::getInt16Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::UINT32) {
+		llvm_type = llvm::Type::getInt32Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::UINT64) {
+		llvm_type = llvm::Type::getInt64Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::FLOAT32) {
+		llvm_type = llvm::Type::getFloatTy(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::FLOAT64) {
+		llvm_type = llvm::Type::getDoubleTy(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::FLOAT128) {
+		llvm_type = llvm::Type::getFP128Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::STRING) {
+		llvm_type = llvm::Type::getInt8Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::POINTER) {
+		llvm_type = llvm::Type::getInt64PtrTy(Context, 0);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	} else if (t->type_name->type_name == TypeName::type_names::CUSTOM) {
+		llvm_type = llvm::Type::getInt64Ty(Context);
+	//	llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
+	}
+	return llvm_type;
+
+}
+
+llvm::Type *StructUnionField::codeGen() {
 	// REFER https://llvm.org/docs/LangRef.html#type-system
 	llvm::Type *llvm_type;
 

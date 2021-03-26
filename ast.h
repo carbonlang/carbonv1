@@ -79,6 +79,7 @@ class StructDefn;
 class UnionDefn;
 class EnumDefn;
 class StructUnionFields;
+class StructUnionField;
 class EnumFields;
 
 class AssignOp;
@@ -158,8 +159,15 @@ class EnumDefn {
 class StructUnionFields {
 	public:
 		bool is_set = false;
-		std::list<TypeIdentifier *> ti;
+		std::list<StructUnionField *> suf;
 		void codeGen();
+};
+
+class StructUnionField {
+	public:
+		Type *t;
+		std::string ident;
+		llvm::Type *codeGen();
 };
 
 class EnumFields {

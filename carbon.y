@@ -100,6 +100,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> U_POINTER U_INC U_DEC
 %token <int> SCOPE_R
 
+%token <int> EOL
+
 %left PLUS MINUS MULTIPLY DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
@@ -154,6 +156,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <UnionDefn *> union_defn
 %nterm <EnumDefn *> enum_defn
 %nterm <StructUnionFields *> struct_union_fields
+%nterm <StructUnionField *> struct_union_field
 %nterm <EnumFields *> enum_fields
 %nterm <TypeIdentifier *> type_identifier
 %nterm <FunctionSign *> func_sign
@@ -198,13 +201,13 @@ source_file
 		;
 
 top_level
-		: import_decl			{
+		: import_decl EOL		{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::IMPORT_DECL;
 							$$->id = $1;
 							DEBUG("[TopLevel::ImportDecl]");
 						}
-		| variable_decl			{
+		| variable_decl	EOL		{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::VARIABLE_DECL;
 							$$->vd = $1;
@@ -286,7 +289,7 @@ namespace_block_list
 		;
 
 namespace_block
-		: variable_decl
+		: variable_decl EOL
 						{
 							$$ = new NamespaceBlock();
 							$$->type = NamespaceBlock::types::VARIABLE_DECL;
@@ -438,6 +441,15 @@ func_return
 
 							$$->frl.push_back(ti);
 							DEBUG("[FunctionReturn]");
+						}
+		;
+
+type_identifier
+		: type IDENTIFIER		{
+							$$ = new TypeIdentifier();
+							$$->t = $1;
+							$$->ident = $2;
+							DEBUG("[TypeIdentifier]");
 						}
 		;
 
@@ -683,7 +695,7 @@ statements
 		;
 
 statement
-		: variable_decl			{
+		: variable_decl	EOL		{
 							$$ = new Statement();
 							$$->type = Statement::types::VARIABLE_DECL;
 							$$->vds = $1;
@@ -697,13 +709,13 @@ statement
 							$$->ctds->is_global = false;
 							DEBUG("[Stmt:CompositeTypeDefnStmt]");
 						}
-		| expression_stmt		{
+		| expression_stmt EOL		{
 							$$ = new Statement();
 							$$->type = Statement::types::EXPRESSION;
 							// $$->es = &$1;
 							DEBUG("[Stmt:ExprStmt]");
 						}
-		| assignment_stmt		{
+		| assignment_stmt EOL		{
 							$$ = new Statement();
 							$$->type = Statement::types::ASSIGNMENT;
 							// $$->as = &$1;
@@ -722,7 +734,7 @@ statement
 							$$->is = $1;
 							DEBUG("[Stmt:IterationStmt]");
 						}
-		| jump_stmt			{
+		| jump_stmt EOL			{
 							$$ = new Statement();
 							$$->type = Statement::types::JUMP;
 							$$->js = $1;
@@ -1051,28 +1063,29 @@ enum_defn
 
 struct_union_fields
 		: %empty			{ /* empty */ }
-		| struct_union_fields type_identifier
+		| struct_union_fields struct_union_field
 						{
 							if (!$1) {
 								$1 = new StructUnionFields();
 							}
-							$1->ti.push_back($2);
+							$1->suf.push_back($2);
 							$$ = $1;
 							DEBUG("[StructUnionFields]");
 						}
 		;
 
-type_identifier : type IDENTIFIER		{
-							$$ = new TypeIdentifier();
+struct_union_field
+		: type IDENTIFIER EOL		{
+							$$ = new StructUnionField();
 							$$->t = $1;
 							$$->ident = $2;
-							DEBUG("[TypeIdentifier]");
+							DEBUG("[StructUnionField]");
 						}
 		;
 
 enum_fields
 		: %empty			{ /* empty */ }
-		| enum_fields IDENTIFIER	{
+		| enum_fields IDENTIFIER EOL	{
 							if (!$1) {
 								$1 = new EnumFields();
 							}
