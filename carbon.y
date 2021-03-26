@@ -650,21 +650,23 @@ type_name
 							DEBUG("[Tupple]");
 						}
 */
-/*		| function_type			{
+		| function_type			{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FUNCTION;
 							DEBUG("[Function]");
 						}
-*/
 		| IDENTIFIER			{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::CUSTOM;
 							DEBUG("[Type::CustomType]");
 						}
 		;
-/*
+
 function_type
 		: '(' func_param_type ')' FUNC_RETURN '(' func_ret_type ')'
+						{
+
+						}
 		;
 
 func_param_type
@@ -676,7 +678,6 @@ func_ret_type
 		: type
 		| func_ret_type ',' type
 		;
-*/
 
 /******************************************************************************************/
 /************************************** STATEMENTS ****************************************/

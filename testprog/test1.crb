@@ -165,8 +165,9 @@ def main(int a, bool b) -> (int) {
 	return
 }
 
-public def run(int a, int b) -> () {
+public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
 	int z = 0
+	ptr : (int , int) -> (bool) f1
 	return
 }
 
