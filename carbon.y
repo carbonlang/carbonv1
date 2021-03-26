@@ -646,10 +646,6 @@ type_name
 							$$->type_name = TypeName::type_names::POINTER;
 							DEBUG("[Type::Pointer]");
 						}
-/*		| tupple_type			{
-							DEBUG("[Tupple]");
-						}
-*/
 		| function_type			{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FUNCTION;
@@ -801,7 +797,6 @@ literal
 							$$->composite = $1;
 							DEBUG("[Literal::Composite]");
 						}
-		/* TODO: | tupple_lit */
 		;
 
 bool_lit
@@ -989,23 +984,6 @@ comp_key
 comp_element
 		: literal
 		;
-
-/*
-tupple_lit
-		: '(' tupple_items ')'
-		;
-
-tupple_items
-		: tupple_item
-		| tupple_items ',' tupple_item
-		;
-
-tupple_item
-		: IDENTIFIER
-		| literal
-		| expression
-		;
-*/
 
 /******************************************************************************************/
 /******************************* COMPOSITE TYPE DEFINITION ********************************/
