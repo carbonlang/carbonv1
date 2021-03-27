@@ -1018,6 +1018,13 @@ struct_defn
 							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
+		| STRUCT '{' struct_union_fields '}'
+						{
+							$$ = new StructDefn();
+							$$->ident = "";
+							$$->f = $3;
+							DEBUG("[StructDefn]");
+						}
 		;
 
 union_defn
@@ -1028,6 +1035,13 @@ union_defn
 							$$->f = $4;
 							DEBUG("[UnionDefn]");
 						}
+		| UNION '{' struct_union_fields '}'
+						{
+							$$ = new UnionDefn();
+							$$->ident = "";
+							$$->f = $3;
+							DEBUG("[UnionDefn]");
+						}
 		;
 
 enum_defn
@@ -1036,6 +1050,13 @@ enum_defn
 							$$ = new EnumDefn();
 							$$->ident = $2;
 							$$->f = $4;
+							DEBUG("[EnumDefn]");
+						}
+		| ENUM '{' enum_fields '}'
+						{
+							$$ = new EnumDefn();
+							$$->ident = "";
+							$$->f = $3;
 							DEBUG("[EnumDefn]");
 						}
 		;
