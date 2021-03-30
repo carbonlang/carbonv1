@@ -563,7 +563,7 @@ class IntegerLiteral {
 
 class FloatLiteral {
 	public:
-		double value;
+		long double value;
 		int reg_size = 0;
 };
 

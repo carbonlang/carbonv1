@@ -55,14 +55,23 @@ float_3				"."{dec_digit}+{float_exp}
 float_lit			("+"|"-")?{float_1}|{float_2}|{float_3}
 
 escape_char			\\("a"|"b"|"f"|"n"|"r"|"t"|"v")
-char_lit			"'"([a-zA-z]|{escape_char})"'"|[0-255]
+char_lit			"'"([a-zA-z]|{escape_char})"'"
 
 letter				[a-zA-Z_]
 ident				{letter}({letter}|{dec_digit})*
 
+%x COMMENT
 
 %%
-"/*".*"*/"			; /* Ignore all comments */
+
+"/*"				{ start(COMMENT); }
+<COMMENT>[^*]*			; // eat anything that is not a '*'
+<COMMENT>"*"+[^*/]*		; // eat '*'s not followed by a '/'
+<COMMENT>"*"+"/"		{ start(INITIAL); }
+<COMMENT><<EOF>>		{ std::cerr << "EOF in comment\n"; return 1; }
+
+"//"(.)*			; /* Ignore single line commnet */
+
 [ \t\r]				; /* Ignore all whitespaces */
 [\n]				{ if (ins_eol == 1) { ins_eol = 0; return yy::parser::token::EOL; } }
 
@@ -133,15 +142,15 @@ ident				{letter}({letter}|{dec_digit})*
 
 {char_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
 
-\"[^"]*\"			{ ins_eol = 1; return yy::parser::token::STR1_LITERAL; }
-\'[^']*\'			{ ins_eol = 1; return yy::parser::token::STR2_LITERAL; }
-"r"\"[^"]*\"			{ ins_eol = 1; return yy::parser::token::RSTR1_LITERAL; }
-"r"\'[^']*\'			{ ins_eol = 1; return yy::parser::token::RSTR2_LITERAL; }
+\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::STR1_LITERAL; }
+\'[^']*\'			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::STR2_LITERAL; }
+"r"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::RSTR1_LITERAL; }
+"r"\'[^']*\'			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::RSTR2_LITERAL; }
 
-\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; return yy::parser::token::HSTR1_LITERAL; }
-\'\'\'[^''']*\'\'\'		{ ins_eol = 1; return yy::parser::token::HSTR2_LITERAL; }
-"r"\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; return yy::parser::token::HRSTR1_LITERAL; }
-"r"\'\'\'[^''']*\'\'\'		{ ins_eol = 1; return yy::parser::token::HRSTR2_LITERAL; }
+\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HSTR1_LITERAL; }
+\'\'\'[^''']*\'\'\'		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HSTR2_LITERAL; }
+"r"\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HRSTR1_LITERAL; }
+"r"\'\'\'[^''']*\'\'\'		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HRSTR2_LITERAL; }
 
 "null"				{ ins_eol = 1; return yy::parser::token::PTR_NULL; }
 

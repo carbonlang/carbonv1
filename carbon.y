@@ -38,6 +38,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %code {
 	#include <typeinfo>
+	#include <limits>
 	#include "ast.h"
 	#include "lex.yy.h"  // header file generated with reflex --header-file
 	#undef yylex
@@ -65,8 +66,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> NAMESAPCE
 %token <int> IMPORT FROM AS
-%token <int> STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
-%token <int> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
+%token <std::string> STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
+%token <std::string> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
 %token <int> FUNC_RETURN
 %token <std::string> IDENTIFIER
 %token <int> DEF
@@ -718,7 +719,6 @@ statement
 							// $$->as = &$1;
 							DEBUG("[Stmt:AssignStmt]");
 						}
-/*	| inc_dec_stmt				*/
 		| selection_stmt		{
 							$$ = new Statement();
 							$$->type = Statement::types::SELECTION;
@@ -891,6 +891,15 @@ int_lit
 float_lit
 		: FLOAT_LIT			{
 							$$ = new FloatLiteral();
+							$$->value = stold($1);
+							if ($$->value <= std::numeric_limits<float>::max()) {
+								$$->reg_size = 32;
+							} else if ($$->value <= std::numeric_limits<double>::max()) {
+								$$->reg_size = 64;
+							} else {
+								$$->reg_size = 128;
+								/* TODO */
+							}
 							DEBUG("[Literal::Float]");
 						}
 		;

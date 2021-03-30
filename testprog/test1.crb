@@ -48,6 +48,9 @@ extend GlobalPerson {
 extend GlobalPerson1 {
 }
 
+/* The "main" function is entry point of the program
+ * This is test for multi-line comment
+ */
 def main(int a, bool b) -> (int) {
 	bool a
 	bool b = false
@@ -62,7 +65,7 @@ def main(int a, bool b) -> (int) {
 	uint32 i10 = 3454
 	uint64 i11 = -12
 
-	float32 f1 = 123.45
+	float32 f1 = 3.40282e+39
 	float64 f1 = 123e7
 	float128 f1 = 123.456e-67
 	char c1 = 'a'
@@ -124,7 +127,10 @@ def main(int a, bool b) -> (int) {
 
 	/* io.Print() */
 
-	/* io.Print(a, b) */
+	int before_comment = 0
+	io.Print(a, b)
+	// int in_comment = 0
+	int after_comment = 0
 
 	if (x > y) {
 		x = y
