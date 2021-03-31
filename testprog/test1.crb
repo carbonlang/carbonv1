@@ -127,10 +127,11 @@ def main(int a, bool b) -> (int) {
 
 	/* io.Print() */
 
-	int before_comment = 0
+	/* this is a pre comment */ int before_comment = 0
 	io.Print(a, b)
 	// int in_comment = 0
-	int after_comment = 0
+	int after_comment = 0 /* this is a post comment
+	on two separate lines */
 
 	if (x > y) {
 		x = y
