@@ -969,30 +969,24 @@ func_lit
 		;
 
 composite_lit
-		: IDENTIFIER '{' composite_list '}'
+		: '{' composite_lit_list '}'
 						{
+							/* For struct, union, arrays, etc */
 							$$ = new CompositeLiteral();
 							DEBUG("[Literal::Composite]");
 						}
 		;
 
-composite_list
-		: keyed_element
-		| composite_list ',' keyed_element
+composite_lit_list
+		: composite_lit_element
+		| composite_lit_list ',' composite_lit_element
 		;
 
-keyed_element
-		: comp_element
-		| comp_key ':' comp_element
+composite_lit_element
+		: expression
+		| IDENTIFIER ':' expression
 		;
 
-comp_key
-		: IDENTIFIER
-		;
-
-comp_element
-		: literal
-		;
 
 /******************************************************************************************/
 /******************************* COMPOSITE TYPE DEFINITION ********************************/
@@ -1789,9 +1783,9 @@ jump_stmt
 							$$->type = JumpStmt::types::RETURN;
 							DEBUG("[Return]");
 						}
-/*		| RETURN expression_list	{
+		| RETURN expression_list	{
 							DEBUG("[Return Expr]");
-						} */
+						}
 		;
 
 %%

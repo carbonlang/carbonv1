@@ -169,7 +169,7 @@ def main(int a, bool b) -> (int) {
 		free(p)
 	}
 
-	return
+	return a + b, c
 }
 
 public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
