@@ -1516,21 +1516,32 @@ expression_list
 /******************************************************************************************/
 
 variable_decl
-		: type IDENTIFIER
+		: type variable_ident_list
 						{
 							$$ = new VariableDecl();
-							$$->type = $1;
-							$$->ident = $2;
-							$$->lit = NULL;
+							//$$->type = $1;
+							//$$->ident = $2;
+							//$$->lit = NULL;
+							DEBUG("[VariableDecl]");
+						}
+		;
+
+variable_ident_list
+		: variable_ident_list ',' IDENTIFIER EQUAL_TO literal
+						{
+							DEBUG("[VariableDecl::IdentifierEqLit]");
+						}
+		| variable_ident_list ',' IDENTIFIER
+						{
 							DEBUG("[VariableDecl::Identifier]");
 						}
-		| type IDENTIFIER EQUAL_TO literal
+		| IDENTIFIER EQUAL_TO literal
 						{
-							$$ = new VariableDecl();
-							$$->type = $1;
-							$$->ident = $2;
-							$$->lit = $4;
-							DEBUG("[VariableDecl::Literal::Identifier]");
+							DEBUG("[VariableDecl::IdentifierEqLit]");
+						}
+		| IDENTIFIER
+						{
+							DEBUG("[VariableDecl::Identifier]");
 						}
 		;
 

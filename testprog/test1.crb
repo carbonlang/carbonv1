@@ -48,11 +48,9 @@ extend GlobalPerson {
 extend GlobalPerson1 {
 }
 
-/* The "main" function is entry point of the program
- * This is test for multi-line comment
- */
+/* The "main" function is entry point of the program. * This is test for multi-line comment */
 def main(int a, bool b) -> (int) {
-	bool a
+	bool a, b = false, c = true, d
 	bool b = false
 	int in1
 	int in2 = 8x1237
