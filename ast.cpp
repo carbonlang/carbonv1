@@ -78,7 +78,7 @@ void Block::codeGen() {
 void Statements::codeGen() {
 	std::list<Statement *>::iterator si;
 	for (si = s.begin(); si != s.end(); ++si) {
-		if ((*si)->type == Statement::types::VARIABLE_DECL) {
+		if ((*si)->type == Statement::types::VARIABLE_DEF) {
 			(*si)->vds->codeGen();
 		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
 			(*si)->ctds->codeGen();
@@ -86,7 +86,7 @@ void Statements::codeGen() {
 	}
 }
 
-void VariableDecl::codeGen() {
+void VariableDef::codeGen() {
 	// REFER https://llvm.org/docs/LangRef.html#type-system
 	llvm::Type *llvm_type;
 	llvm::Value *val;

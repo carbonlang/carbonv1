@@ -132,7 +132,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <Statements *> statements
 %nterm <Statement *> statement
-%nterm <VariableDecl *> variable_decl
+%nterm <VariableDef *> variable_def
 %nterm <IterationStmt *> iteration
 %nterm <ForStmt *> for_stmt
 %nterm <ForInit *> for_init
@@ -208,12 +208,12 @@ top_level
 							$$->id = $1;
 							DEBUG("[TopLevel::ImportDecl]");
 						}
-		| variable_decl	EOL		{
+		| variable_def EOL		{
 							$$ = new TopLevel();
-							$$->type = TopLevel::types::VARIABLE_DECL;
+							$$->type = TopLevel::types::VARIABLE_DEF;
 							$$->vd = $1;
 							$$->vd->is_global = true;
-							DEBUG("[TopLevel::VariableDecl]");
+							DEBUG("[TopLevel::VariableDef]");
 						}
 		| composite_type_defn		{
 							$$ = new TopLevel();
@@ -290,12 +290,12 @@ namespace_block_list
 		;
 
 namespace_block
-		: variable_decl EOL
+		: variable_def EOL
 						{
 							$$ = new NamespaceBlock();
-							$$->type = NamespaceBlock::types::VARIABLE_DECL;
+							$$->type = NamespaceBlock::types::VARIABLE_DEF;
 							$$->vd = $1;
-							DEBUG("[NS::VariableDecl]");
+							DEBUG("[NS::VariableDef]");
 						}
 		| composite_type_defn
 						{
@@ -708,12 +708,12 @@ statements
 		;
 
 statement
-		: variable_decl	EOL		{
+		: variable_def EOL		{
 							$$ = new Statement();
-							$$->type = Statement::types::VARIABLE_DECL;
+							$$->type = Statement::types::VARIABLE_DEF;
 							$$->vds = $1;
 							$$->vds->is_global = false;
-							DEBUG("[Stmt:VariableDecl]");
+							DEBUG("[Stmt:VariableDef]");
 						}
 		| composite_type_defn		{
 							$$ = new Statement();
@@ -1530,33 +1530,33 @@ expression_list
 /************************************** STATEMENTS ****************************************/
 /******************************************************************************************/
 
-variable_decl
+variable_def
 		: type variable_ident_list
 						{
-							$$ = new VariableDecl();
+							$$ = new VariableDef();
 							//$$->type = $1;
 							//$$->ident = $2;
 							//$$->lit = NULL;
-							DEBUG("[VariableDecl]");
+							DEBUG("[VariableDef]");
 						}
 		;
 
 variable_ident_list
 		: variable_ident_list ',' IDENTIFIER EQUAL_TO literal
 						{
-							DEBUG("[VariableDecl::IdentifierEqLit]");
+							DEBUG("[VariableDef::IdentifierEqLit]");
 						}
 		| variable_ident_list ',' IDENTIFIER
 						{
-							DEBUG("[VariableDecl::Identifier]");
+							DEBUG("[VariableDef::Identifier]");
 						}
 		| IDENTIFIER EQUAL_TO literal
 						{
-							DEBUG("[VariableDecl::IdentifierEqLit]");
+							DEBUG("[VariableDef::IdentifierEqLit]");
 						}
 		| IDENTIFIER
 						{
-							DEBUG("[VariableDecl::Identifier]");
+							DEBUG("[VariableDef::Identifier]");
 						}
 		;
 
