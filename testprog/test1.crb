@@ -78,6 +78,8 @@ def main(int a, bool b) -> (int) {
 	string s8 = '''this is a test'''
 	string s7 = """this is a test"""
 	ptr : int p1 = null
+	ptr : struct Person s1
+	struct Person p
 
 	static atomic bool isActive = true
 	const int age = 200

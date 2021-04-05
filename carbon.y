@@ -647,6 +647,21 @@ type_name
 							$$->type_name = TypeName::type_names::POINTER;
 							DEBUG("[Type::Pointer]");
 						}
+		| STRUCT IDENTIFIER		{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRUCT;
+							DEBUG("[Type::Struct]");
+						}
+		| UNION	IDENTIFIER		{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UNION;
+							DEBUG("[Type::Union]");
+						}
+		| ENUM IDENTIFIER		{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::ENUM;
+							DEBUG("[Type::ENUM]");
+						}
 		| function_type			{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FUNCTION;
