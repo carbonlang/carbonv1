@@ -87,7 +87,7 @@ ident				{letter}({letter}|{dec_digit})*
 "["				{ ins_eol = 0; return '['; }
 "]"				{ ins_eol = 1; return ']'; }
 "{"				{ ins_eol = 0; return '{'; }
-"}"				{ ins_eol = 0; return '}'; }
+"}"				{ ins_eol = 1; return '}'; }
 "->"				{ ins_eol = 0; return yy::parser::token::FUNC_RETURN; }
 "~>"				{ ins_eol = 0; return yy::parser::token::PTR_MEMBER; }
 "."				{ ins_eol = 0; return '.'; }

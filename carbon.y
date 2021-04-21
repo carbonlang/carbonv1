@@ -267,7 +267,7 @@ import_decl
 		;
 
 namespace_defn
-		: NAMESAPCE IDENTIFIER '{' namespace_block_list '}'
+		: NAMESAPCE IDENTIFIER '{' namespace_block_list '}' EOL
 						{
 							$$ = new NamespaceDefn();
 							$$->ident = $2;
@@ -328,7 +328,7 @@ namespace_block
 		;
 
 func_defn
-		: DEF IDENTIFIER func_sign block
+		: DEF IDENTIFIER func_sign block EOL
 						{
 							$$ = new FunctionDefn();
 							// Default type is PUBLIC if not specified
@@ -339,7 +339,7 @@ func_defn
 							$$->b = $4;
 							DEBUG("[FunctionDefn]");
 						}
-		| access_modifier DEF IDENTIFIER func_sign block
+		| access_modifier DEF IDENTIFIER func_sign block EOL
 						{
 							$$ = new FunctionDefn();
 							$$->am = $1;
@@ -455,7 +455,7 @@ type_identifier
 		;
 
 type_func
-		: EXTEND type_name '{' func_defn_list '}'
+		: EXTEND type_name '{' func_defn_list '}' EOL
 						{
 							$$ = new TypeFunction();
 							$$->fdl = $4;
@@ -977,14 +977,14 @@ ptr_lit
 		;
 
 func_lit
-		: DEF func_sign block		{
+		: DEF func_sign block EOL	{
 							$$ = new FunctionLiteral();
 							DEBUG("[Literal::Function]");
 						}
 		;
 
 composite_lit
-		: '{' composite_lit_list '}'
+		: '{' composite_lit_list '}' EOL
 						{
 							/* For struct, union, arrays, etc */
 							$$ = new CompositeLiteral();
@@ -1029,52 +1029,97 @@ composite_type_defn
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' struct_union_fields '}'
+		: STRUCT IDENTIFIER '{' struct_union_fields '}' variable_ident_list EOL
 						{
 							$$ = new StructDefn();
 							$$->ident = $2;
 							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
-		| STRUCT '{' struct_union_fields '}'
+		| STRUCT IDENTIFIER '{' struct_union_fields '}' EOL
+						{
+							$$ = new StructDefn();
+							$$->ident = "";
+							$$->f = $4;
+							DEBUG("[StructDefn]");
+						}
+		| STRUCT '{' struct_union_fields '}' variable_ident_list EOL
 						{
 							$$ = new StructDefn();
 							$$->ident = "";
 							$$->f = $3;
+							DEBUG("[StructDefn]");
+						}
+		| STRUCT '{' struct_union_fields '}' EOL
+						{
+							$$ = new StructDefn();
+							// This is useless
+							// $$->ident = "";
+							// $$->f = $3;
 							DEBUG("[StructDefn]");
 						}
 		;
 
 union_defn
-		: UNION IDENTIFIER '{' struct_union_fields '}'
+		: UNION IDENTIFIER '{' struct_union_fields '}' variable_ident_list EOL
 						{
 							$$ = new UnionDefn();
 							$$->ident = $2;
 							$$->f = $4;
 							DEBUG("[UnionDefn]");
 						}
-		| UNION '{' struct_union_fields '}'
+		| UNION IDENTIFIER '{' struct_union_fields '}' EOL
+						{
+							$$ = new UnionDefn();
+							$$->ident = $2;
+							$$->f = $4;
+							DEBUG("[UnionDefn]");
+						}
+		| UNION '{' struct_union_fields '}' variable_ident_list EOL
 						{
 							$$ = new UnionDefn();
 							$$->ident = "";
 							$$->f = $3;
 							DEBUG("[UnionDefn]");
 						}
+		| UNION '{' struct_union_fields '}' EOL
+						{
+							$$ = new UnionDefn();
+							// This is useless
+							// $$->ident = "";
+							// $$->f = $3;
+							DEBUG("[UnionDefn]");
+						}
 		;
 
 enum_defn
-		: ENUM IDENTIFIER '{' enum_fields '}'
+		: ENUM IDENTIFIER '{' enum_fields '}' variable_ident_list EOL
 						{
 							$$ = new EnumDefn();
 							$$->ident = $2;
 							$$->f = $4;
 							DEBUG("[EnumDefn]");
 						}
-		| ENUM '{' enum_fields '}'
+		| ENUM IDENTIFIER '{' enum_fields '}' EOL
+						{
+							$$ = new EnumDefn();
+							$$->ident = $2;
+							$$->f = $4;
+							DEBUG("[EnumDefn]");
+						}
+		| ENUM '{' enum_fields '}' variable_ident_list EOL
 						{
 							$$ = new EnumDefn();
 							$$->ident = "";
 							$$->f = $3;
+							DEBUG("[EnumDefn]");
+						}
+		| ENUM '{' enum_fields '}' EOL
+						{
+							$$ = new EnumDefn();
+							// This is useless
+							// $$->ident = "";
+							// $$->f = $3;
 							DEBUG("[EnumDefn]");
 						}
 		;
@@ -1588,7 +1633,7 @@ iteration
 		;
 
 for_stmt
-		: FOR '(' for_init for_cond for_post ')' block
+		: FOR '(' for_init for_cond for_post ')' block EOL
 						{
 							$$ = new ForStmt();
 							$$->i = $3;
@@ -1656,7 +1701,7 @@ simple_stmt
 		;
 
 while_stmt
-		: WHILE '(' expression ')' block
+		: WHILE '(' expression ')' block EOL
 						{
 							$$ = new WhileStmt();
 							$$->e = $3;
@@ -1676,7 +1721,7 @@ dowhile_stmt
 		;
 
 defer_stmt
-		: DEFER block			{
+		: DEFER block EOL 		{
 							$$ = new DeferStmt();
 							$$->b = $2;
 							DEBUG("[Defer]");
@@ -1699,7 +1744,7 @@ selection_stmt
 		;
 
 if_else_stmt
-		: if_block
+		: if_block EOL
 						{
 							$$ = new IfElseStmt();
 							$$->if_block = $1;
@@ -1735,7 +1780,7 @@ else_block
 							DEBUG("[IfElseStmt::ElseIfBlock]");
 
 						}
-		| ELSE block
+		| ELSE block EOL
 						{
 							$$ = new ElseBlock();
 							$$->is_set_if_else = false;
@@ -1746,7 +1791,7 @@ else_block
 		;
 
 switch_stmt
-		: SWITCH '(' expression ')' '{' case_block '}'
+		: SWITCH '(' expression ')' '{' case_block '}' EOL
 						{
 							$$ = new SwitchStmt();
 							$$->e = $3;
@@ -1754,7 +1799,7 @@ switch_stmt
 							$$->is_set_default = false;
 							DEBUG("[SwitchStmt::SwitchCase]");
 						}
-		| SWITCH '(' expression ')' '{' case_block DEFAULT ':' statements '}'
+		| SWITCH '(' expression ')' '{' case_block DEFAULT ':' statements '}' EOL
 						{
 							$$ = new SwitchStmt();
 							$$->e = $3;

@@ -89,6 +89,10 @@ def main(int a, bool b) -> (int) {
 		int age
 		char gender
 		string name
+	} h1, h2
+	struct {
+		/* this is useless */
+		int anonymous
 	}
 	struct Zero {
 
@@ -133,8 +137,20 @@ def main(int a, bool b) -> (int) {
 	int after_comment = 0 /* this is a post comment
 	on two separate lines */
 
+	if (a > b) {
+		a = b
+	}
+
 	if (x > y) {
 		x = y
+	} else {
+		x = x - y
+	}
+
+	if (x > y) {
+		x = y
+	} else if (x < y) {
+		x = x - y
 	} else if (x < y) {
 		x = x - y
 	} else {
