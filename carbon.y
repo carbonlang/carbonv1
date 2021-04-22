@@ -180,7 +180,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
 %nterm <QualifiedIdent *> qualified_ident
-%nterm <FunctionCall *> function_call
+%nterm <FunctionCall *> func_call
 %nterm <ExpressionList *> expression_list
 %nterm <CaseBlock *> case_block
 
@@ -720,7 +720,7 @@ statement
 							$$->ctds->is_global = false;
 							DEBUG("[Stmt:CompositeTypeDefnStmt]");
 						}
-		| expression_stmt EOL		{
+		| func_call_stmt EOL		{
 							$$ = new Statement();
 							$$->type = Statement::types::EXPRESSION;
 							// $$->es = &$1;
@@ -1521,7 +1521,7 @@ unary_expr
 postfix_expr
 		: qualified_ident
 		| postfix_expr '[' expression ']'
-		| postfix_expr function_call
+		| postfix_expr func_call
 		| postfix_expr '.' IDENTIFIER
 		| postfix_expr PTR_MEMBER IDENTIFIER
 		;
@@ -1546,7 +1546,7 @@ qualified_ident
 						}
 		;
 
-function_call
+func_call
 		: '(' ')'			{
 							$$ = new FunctionCall;
 							$$->el = NULL;
@@ -1609,8 +1609,8 @@ variable_ident_list
 						}
 		;
 
-expression_stmt
-		: postfix_expr function_call	{
+func_call_stmt
+		: postfix_expr func_call	{
 							DEBUG("[FunctionCall]");
 						}
 		;

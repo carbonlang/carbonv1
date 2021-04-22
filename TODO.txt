@@ -6,3 +6,4 @@ expression
 expression statement
 iteration conditions
 auto
+function call
