@@ -676,21 +676,18 @@ type_name
 		;
 
 function_type
-		: '(' func_param_type ')' FUNC_RETURN '(' func_ret_type ')'
+		: '(' type_list ')' FUNC_RETURN '(' type_list ')'
 						{
 
 						}
 		;
 
-func_param_type
-		: type
-		| func_param_type ',' type
+type_list
+		: %empty			{ /* empty */ }
+		| type_list ',' type
+		| type
 		;
 
-func_ret_type
-		: type
-		| func_ret_type ',' type
-		;
 
 /******************************************************************************************/
 /************************************** STATEMENTS ****************************************/
