@@ -185,6 +185,11 @@ def main(int a, bool b) -> (int) {
 		free(p)
 	}
 
+	{
+		// This is a block
+		x = 1
+	}
+
 	return a + b, c
 }
 

@@ -750,11 +750,17 @@ statement
 							$$->js = $1;
 							DEBUG("[Stmt:JumpStmt]");
 						}
-		| defer_stmt EOL			{
+		| defer_stmt EOL		{
 							$$ = new Statement();
 							$$->type = Statement::types::DEFER;
 							$$->ds = $1;
 							DEBUG("[Stmt:DeferStmt]");
+						}
+		| block EOL			{
+							$$ = new Statement();
+							$$->type = Statement::types::BLOCK;
+							// $$->ds = $1;
+							DEBUG("[Stmt:BlockStmt]");
 						}
 
 /******************************************************************************************/

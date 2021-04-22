@@ -5,3 +5,4 @@ assignment statement
 expression
 expression statement
 iteration conditions
+auto
