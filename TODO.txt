@@ -1,5 +1,4 @@
 EOL => function literal, composite literal
-statements
 literal => function, composite
 assignment statement
 expression
@@ -7,3 +6,4 @@ expression statement
 iteration conditions
 auto
 function call
+inc dec statement

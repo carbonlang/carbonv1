@@ -176,6 +176,7 @@ def main(int a, bool b) -> (int) {
 			return
 	}
 
+	label1:
 	while (x < 100) {
 		x += 1
 		x -= 1

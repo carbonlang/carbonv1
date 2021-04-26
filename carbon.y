@@ -762,6 +762,12 @@ statement
 							// $$->ds = $1;
 							DEBUG("[Stmt:BlockStmt]");
 						}
+		| label_stmt EOL		{
+							$$ = new Statement();
+							$$->type = Statement::types::LABEL;
+							DEBUG("[Stmt:LabelStmt]");
+						}
+		;
 
 /******************************************************************************************/
 /************************************** LITERAL *******************************************/
@@ -1729,6 +1735,12 @@ defer_stmt
 							$$ = new DeferStmt();
 							$$->b = $2;
 							DEBUG("[Defer]");
+						}
+		;
+
+label_stmt
+		: IDENTIFIER ':'		{
+
 						}
 		;
 

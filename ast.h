@@ -283,7 +283,7 @@ class Statements {
 class Statement {
 	public:
 		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
-			ITERATION, JUMP, DEFER, BLOCK } type;
+			ITERATION, JUMP, DEFER, BLOCK, LABEL } type;
 		VariableDef *vds;
 		CompositeTypeDefn *ctds;
 		ExpressionStmt *es;
