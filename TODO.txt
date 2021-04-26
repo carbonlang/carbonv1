@@ -1,5 +1,4 @@
-EOL => function literal, composite literal
-literal => function, composite
+composite literal + EOL
 assignment statement
 expression
 expression statement

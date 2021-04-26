@@ -42,7 +42,6 @@ class FloatLiteral;
 class CharLiteral;
 class StringLiteral;
 class PointerLiteral;
-class FunctionLiteral;
 class CompositeLiteral;
 
 class Statements;
@@ -539,14 +538,13 @@ class DeferStmt {
 
 class Literal {
 	public:
-		enum types { BOOL, INT, FLOAT, CHAR, STRING, POINTER, FUNCTION, COMPOSITE } type;
+		enum types { BOOL, INT, FLOAT, CHAR, STRING, POINTER, COMPOSITE } type;
 		BooleanLiteral *boolean;
 		IntegerLiteral *integer;
 		FloatLiteral *floating;
 		CharLiteral *character;
 		StringLiteral *string;
 		PointerLiteral *pointer;
-		FunctionLiteral *function;
 		CompositeLiteral *composite;
 };
 
@@ -580,10 +578,6 @@ class StringLiteral {
 };
 
 class PointerLiteral {
-	public:
-};
-
-class FunctionLiteral {
 	public:
 };
 

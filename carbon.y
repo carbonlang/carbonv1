@@ -150,7 +150,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <CharLiteral *> char_lit
 %nterm <StringLiteral *> str_lit
 %nterm <PointerLiteral * > ptr_lit
-%nterm <FunctionLiteral *> func_lit
 %nterm <CompositeLiteral *> composite_lit
 %nterm <CompositeTypeDefn *> composite_type_defn
 %nterm <StructDefn *> struct_defn
@@ -810,12 +809,6 @@ literal
 							$$->pointer = $1;
 							DEBUG("[Literal::Pointer]");
 						}
-		| func_lit			{
-							$$ = new Literal();
-							$$->type = Literal::types::FUNCTION;
-							$$->function = $1;
-							DEBUG("[Literal::Function]");
-						}
 		| composite_lit			{
 							$$ = new Literal();
 							$$->type = Literal::types::COMPOSITE;
@@ -983,13 +976,6 @@ ptr_lit
 		: PTR_NULL			{
 							$$ = new PointerLiteral();
 							DEBUG("[Literal::Pointer]");
-						}
-		;
-
-func_lit
-		: DEF func_sign block EOL	{
-							$$ = new FunctionLiteral();
-							DEBUG("[Literal::Function]");
 						}
 		;
 
