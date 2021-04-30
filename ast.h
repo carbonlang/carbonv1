@@ -93,7 +93,7 @@ class BinaryExpression;
 class Operand;
 class QualifiedIdent;
 class Index;
-class FunctionCall;
+class FunctionCallOp;
 class ExpressionList;
 
 class TypeIdentifier;
@@ -376,7 +376,7 @@ class Operand {
 		Literal *l;
 		QualifiedIdent *qi;
 		Index *i;
-		FunctionCall *fc;
+		FunctionCallOp *fco;
 		void codeGen();
 };
 
@@ -396,7 +396,7 @@ class Index {
 		void codeGen();
 };
 
-class FunctionCall {
+class FunctionCallOp {
 	public:
 		bool is_set = false;
 		ExpressionList *el;

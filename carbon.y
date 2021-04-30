@@ -180,7 +180,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
 %nterm <QualifiedIdent *> qualified_ident
-%nterm <FunctionCall *> func_call
+%nterm <FunctionCallOp *> func_call_op
 %nterm <ExpressionList *> expression_list
 %nterm <CaseBlock *> case_block
 
@@ -1514,7 +1514,7 @@ unary_expr
 postfix_expr
 		: qualified_ident
 		| postfix_expr '[' expression ']'
-		| postfix_expr func_call
+		| postfix_expr func_call_op
 		| postfix_expr '.' IDENTIFIER
 		| postfix_expr PTR_MEMBER IDENTIFIER
 		;
@@ -1539,21 +1539,17 @@ qualified_ident
 						}
 		;
 
-func_call
-		: '(' ')'			{
-							$$ = new FunctionCall;
-							$$->el = NULL;
-							DEBUG("[FunctionCallNoParam]");
-						}
-		| '(' expression_list ')'	{
-							$$ = new FunctionCall;
+func_call_op
+		: '(' expression_list ')'	{
+							$$ = new FunctionCallOp;
 							$$->el = $2;
-							DEBUG("[FunctionCall]");
+							DEBUG("[FunctionCallOp]");
 						}
 		;
 
 expression_list
-		: expression_list ',' expression
+		: %empty			{ /* empty */ }
+		| expression_list ',' expression
 						{
 							$1->el.push_back($3);
 							$$ = $1;
@@ -1611,7 +1607,8 @@ variable_ident_list
 		;
 
 func_call_stmt
-		: postfix_expr func_call	{
+		: postfix_expr func_call_op
+						{
 							DEBUG("[FunctionCall]");
 						}
 		;
@@ -1860,13 +1857,10 @@ jump_stmt
 							$$->type = JumpStmt::types::BREAK;
 							DEBUG("[Break]");
 						}
-		| RETURN			{
+		| RETURN expression_list	{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::RETURN;
 							DEBUG("[Return]");
-						}
-		| RETURN expression_list	{
-							DEBUG("[Return Expr]");
 						}
 		;
 
