@@ -80,6 +80,7 @@ def main(int a, bool b) -> (int) {
 	ptr : int p1 = null
 	ptr : struct Person s1
 	struct Person p
+	auto p2 = f()
 
 	static atomic bool isActive = true
 	const int age = 200

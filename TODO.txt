@@ -3,6 +3,6 @@ assignment statement
 expression
 expression statement
 iteration conditions
-auto
 function call
 inc dec statement
+templates

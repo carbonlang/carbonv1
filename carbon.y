@@ -76,6 +76,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> FLOAT32 FLOAT64 FLOAT128
 %token <int> STRING
 %token <int> POINTER
+%token <int> AUTO
 %token <int> TYPE STRUCT UNION ENUM
 %token <int> EXTEND
 %token <int> TRUE FALSE
@@ -1580,10 +1581,18 @@ variable_def
 							//$$->lit = NULL;
 							DEBUG("[VariableDef]");
 						}
+		| AUTO variable_ident_list
+						{
+							$$ = new VariableDef();
+							//$$->type = $1;
+							//$$->ident = $2;
+							//$$->lit = NULL;
+							DEBUG("[AutoVariableDef]");
+						}
 		;
 
 variable_ident_list
-		: variable_ident_list ',' IDENTIFIER EQUAL_TO literal
+		: variable_ident_list ',' IDENTIFIER EQUAL_TO expression
 						{
 							DEBUG("[VariableDef::IdentifierEqLit]");
 						}
@@ -1591,7 +1600,7 @@ variable_ident_list
 						{
 							DEBUG("[VariableDef::Identifier]");
 						}
-		| IDENTIFIER EQUAL_TO literal
+		| IDENTIFIER EQUAL_TO expression
 						{
 							DEBUG("[VariableDef::IdentifierEqLit]");
 						}
