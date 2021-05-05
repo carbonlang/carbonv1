@@ -981,7 +981,7 @@ ptr_lit
 		;
 
 composite_lit
-		: '{' composite_lit_list '}' EOL
+		: '{' composite_lit_list '}'
 						{
 							/* For struct, union, arrays, etc */
 							$$ = new CompositeLiteral();

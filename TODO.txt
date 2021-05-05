@@ -1,4 +1,3 @@
-composite literal + EOL
 assignment statement
 expression
 expression statement
@@ -6,3 +5,4 @@ iteration conditions
 function call
 inc dec statement
 templates
+type casting

@@ -90,7 +90,7 @@ def main(int a, bool b) -> (int) {
 		int age
 		char gender
 		string name
-	} h1, h2
+	} h1 = {a, b, c}, h2 = {a, b, c}
 	struct {
 		/* this is useless */
 		int anonymous
