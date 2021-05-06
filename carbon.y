@@ -100,7 +100,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> PUBLIC PRIVATE
 
 %token <int> U_POINTER U_INC U_DEC
-%token <int> SCOPE_R
+%token <int> SCOPE_RESOLUTION
 
 %token <int> EOL
 
@@ -179,7 +179,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Expression *> expression
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
-%nterm <QualifiedIdent *> qualified_ident
+%nterm <NameSpaceIdent *> namespace_ident
 %nterm <FunctionCallOp *> func_call_op
 %nterm <ExpressionList *> expression_list
 %nterm <CaseBlock *> case_block
@@ -1260,10 +1260,10 @@ l_value_list
 		;
 
 l_value
-		: qualified_ident		{
+		: postfix_expr			{
 							$$ = new LValue();
-							$$->type = LValue::types::QUALIFIED_IDENT;
-							$$->qi = $1;
+							// $$->type = LValue::types::POSTFIX_EXPR;
+							// $$->qi = $1;
 							DEBUG("[LValue::QualifiedIdent]");
 						}
 		| U_POINTER unary_expr		{
@@ -1512,29 +1512,29 @@ unary_expr
 		;
 
 postfix_expr
-		: qualified_ident
+		: namespace_ident
 		| postfix_expr '[' expression ']'
 		| postfix_expr func_call_op
 		| postfix_expr '.' IDENTIFIER
 		| postfix_expr PTR_MEMBER IDENTIFIER
 		;
 
-qualified_ident
+namespace_ident
 		: IDENTIFIER
 						{
-							$$ = new QualifiedIdent;
+							$$ = new NameSpaceIdent;
 							$$->ident = $1;
-							$$->is_dot_QualifiedIdent = false;
-							$$->is_ptr_QualifiedIdent = false;
+							$$->is_dot_NameSpaceIdent = false;
+							$$->is_ptr_NameSpaceIdent = false;
 							DEBUG("[Identifier]");
 						}
-		| qualified_ident SCOPE_R IDENTIFIER
+		| namespace_ident SCOPE_RESOLUTION IDENTIFIER
 						{
-							$$ = new QualifiedIdent;
+							$$ = new NameSpaceIdent;
 							$$->ident = $3;
-							$$->is_dot_QualifiedIdent = true;
-							$$->is_ptr_QualifiedIdent = false;
-							$$->dot_QualifiedIdent = $1;
+							$$->is_dot_NameSpaceIdent = true;
+							$$->is_ptr_NameSpaceIdent = false;
+							$$->dot_NameSpaceIdent = $1;
 							DEBUG("[Identifier::X::Y]");
 						}
 		;

@@ -91,7 +91,7 @@ class Expression;
 class UnaryExpression;
 class BinaryExpression;
 class Operand;
-class QualifiedIdent;
+class NameSpaceIdent;
 class Index;
 class FunctionCallOp;
 class ExpressionList;
@@ -317,8 +317,8 @@ class AssignmentStmt {
 
 class LValue {
 	public:
-		enum types { QUALIFIED_IDENT, ADDR_OF_UNARY_EXP, PTR_TO_UNARY_EXP, OPERAND_INDEX } type;
-		QualifiedIdent *qi;
+		enum types { POSTFIX_EXPR, ADDR_OF_UNARY_EXP, PTR_TO_UNARY_EXP, OPERAND_INDEX } type;
+		// QualifiedIdent *qi;
 		UnaryExpression *ue;
 		Operand *o;
 		Index *i;
@@ -374,19 +374,19 @@ class Operand {
 	public:
 		enum types { LITERAL, QUALIFIED_IDENT, INDEX, FUNCTION_CALL } type;
 		Literal *l;
-		QualifiedIdent *qi;
+		NameSpaceIdent *nsi;
 		Index *i;
 		FunctionCallOp *fco;
 		void codeGen();
 };
 
-class QualifiedIdent {
+class NameSpaceIdent {
 	public:
 		std::string ident;
-		bool is_dot_QualifiedIdent = false;
-		bool is_ptr_QualifiedIdent = false;
-		QualifiedIdent *dot_QualifiedIdent;
-		QualifiedIdent *ptr_QualifiedIdent;
+		bool is_dot_NameSpaceIdent = false;
+		bool is_ptr_NameSpaceIdent = false;
+		NameSpaceIdent *dot_NameSpaceIdent;
+		NameSpaceIdent *ptr_NameSpaceIdent;
 		void codeGen();
 };
 

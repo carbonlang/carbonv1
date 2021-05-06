@@ -187,7 +187,7 @@ ident				{letter}({letter}|{dec_digit})*
 
 "="				{ ins_eol = 0; return yy::parser::token::EQUAL_TO; }
 
-"::"				{ ins_eol = 0; return yy::parser::token::SCOPE_R; }
+"::"				{ ins_eol = 0; return yy::parser::token::SCOPE_RESOLUTION; }
 
 "public"			{ ins_eol = 0; return yy::parser::token::PUBLIC; }
 "private"			{ ins_eol = 0; return yy::parser::token::PRIVATE; }

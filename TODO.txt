@@ -1,4 +1,4 @@
-assignment statement
+assignment statement -> l_value
 expression
 expression statement
 iteration conditions
