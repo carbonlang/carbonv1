@@ -156,6 +156,19 @@ ident				{letter}({letter}|{dec_digit})*
 
 "null"				{ ins_eol = 1; return yy::parser::token::PTR_NULL; }
 
+"+="				{ ins_eol = 0; return yy::parser::token::PLUS_EQUAL_TO; }
+"-="				{ ins_eol = 0; return yy::parser::token::MINUS_EQUAL_TO; }
+"*="				{ ins_eol = 0; return yy::parser::token::MULTIPLY_EQUAL_TO; }
+"/="				{ ins_eol = 0; return yy::parser::token::DIVIDE_EQUAL_TO; }
+"%="				{ ins_eol = 0; return yy::parser::token::MODULUS_EQUAL_TO; }
+">>="				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT_EQUAL_TO; }
+"<<="				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_EQUAL_TO; }
+">>>="				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT_US_EQUAL_TO; }
+"<<<="				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_US_EQUAL_TO; }
+"||="				{ ins_eol = 0; return yy::parser::token::LOGICAL_OR_EQUAL_TO; }
+"&&="				{ ins_eol = 0; return yy::parser::token::LOGICAL_AND_EQUAL_TO; }
+
+
 "+"				{ ins_eol = 0; return yy::parser::token::PLUS; }
 "-"				{ ins_eol = 0; return yy::parser::token::MINUS; }
 "*"				{ ins_eol = 0; return yy::parser::token::MULTIPLY; }

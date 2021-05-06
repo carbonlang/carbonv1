@@ -92,6 +92,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token <int> LOGICAL_OR LOGICAL_AND
 %token <int> BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
+
+%token <int> PLUS_EQUAL_TO MINUS_EQUAL_TO MULTIPLY_EQUAL_TO DIVIDE_EQUAL_TO MODULUS_EQUAL_TO
+%token <int> RIGHT_SHIFT_EQUAL_TO LEFT_SHIFT_EQUAL_TO RIGHT_SHIFT_US_EQUAL_TO LEFT_SHIFT_US_EQUAL_TO
+%token <int> LOGICAL_OR_EQUAL_TO LOGICAL_AND_EQUAL_TO
+
 %token <int> LU_NOT LU_2COMP LU_ADD_OF RU_INC RU_DEC
 %token <int> PTR_MEMBER
 
@@ -171,7 +176,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <ElseBlock *> else_block
 
 %nterm <AssignOp *> assign_op
-%nterm <CompoundOp *> compound_op
 %nterm <LValue *> l_value
 %nterm <LValueList *> l_value_list
 %nterm <AssignmentStmt *> assignment_stmt
@@ -1159,75 +1163,77 @@ enum_fields
 /************************************** OPERATORS *****************************************/
 /******************************************************************************************/
 
-compound_op
-		: PLUS				{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::PLUS;
-							DEBUG("[+=]");
-						}
-		| MINUS				{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::MINUS;
-							DEBUG("[-=]");
-						}
-		| MULTIPLY			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::MULTIPLY;
-							DEBUG("[-=]");
-						}
-		| DIVIDE			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::DIVIDE;
-							DEBUG("[/=]");
-						}
-		| MODULUS			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::MODULUS;
-							DEBUG("[%%=]");
-						}
-		| RIGHT_SHIFT			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::RIGHT_SHIFT;
-							DEBUG("[<<=]");
-						}
-		| LEFT_SHIFT			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::LEFT_SHIFT;
-							DEBUG("[>>=]");
-						}
-		| RIGHT_SHIFT_US		{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::RIGHT_SHIFT_US;
-							DEBUG("[<<<=]");
-						}
-		| LEFT_SHIFT_US			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::LEFT_SHIFT_US;
-							DEBUG("[>>>=]");
-						}
-		| LOGICAL_AND			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::LOGICAL_AND;
-							DEBUG("[&&=]");
-						}
-		| LOGICAL_OR			{
-							$$ = new CompoundOp();
-							$$->type = CompoundOp::types::LOGICAL_OR;
-							DEBUG("[||=]");
-						}
-		;
-
 assign_op
 		: EQUAL_TO			{
 							$$ = new AssignOp();
 							$$->is_compound = false;
 							DEBUG("[=]");
 						}
-		| compound_op EQUAL_TO		{
+		| PLUS_EQUAL_TO			{
 							$$ = new AssignOp();
-							$$->is_compound = false;
-							$$->co = $1;
-							DEBUG("[Compound=]");
+							$$->is_compound = true;
+							$$->type = AssignOp::types::PLUS_EQUAL_TO;
+							DEBUG("[+=]");
+						}
+		| MINUS_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::MINUS_EQUAL_TO;
+							DEBUG("[-=]");
+						}
+		| MULTIPLY_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::MULTIPLY_EQUAL_TO;
+							DEBUG("[-=]");
+						}
+		| DIVIDE_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::DIVIDE_EQUAL_TO;
+							DEBUG("[/=]");
+						}
+		| MODULUS_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::MODULUS_EQUAL_TO;
+							DEBUG("[%%=]");
+						}
+		| RIGHT_SHIFT_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::RIGHT_SHIFT_EQUAL_TO;
+							DEBUG("[<<=]");
+						}
+		| LEFT_SHIFT_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::LEFT_SHIFT_EQUAL_TO;
+							DEBUG("[>>=]");
+						}
+		| RIGHT_SHIFT_US_EQUAL_TO	{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::RIGHT_SHIFT_US_EQUAL_TO;
+							DEBUG("[<<<=]");
+						}
+		| LEFT_SHIFT_US_EQUAL_TO	{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::LEFT_SHIFT_US_EQUAL_TO;
+							DEBUG("[>>>=]");
+						}
+		| LOGICAL_AND_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::LOGICAL_AND_EQUAL_TO;
+							DEBUG("[&&=]");
+						}
+		| LOGICAL_OR_EQUAL_TO		{
+							$$ = new AssignOp();
+							$$->is_compound = true;
+							$$->type = AssignOp::types::LOGICAL_OR_EQUAL_TO;
+							DEBUG("[||=]");
 						}
 		;
 
@@ -1266,10 +1272,10 @@ l_value
 							// $$->qi = $1;
 							DEBUG("[LValue::QualifiedIdent]");
 						}
-		| U_POINTER unary_expr		{
+		| U_POINTER expression		{
 							$$ = new LValue();
-							$$->type = LValue::types::PTR_TO_UNARY_EXP;
-							$$->ue = $2;
+							// $$->type = LValue::types::PTR_TO_UNARY_EXP;
+							// $$->ue = $2;
 							DEBUG("[LValue::PtrToUnaryExpr]");
 						}
 		;

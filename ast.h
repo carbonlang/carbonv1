@@ -82,7 +82,6 @@ class StructUnionField;
 class EnumFields;
 
 class AssignOp;
-class CompoundOp;
 
 class LValue;
 class LValueList;
@@ -360,14 +359,10 @@ class BinaryExpression {
 
 class AssignOp {
 	public:
+		enum types { PLUS_EQUAL_TO, MINUS_EQUAL_TO, MULTIPLY_EQUAL_TO, DIVIDE_EQUAL_TO, MODULUS_EQUAL_TO,
+			RIGHT_SHIFT_EQUAL_TO, LEFT_SHIFT_EQUAL_TO, RIGHT_SHIFT_US_EQUAL_TO, LEFT_SHIFT_US_EQUAL_TO,
+			LOGICAL_OR_EQUAL_TO, LOGICAL_AND_EQUAL_TO } type;
 		bool is_compound = false;
-		CompoundOp *co;
-};
-
-class CompoundOp {
-	public:
-		enum types { PLUS, MINUS, MULTIPLY, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
-			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR } type;
 };
 
 class Operand {
