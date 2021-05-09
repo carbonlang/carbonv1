@@ -339,7 +339,7 @@ class Expression {
 
 class UnaryExpression {
 	public:
-		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY, PLUS, MINUS, BRACES, OPERAND } type;
+		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY_OR_DEREF, PLUS, MINUS, BRACES, OPERAND } type;
 		UnaryExpression *ue;
 		Expression *e;
 		Operand *o;
@@ -348,7 +348,7 @@ class UnaryExpression {
 
 class BinaryExpression {
 	public:
-		enum types { PLUS, MINUS, MULTIPLY, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
+		enum types { PLUS, MINUS, MULTIPLY_OR_DEREF, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
 			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR, IS_EQUAL, IS_NOT_EQUAL,
 			IS_LESS, IS_GREATER, IS_LESS_OR_EQ, IS_GREATER_OR_EQ,
 			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;

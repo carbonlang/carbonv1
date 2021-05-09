@@ -171,7 +171,7 @@ ident				{letter}({letter}|{dec_digit})*
 
 "+"				{ ins_eol = 0; return yy::parser::token::PLUS; }
 "-"				{ ins_eol = 0; return yy::parser::token::MINUS; }
-"*"				{ ins_eol = 0; return yy::parser::token::MULTIPLY; }
+"*"				{ ins_eol = 0; return yy::parser::token::MULTIPLY_OR_DEREF; }
 "/"				{ ins_eol = 0; return yy::parser::token::DIVIDE; }
 "%"				{ ins_eol = 0; return yy::parser::token::MODULUS; }
 "=="				{ ins_eol = 0; return yy::parser::token::IS_EQUAL; }
@@ -195,8 +195,6 @@ ident				{letter}({letter}|{dec_digit})*
 "~"				{ ins_eol = 0; return yy::parser::token::U_2COMP; }
 "$"				{ ins_eol = 0; return yy::parser::token::U_POINTER; }
 "@"				{ ins_eol = 0; return yy::parser::token::U_ADD_OF; }
-"++"				{ ins_eol = 1; return yy::parser::token::U_INC; }
-"--"				{ ins_eol = 1; return yy::parser::token::U_DEC; }
 
 "="				{ ins_eol = 0; return yy::parser::token::EQUAL_TO; }
 

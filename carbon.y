@@ -87,7 +87,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <std::string> FLOAT_LIT CHAR_LIT
 
 %token <int> EQUAL_TO
-%token <int> PLUS MINUS MULTIPLY DIVIDE MODULUS
+%token <int> PLUS MINUS MULTIPLY_OR_DEREF DIVIDE MODULUS
 %token <int> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token <int> IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token <int> LOGICAL_OR LOGICAL_AND
@@ -104,12 +104,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> PUBLIC PRIVATE
 
-%token <int> U_POINTER U_INC U_DEC
+%token <int> U_POINTER
 %token <int> SCOPE_RESOLUTION
 
 %token <int> EOL
 
-%left PLUS MINUS MULTIPLY DIVIDE MODULUS
+%left PLUS MINUS MULTIPLY_OR_DEREF DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
@@ -1315,10 +1315,10 @@ binary_expr
 							$$->re = $3;
 							DEBUG("[BinaryExpr::-]");
 						}
-		| expression MULTIPLY expression
+		| expression MULTIPLY_OR_DEREF expression
 						{
 							$$ = new BinaryExpression();
-							$$->type = BinaryExpression::types::MULTIPLY;
+							$$->type = BinaryExpression::types::MULTIPLY_OR_DEREF;
 							$$->le = $1;
 							$$->re = $3;
 							DEBUG("[BinaryExpr::*]");
@@ -1488,9 +1488,9 @@ unary_expr
 							//$$->ue = $2;
 							DEBUG("[UnaryExpr::@]");
 						}
-		| MULTIPLY expression		{
+		| MULTIPLY_OR_DEREF expression		{
 							$$ = new UnaryExpression();
-							$$->type = UnaryExpression::types::MULTIPLY;
+							$$->type = UnaryExpression::types::MULTIPLY_OR_DEREF;
 							//$$->ue = $2;
 							DEBUG("[UnaryExpr::$]");
 						}
