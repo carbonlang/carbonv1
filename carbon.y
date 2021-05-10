@@ -1828,7 +1828,7 @@ case_blocks
 		;
 
 case_block
-		: CASE '(' expression ')' block
+		: CASE '(' case_expression_list ')' block
 						{
 							$$ = new CaseBlock();
 							//$$->is_set = true;
@@ -1843,6 +1843,11 @@ case_block
 							$$ = new CaseBlock();
 							DEBUG("[CaseBlock]");
 						}
+		;
+
+case_expression_list
+		: case_expression_list ',' expression
+		| expression
 		;
 
 jump_stmt

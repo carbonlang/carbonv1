@@ -177,8 +177,8 @@ def main(int a, bool b) -> (int) {
 			print("This is not correct")
 			return
 		}
-		case (10) {
-			print("X is less than 10")
+		case (10, 20, 30) {
+			print("X is less than 10, 20 & 30")
 		}
 		default {
 			print("X is more than 10")
