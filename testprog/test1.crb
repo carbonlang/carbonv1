@@ -167,18 +167,24 @@ def main(int a, bool b) -> (int) {
 		x = 0
 	}
 
-	for (c = 0; c < 100; c += 1) {
+	for (int c = 0; c < 100; c += 1) {
 		/* math.inc(x) */
 	}
 
 	switch (x) {
-		case 0 : print("X is 0")
+		case (0) {
+			print("X is 0")
 			print("This is not correct")
 			return
-		case x < 10 : print("X is less than 10")
-		default : print("X is more than 10")
+		}
+		case (10) {
+			print("X is less than 10")
+		}
+		default {
+			print("X is more than 10")
 			print("This is not correct")
 			return
+		}
 	}
 
 	label1:

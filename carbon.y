@@ -1641,24 +1641,24 @@ iteration
 		;
 
 for_stmt
-		: FOR '(' for_init for_cond for_post ')' block
+		: FOR '(' for_init ';' for_cond ';' for_post ')' block
 						{
 							$$ = new ForStmt();
 							$$->i = $3;
-							$$->c = $4;
-							$$->p = $5;
+							$$->c = $5;
+							$$->p = $7;
 							DEBUG("[ForStmt]");
 						}
 		;
 
 for_init
-		: ';'
+		: %empty
 						{
 							$$ = new ForInit();
 							$$->is_set = false;
 							DEBUG("[ForStmt::Init]");
 						}
-		| simple_stmt ';'
+		| simple_stmt
 						{
 							$$ = new ForInit();
 							$$->is_set = true;
@@ -1668,13 +1668,13 @@ for_init
 		;
 
 for_cond
-		: ';'
+		: %empty
 						{
 							$$ = new ForCondition();
 							$$->is_set = false;
 							DEBUG("[ForStmt::Condition]");
 						}
-		| expression ';'
+		| expression
 						{
 							$$ = new ForCondition();
 							$$->is_set = true;
@@ -1705,6 +1705,8 @@ simple_stmt
 							$$->type = SimpleStmt::types::ASSIGNMENT;
 							$$->as = $1;
 							DEBUG("[ForStmt::SimpleStmt]");
+						}
+		| variable_def			{
 						}
 		;
 
@@ -1805,43 +1807,40 @@ else_block
 		;
 
 switch_stmt
-		: SWITCH '(' expression ')' '{' case_block '}'
+		: SWITCH '(' expression ')' '{' case_blocks '}'
 						{
 							$$ = new SwitchStmt();
-							$$->e = $3;
-							$$->c = $6;
-							$$->is_set_default = false;
+							//$$->e = $3;
+							//$$->c = $6;
+							//$$->is_set_default = false;
 							DEBUG("[SwitchStmt::SwitchCase]");
 						}
-		| SWITCH '(' expression ')' '{' case_block DEFAULT ':' statements '}'
+		| SWITCH  '{' case_blocks '}'
 						{
 							$$ = new SwitchStmt();
-							$$->e = $3;
-							$$->c = $6;
-							$$->is_set_default = true;
-							$$->default_s = $9;
 							DEBUG("[SwitchStmt::SwitchCaseDefault]");
 						}
 		;
 
+case_blocks
+		: %empty
+		| case_blocks case_block EOL
+		;
+
 case_block
-		: case_block CASE expression ':' statements
-						{
-							CaseExpressionStmt *ce = new CaseExpressionStmt();
-							ce->e = $3;
-							ce->s = $5;
-							$1->case_expression_stmt.push_back(ce);
-							$$ = $1;
-							DEBUG("[CaseBlock]");
-						}
-		| CASE expression ':' statements
+		: CASE '(' expression ')' block
 						{
 							$$ = new CaseBlock();
-							$$->is_set = true;
-							CaseExpressionStmt *ce = new CaseExpressionStmt();
-							ce->e = $2;
-							ce->s = $4;
-							$$->case_expression_stmt.push_back(ce);
+							//$$->is_set = true;
+							//CaseExpressionStmt *ce = new CaseExpressionStmt();
+							//ce->e = $2;
+							//ce->s = $4;
+							//$$->case_expression_stmt.push_back(ce);
+							DEBUG("[CaseBlock]");
+						}
+		| DEFAULT block
+						{
+							$$ = new CaseBlock();
 							DEBUG("[CaseBlock]");
 						}
 		;
