@@ -1,5 +1,4 @@
 expression statement
-function call
 inc dec operator and statement
 templates
 type casting
