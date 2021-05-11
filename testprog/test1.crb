@@ -194,7 +194,7 @@ def main(int a, bool b) -> (int) {
 	}
 
 	defer {
-		free(p)
+		free(p = a + b)
 	}
 
 	{

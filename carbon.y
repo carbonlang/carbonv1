@@ -185,7 +185,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <BinaryExpression *> binary_expr
 %nterm <NameSpaceIdent *> namespace_ident
 %nterm <FunctionCallOp *> func_call_op
-%nterm <ExpressionList *> expression_list
+%nterm <ReturnArgumentList *> return_argument_list
 %nterm <CaseBlock *> case_block
 
 %nterm <JumpStmt *> jump_stmt
@@ -1546,29 +1546,24 @@ namespace_ident
 		;
 
 func_call_op
-		: '(' expression_list ')'	{
+		: '(' func_argument_list ')'	{
 							$$ = new FunctionCallOp;
-							$$->el = $2;
+							// $$->el = $2;
 							DEBUG("[FunctionCallOp]");
 						}
 		;
 
-expression_list
-		: %empty			{ /* empty */ }
-		| expression_list ',' expression
-						{
-							$1->el.push_back($3);
-							$$ = $1;
-							DEBUG("[ExpressionList]");
-						}
-		| expression
-						{
-							$$ = new ExpressionList;
-							$$->is_set = true;
-							$$->el.push_back($1);
-							DEBUG("[ExpressionList]");
-						}
+func_argument_list
+		: %empty
+		| func_argument_list ',' func_argument
+		| func_argument
 		;
+
+func_argument
+		: expression
+		| IDENTIFIER EQUAL_TO expression
+		;
+
 
 /******************************************************************************************/
 /************************************** STATEMENTS ****************************************/
@@ -1851,26 +1846,47 @@ case_expression_list
 		;
 
 jump_stmt
-		: GOTO IDENTIFIER		{
+		: GOTO IDENTIFIER
+						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::GOTO;
 							$$->goto_ident = $2;
 							DEBUG("[Goto]");
 						}
-		| CONTINUE			{
+		| CONTINUE
+						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::CONTINUE;
 							DEBUG("[Continue]");
 						}
-		| BREAK				{
+		| BREAK
+						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::BREAK;
 							DEBUG("[Break]");
 						}
-		| RETURN expression_list	{
+		| RETURN return_argument_list
+						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::RETURN;
 							DEBUG("[Return]");
+						}
+		;
+
+return_argument_list
+		: %empty			{ /* empty */ }
+		| return_argument_list ',' expression
+						{
+							//$1->el.push_back($3);
+							//$$ = $1;
+							DEBUG("[ExpressionList]");
+						}
+		| expression
+						{
+							//$$ = new ExpressionList;
+							//$$->is_set = true;
+							//$$->el.push_back($1);
+							DEBUG("[ExpressionList]");
 						}
 		;
 

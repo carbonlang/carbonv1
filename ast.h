@@ -93,7 +93,7 @@ class Operand;
 class NameSpaceIdent;
 class Index;
 class FunctionCallOp;
-class ExpressionList;
+class ReturnArgumentList;
 
 class TypeIdentifier;
 
@@ -394,11 +394,11 @@ class Index {
 class FunctionCallOp {
 	public:
 		bool is_set = false;
-		ExpressionList *el;
+		// ExpressionList *el;
 		void codeGen();
 };
 
-class ExpressionList {
+class ReturnArgumentList {
 	public:
 		bool is_set = false;
 		std::list<Expression *> el;
