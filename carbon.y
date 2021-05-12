@@ -117,6 +117,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %precedence U_NOT
 %precedence U_2COMP
 %precedence U_ADD_OF
+%precedence "type_cast"
 
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
@@ -1426,6 +1427,7 @@ expression
 		| '(' expression ')'
 						{
 							$$ = new Expression();
+							DEBUG("[()Expr]");
 						}
 		;
 
@@ -1649,6 +1651,12 @@ unary_expr
 							//$$->type = UnaryExpression::types::BRACES;
 							//$$->e = $2;
 							DEBUG("[UnaryExpr::()]");
+						}
+		| '[' type_name ']' expression %prec "type_cast"
+						{
+							// There is a S-R conflict between (int)a + b hence
+							// give [int]a higher priority usng %prec
+							$$ = new UnaryExpression();
 						}
 		| literal
 						{
