@@ -1422,11 +1422,6 @@ l_value_list
 							$$->lvl.push_back($1);
 							DEBUG("[LValue]");
 						}
-		| '_'
-						{
-							$$ = new LValueList();
-							DEBUG("[LValue_]");
-						}
 		;
 
 l_value
@@ -1443,6 +1438,11 @@ l_value
 							// $$->type = LValue::types::PTR_TO_UNARY_EXP;
 							// $$->ue = $2;
 							DEBUG("[LValue::PtrToUnaryExpr]");
+						}
+		| '_'
+						{
+							$$ = new LValue();
+							DEBUG("[LValue::_]");
 						}
 		;
 
@@ -2156,5 +2156,5 @@ int main() {
 
 void yy::parser::error(const location_type& loc, const std::string& msg) {
 	std::cerr << "\033[31m" << msg << " @ " << "line=" << loc.begin.line
-		<< "col=" << loc.begin.column << "\033[0m\n" << std::endl;
+		<< " col=" << loc.begin.column << "\033[0m\n" << std::endl;
 }
