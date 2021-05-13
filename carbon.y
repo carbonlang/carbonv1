@@ -1424,6 +1424,7 @@ l_value_list
 						}
 		| '_'
 						{
+							$$ = new LValueList();
 							DEBUG("[LValue_]");
 						}
 		;
@@ -2154,5 +2155,6 @@ int main() {
 }
 
 void yy::parser::error(const location_type& loc, const std::string& msg) {
-	std::cerr << msg << " @ " << "line=" << loc.begin.line << " col=" << loc.begin.column << std::endl;
+	std::cerr << "\033[31m" << msg << " @ " << "line=" << loc.begin.line
+		<< "col=" << loc.begin.column << "\033[0m\n" << std::endl;
 }

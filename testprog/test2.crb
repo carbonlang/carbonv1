@@ -1,3 +1,4 @@
-import "print" from1 "io" as "cout"
-import "print" from1 "io"
-import "math"
+def main(int a, bool b) -> (int) {
+        int a
+        a = [int]-(b + c)
+}
