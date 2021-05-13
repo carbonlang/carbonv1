@@ -136,7 +136,10 @@ def main(int a, bool b) -> (int) {
 	a = [int](b + [float32]c)
 
 	/* io.Print() */
+
 	_, a, _ = compute()
+
+	ptr : generic gP
 
 	/* this is a pre comment */ int before_comment = 0
 	io.Print(a, b)

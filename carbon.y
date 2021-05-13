@@ -76,6 +76,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> FLOAT32 FLOAT64 FLOAT128
 %token <int> STRING
 %token <int> POINTER
+%token <int> GENERIC_POINTER
 %token <int> AUTO
 %token <int> TYPE
 %token <int> STRUCT UNION ENUM
@@ -695,6 +696,12 @@ type_name
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::POINTER;
 							DEBUG("[Type::Pointer]");
+						}
+		| GENERIC_POINTER
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::GENERIC_POINTER;
+							DEBUG("[Type::GenericPointer]");
 						}
 		| STRUCT IDENTIFIER
 						{

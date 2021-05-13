@@ -125,6 +125,7 @@ ident				{letter}({letter}|{dec_digit})*
 "string"			{ ins_eol = 0; return yy::parser::token::STRING; }
 
 "ptr"				{ ins_eol = 0; return yy::parser::token::POINTER; }
+"generic"			{ ins_eol = 0; return yy::parser::token::GENERIC_POINTER; }
 
 "auto"				{ ins_eol = 0; return yy::parser::token::AUTO; }
 

@@ -2,5 +2,4 @@ expression statement
 inc dec operator and statement
 templates
 using / type
-generic pointer
 foreach
