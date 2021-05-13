@@ -68,7 +68,6 @@ class ForCondition;
 class ForPost;
 class WhileStmt;
 class DoWhileStmt;
-class SimpleStmt;
 
 class FunctionSign;
 class FunctionParam;
@@ -480,7 +479,6 @@ class ForStmt {
 class ForInit {
 	public:
 		bool is_set = false;
-		SimpleStmt *ss;
 		void codeGen();
 };
 
@@ -494,14 +492,6 @@ class ForCondition {
 class ForPost {
 	public:
 		bool is_set = false;
-		SimpleStmt *ss;
-		void codeGen();
-};
-
-class SimpleStmt {
-	public:
-		enum types { ASSIGNMENT } type;
-		AssignmentStmt *as;
 		void codeGen();
 };
 

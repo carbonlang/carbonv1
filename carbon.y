@@ -146,7 +146,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <ForInit *> for_init
 %nterm <ForCondition *> for_cond
 %nterm <ForPost *> for_post
-%nterm <SimpleStmt *> simple_stmt
 %nterm <WhileStmt *> while_stmt
 %nterm <DoWhileStmt *> dowhile_stmt
 %nterm <DeferStmt *> defer_stmt
@@ -1863,11 +1862,14 @@ for_init
 							$$->is_set = false;
 							DEBUG("[ForStmt::Init]");
 						}
-		| simple_stmt
+		| assignment_stmt
 						{
 							$$ = new ForInit();
-							$$->is_set = true;
-							$$->ss = $1;
+							DEBUG("[ForStmt::Init]");
+						}
+		| variable_def
+						{
+							$$ = new ForInit();
 							DEBUG("[ForStmt::Init]");
 						}
 		;
@@ -1895,25 +1897,15 @@ for_post
 							$$->is_set = false;
 							DEBUG("[ForStmt::Post]");
 						}
-		| simple_stmt
+		| assignment_stmt
 						{
 							$$ = new ForPost();
-							$$->is_set = true;
-							$$->ss = $1;
 							DEBUG("[ForStmt::Post]");
-						}
-		;
-
-simple_stmt
-		: assignment_stmt
-						{
-							$$ = new SimpleStmt();
-							$$->type = SimpleStmt::types::ASSIGNMENT;
-							$$->as = $1;
-							DEBUG("[ForStmt::SimpleStmt]");
 						}
 		| variable_def
 						{
+							$$ = new ForPost();
+							DEBUG("[ForStmt::Post]");
 						}
 		;
 
