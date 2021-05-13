@@ -105,27 +105,27 @@ ident				{letter}({letter}|{dec_digit})*
 "atomic"			{ ins_eol = 0; return yy::parser::token::ATOMIC; }
 "const restrict"		{ ins_eol = 0; return yy::parser::token::CONST_RESTRICT; }
 
-"bool"				{ ins_eol = 0; return yy::parser::token::BOOL; }
-"char"				{ ins_eol = 0; return yy::parser::token::CHAR; }
-"byte"				{ ins_eol = 0; return yy::parser::token::BYTE; }
-"int"				{ ins_eol = 0; return yy::parser::token::INT; }
-"int8"				{ ins_eol = 0; return yy::parser::token::INT8; }
-"int16"				{ ins_eol = 0; return yy::parser::token::INT16; }
-"int32"				{ ins_eol = 0; return yy::parser::token::INT32; }
-"int64"				{ ins_eol = 0; return yy::parser::token::INT64; }
-"uint"				{ ins_eol = 0; return yy::parser::token::UINT; }
-"uint8"				{ ins_eol = 0; return yy::parser::token::UINT8; }
-"uint16"			{ ins_eol = 0; return yy::parser::token::UINT16; }
-"uint32"			{ ins_eol = 0; return yy::parser::token::UINT32; }
-"uint64"			{ ins_eol = 0; return yy::parser::token::UINT64; }
-"float32"			{ ins_eol = 0; return yy::parser::token::FLOAT32; }
-"float64"			{ ins_eol = 0; return yy::parser::token::FLOAT64; }
-"float128"			{ ins_eol = 0; return yy::parser::token::FLOAT128; }
+"bool"				{ ins_eol = 1; return yy::parser::token::BOOL; }
+"char"				{ ins_eol = 1; return yy::parser::token::CHAR; }
+"byte"				{ ins_eol = 1; return yy::parser::token::BYTE; }
+"int"				{ ins_eol = 1; return yy::parser::token::INT; }
+"int8"				{ ins_eol = 1; return yy::parser::token::INT8; }
+"int16"				{ ins_eol = 1; return yy::parser::token::INT16; }
+"int32"				{ ins_eol = 1; return yy::parser::token::INT32; }
+"int64"				{ ins_eol = 1; return yy::parser::token::INT64; }
+"uint"				{ ins_eol = 1; return yy::parser::token::UINT; }
+"uint8"				{ ins_eol = 1; return yy::parser::token::UINT8; }
+"uint16"			{ ins_eol = 1; return yy::parser::token::UINT16; }
+"uint32"			{ ins_eol = 1; return yy::parser::token::UINT32; }
+"uint64"			{ ins_eol = 1; return yy::parser::token::UINT64; }
+"float32"			{ ins_eol = 1; return yy::parser::token::FLOAT32; }
+"float64"			{ ins_eol = 1; return yy::parser::token::FLOAT64; }
+"float128"			{ ins_eol = 1; return yy::parser::token::FLOAT128; }
 
-"string"			{ ins_eol = 0; return yy::parser::token::STRING; }
+"string"			{ ins_eol = 1; return yy::parser::token::STRING; }
 
 "ptr"				{ ins_eol = 0; return yy::parser::token::POINTER; }
-"generic"			{ ins_eol = 0; return yy::parser::token::GENERIC_POINTER; }
+"generic"			{ ins_eol = 1; return yy::parser::token::GENERIC_POINTER; }
 
 "auto"				{ ins_eol = 0; return yy::parser::token::AUTO; }
 

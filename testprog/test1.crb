@@ -86,6 +86,9 @@ def main(int a, bool b) -> (int) {
 	const int age = 200
 	register int i1 = 2x1100111011001110
 
+	type myint = int
+	type myptr = ptr : bool
+
 	struct Human {
 		int age
 		char gender

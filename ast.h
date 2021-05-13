@@ -105,7 +105,7 @@ class SourceFile {
 
 class TopLevel {
 	public:
-		enum types { IMPORT_DECL, VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_FUNC,
+		enum types { IMPORT_DECL, VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, TYPE_FUNC,
 			NAMESPACE_DEFN, FUNC_DEFN } type;
 		ImportDecl *id;
 		VariableDef *vd;
@@ -188,7 +188,7 @@ class NamespaceBlockList {
 
 class NamespaceBlock {
 	public:
-		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_FUNC,
+		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, TYPE_FUNC,
 			NAMESPACE_DEFN, FUNC_DEFN } type;
 		VariableDef *vd;
 		CompositeTypeDefn *ctd;
@@ -280,7 +280,7 @@ class Statements {
 
 class Statement {
 	public:
-		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, EXPRESSION, ASSIGNMENT, INC_DEC, SELECTION,
+		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, EXPRESSION, ASSIGNMENT, SELECTION,
 			ITERATION, JUMP, DEFER, BLOCK, LABEL } type;
 		VariableDef *vds;
 		CompositeTypeDefn *ctds;

@@ -233,6 +233,14 @@ top_level
 							$$->ctd->is_global = true;
 							DEBUG("[TopLevel::CompositeTypeDefn]");
 						}
+		| type_alias EOL
+						{
+							$$ = new TopLevel();
+							$$->type = TopLevel::types::TYPE_ALIAS;
+							// $$->ctd = $1;
+							$$->ctd->is_global = true;
+							DEBUG("[TopLevel::TypeAlias]");
+						}
 		| type_func EOL
 						{
 							$$ = new TopLevel();
@@ -320,6 +328,13 @@ namespace_block
 							$$->type = NamespaceBlock::types::COMPOSITE_TYPE_DEFN;
 							$$->ctd = $1;
 							DEBUG("[NS::CompositeTypeDefn]");
+						}
+		| type_alias EOL
+						{
+							$$ = new NamespaceBlock();
+							$$->type = NamespaceBlock::types::TYPE_ALIAS;
+							// $$->ctd = $1;
+							DEBUG("[NS::TypeAlias]");
 						}
 		| type_func EOL
 						{
@@ -792,6 +807,14 @@ statement
 							$$->ctds = $1;
 							$$->ctds->is_global = false;
 							DEBUG("[Stmt:CompositeTypeDefnStmt]");
+						}
+		| type_alias EOL
+						{
+							$$ = new Statement();
+							$$->type = Statement::types::TYPE_ALIAS;
+							// $$->ctd = $1;
+							$$->ctds->is_global = false;
+							DEBUG("[Stmt::TypeAlias]");
 						}
 		| func_call_stmt EOL
 						{
@@ -1785,6 +1808,11 @@ variable_ident_list
 							DEBUG("[VariableDef::Identifier]");
 						}
 		;
+
+type_alias
+		: TYPE IDENTIFIER EQUAL_TO type_name
+						{
+						}
 
 func_call_stmt
 		: postfix_expr func_call_op
