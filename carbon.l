@@ -209,16 +209,21 @@ ident				{letter}({letter}|{dec_digit})*
 "break"				{ ins_eol = 1; return yy::parser::token::BREAK; }
 "continue"			{ ins_eol = 1; return yy::parser::token::CONTINUE; }
 "goto"				{ ins_eol = 0; return yy::parser::token::GOTO; }
-"fallthrough"			{ ins_eol = 1; return yy::parser::token::FALLTHROUGH; }
-"if"				{ ins_eol = 0; return yy::parser::token::IF; }
-"else"				{ ins_eol = 0; return yy::parser::token::ELSE; }
+
 "for"				{ ins_eol = 0; return yy::parser::token::FOR; }
 "while"				{ ins_eol = 0; return yy::parser::token::WHILE; }
 "do"				{ ins_eol = 0; return yy::parser::token::DO; }
+"foreach"			{ ins_eol = 0; return yy::parser::token::FOREACH; }
+"in"				{ ins_eol = 0; return yy::parser::token::IN; }
+
+"if"				{ ins_eol = 0; return yy::parser::token::IF; }
+"else"				{ ins_eol = 0; return yy::parser::token::ELSE; }
 "switch"			{ ins_eol = 0; return yy::parser::token::SWITCH; }
 "case"				{ ins_eol = 0; return yy::parser::token::CASE; }
 "default"			{ ins_eol = 0; return yy::parser::token::DEFAULT; }
+
 "defer"				{ ins_eol = 0; return yy::parser::token::DEFER; }
+
 "extend"			{ ins_eol = 0; return yy::parser::token::EXTEND; }
 
 {ident}				{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::IDENTIFIER; }

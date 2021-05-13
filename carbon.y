@@ -44,7 +44,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	#undef yylex
 	#define yylex lexer.yylex  // Within bison's parse() we should invoke lexer.yylex(), not the global yylex()
 
-	//#define DEBUG(str) std::cout << str
+	// #define DEBUG(str) std::cout << str << "\n"
 	#define DEBUG(str)
 	#define ERR(str) std::cout << str
 	#define ALERT(str) std::cout << "\n" \
@@ -101,7 +101,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> PTR_MEMBER
 
-%token <int> RETURN BREAK CONTINUE GOTO FALLTHROUGH IF ELSE FOR WHILE DO SWITCH CASE DEFAULT DEFER
+%token <int> RETURN BREAK CONTINUE GOTO
+%token <int> FOR WHILE DO FOREACH IN
+%token <int> IF ELSE SWITCH CASE DEFAULT
+%token <int> DEFER
 
 %token <int> PUBLIC PRIVATE
 
@@ -812,7 +815,7 @@ statement
 							$$ = new Statement();
 							$$->type = Statement::types::TYPE_ALIAS;
 							// $$->ctd = $1;
-							$$->ctds->is_global = false;
+							// $$->ctds->is_global = false;
 							DEBUG("[Stmt::TypeAlias]");
 						}
 		| func_call_stmt EOL
@@ -1811,6 +1814,7 @@ variable_ident_list
 type_alias
 		: TYPE IDENTIFIER EQUAL_TO type_name
 						{
+							DEBUG("[TypeAlias]");
 						}
 
 func_call_stmt
@@ -1841,6 +1845,13 @@ iteration
 							$$->type = IterationStmt::types::DO_WHILE;
 							$$->dw = $1;
 							DEBUG("[Iteration::DoWhileStmt]");
+						}
+		| foreach_stmt
+						{
+							$$ = new IterationStmt();
+							$$->type = IterationStmt::types::FOREACH;
+							// $$->fe = $1;
+							DEBUG("[Iteration::ForEach]");
 						}
 		;
 
@@ -1907,6 +1918,21 @@ for_post
 							$$ = new ForPost();
 							DEBUG("[ForStmt::Post]");
 						}
+		;
+
+foreach_stmt
+		: FOREACH '(' foreach_expr ',' foreach_expr IN IDENTIFIER ')'
+						{
+						}
+		| FOREACH '(' foreach_expr IN IDENTIFIER ')'
+						{
+						}
+		;
+
+foreach_expr
+		: type_name IDENTIFIER
+		| AUTO IDENTIFIER
+		| IDENTIFIER
 		;
 
 while_stmt

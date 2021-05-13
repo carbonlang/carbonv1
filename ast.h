@@ -460,7 +460,7 @@ class CaseExpressionStmt {
 
 class IterationStmt {
 	public:
-		enum types { FOR, WHILE, DO_WHILE } type;
+		enum types { FOR, WHILE, DO_WHILE, FOREACH } type;
 		ForStmt *f;
 		WhileStmt *w;
 		DoWhileStmt *dw;

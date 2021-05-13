@@ -86,8 +86,12 @@ def main(int a, bool b) -> (int) {
 	const int age = 200
 	register int i1 = 2x1100111011001110
 
-	type myint = int
-	type myptr = ptr : bool
+	type xint = int8
+
+	foreach (auto a, auto c in arr) {
+	}
+	foreach (auto ac, cc in list) {
+	}
 
 	struct Human {
 		int age
@@ -140,7 +144,7 @@ def main(int a, bool b) -> (int) {
 
 	/* io.Print() */
 
-	_, a, _ = compute()
+	// _, a, _ = compute()
 
 	ptr : generic gP
 
