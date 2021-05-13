@@ -94,6 +94,7 @@ ident				{letter}({letter}|{dec_digit})*
 ":"				{ ins_eol = 1; return ':'; }
 ";"				{ ins_eol = 0; return ';'; }
 ","				{ ins_eol = 0; return ','; }
+"_"				{ ins_eol = 0; return '_'; }
 "..."				{ ins_eol = 0; }
 
 "register"			{ ins_eol = 0; return yy::parser::token::REGISTER; }

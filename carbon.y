@@ -1388,7 +1388,11 @@ l_value_list
 						{
 							$$ = new LValueList();
 							$$->lvl.push_back($1);
-							DEBUG("[LValueList]");
+							DEBUG("[LValue]");
+						}
+		| '_'
+						{
+							DEBUG("[LValue_]");
 						}
 		;
 
