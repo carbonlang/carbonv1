@@ -17,12 +17,13 @@
 #define ALERT(str) std::cout << "\033[42;31m" << str << "\033[0m\n"
 
 void SourceFile::codeGen() {
-	std::list<TopLevel *>::iterator tli;
-	for (tli = t.begin(); tli != t.end(); ++tli) {
-			(*tli)->codeGen();
-	}
+	// std::list<TopLevel *>::iterator tli;
+	// for (tli = t.begin(); tli != t.end(); ++tli) {
+	//		(*tli)->codeGen();
+	// }
 }
 
+/*
 void TopLevel::codeGen() {
 	if (type == TopLevel::types::FUNC_DEFN) {
 		fd->codeGen();
@@ -406,3 +407,4 @@ llvm::Type *StructUnionField::codeGen() {
 	return llvm_type;
 
 }
+*/
