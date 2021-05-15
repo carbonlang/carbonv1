@@ -216,6 +216,10 @@ def main(int a, bool b) -> (int) {
 		x = 1
 	}
 
+	struct Person<:int,float:> p1
+	ptr : struct Person<:int,float:> p2
+	ptr : <:bool:>(int,float) -> (bool) f1
+
 	return a + b, c
 }
 

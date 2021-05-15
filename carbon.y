@@ -723,11 +723,23 @@ type_name
 							$$->type_name = TypeName::type_names::GENERIC_POINTER;
 							DEBUG("[Type::GenericPointer]");
 						}
+		| STRUCT IDENTIFIER template
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRUCT_TEMPLATE;
+							DEBUG("[Type::StructTemplate]");
+						}
 		| STRUCT IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT;
 							DEBUG("[Type::Struct]");
+						}
+		| UNION	IDENTIFIER template
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UNION_TEMPLATE;
+							DEBUG("[Type::UnionTemplate]");
 						}
 		| UNION	IDENTIFIER
 						{
@@ -756,9 +768,11 @@ type_name
 		;
 
 function_type
-		: '(' type_list ')' FUNC_RETURN '(' type_list ')'
+		: template '(' type_list ')' FUNC_RETURN '(' type_list ')'
 						{
-
+						}
+		| '(' type_list ')' FUNC_RETURN '(' type_list ')'
+						{
 						}
 		;
 
