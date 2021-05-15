@@ -232,3 +232,7 @@ public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
 private def calc(ptr : int a) -> () {
 	return
 }
+
+def hide<:T, S:>(T a, S b) -> (T) {
+	return
+}

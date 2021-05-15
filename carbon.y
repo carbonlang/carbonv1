@@ -365,16 +365,14 @@ namespace_block
 		;
 
 func_defn
-		: DEF IDENTIFIER func_sign block
+		: access_modifier DEF IDENTIFIER template_def func_sign block
 						{
 							$$ = new FunctionDefn();
-							// Default type is PUBLIC if not specified
-							$$->am = new AccessModifier();
-							$$->am->type = AccessModifier::types::PUBLIC;
-							$$->fn = $2;
-							$$->fs = $3;
-							$$->b = $4;
-							DEBUG("[FunctionDefn]");
+							$$->am = $1;
+							$$->fn = $3;
+							$$->fs = $5;
+							$$->b = $6;
+							ALERT("[FunctionDefn::Template]");
 						}
 		| access_modifier DEF IDENTIFIER func_sign block
 						{
@@ -388,7 +386,11 @@ func_defn
 		;
 
 access_modifier
-		: PUBLIC
+		: %empty
+						{
+							/* empty */
+						}
+		| PUBLIC
 						{
 							$$ = new AccessModifier();
 							$$->type = AccessModifier::types::PUBLIC;
@@ -727,7 +729,7 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT_TEMPLATE;
-							DEBUG("[Type::StructTemplate]");
+							DEBUG("[Type::Struct::Template]");
 						}
 		| STRUCT IDENTIFIER
 						{
@@ -739,7 +741,7 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UNION_TEMPLATE;
-							DEBUG("[Type::UnionTemplate]");
+							DEBUG("[Type::Union::Template]");
 						}
 		| UNION	IDENTIFIER
 						{
@@ -1767,7 +1769,7 @@ func_call_op
 						{
 							$$ = new FunctionCallOp;
 							// $$->el = $2;
-							DEBUG("[FunctionCallOpTemplate]");
+							DEBUG("[FunctionCallOp::Template]");
 						}
 		;
 
@@ -1792,6 +1794,21 @@ func_argument
 						}
 		;
 
+/*********************************** TEMPLATES ********************************************/
+
+template_def
+		: TEMPLATE_START template_def_items TEMPLATE_END
+						{
+						}
+
+template_def_items
+		: template_def_items ',' IDENTIFIER
+						{
+						}
+		| IDENTIFIER
+						{
+						}
+		;
 
 template
 		: TEMPLATE_START template_items TEMPLATE_END
