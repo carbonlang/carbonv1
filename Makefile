@@ -34,6 +34,8 @@ clean:
 	rm -f y.tab.c y.tab.h y.output lex.yy.cpp
 	rm -f ast.o
 	rm -f carbon *.o *~
+	rm -f carbon.tab.c carbon.tab.h
+	rm -f carbon.html carbon.xml parser.output
 
 test:
 	./carbon < ./testprog/test1.crb
