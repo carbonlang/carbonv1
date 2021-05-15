@@ -111,6 +111,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> U_POINTER
 %token <int> SCOPE_RESOLUTION
 
+%token <int> TEMPLATE_START TEMPLATE_END
+
 %token <int> EOL
 
 %left PLUS MINUS MULTIPLY_OR_DEREF DIVIDE MODULUS
@@ -121,6 +123,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %precedence U_NOT
 %precedence U_2COMP
 %precedence U_ADD_OF
+
 %precedence "type_cast"
 
 %nterm <int> source_file
@@ -1746,6 +1749,12 @@ func_call_op
 							// $$->el = $2;
 							DEBUG("[FunctionCallOp]");
 						}
+		| template '(' func_argument_list ')'
+						{
+							$$ = new FunctionCallOp;
+							// $$->el = $2;
+							DEBUG("[FunctionCallOpTemplate]");
+						}
 		;
 
 func_argument_list
@@ -1769,6 +1778,15 @@ func_argument
 						}
 		;
 
+
+template
+		: TEMPLATE_START template_items TEMPLATE_END
+		;
+
+template_items
+		: template_items ',' type
+		| type
+		;
 
 /******************************************************************************************/
 /************************************** STATEMENTS ****************************************/

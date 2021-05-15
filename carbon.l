@@ -82,6 +82,9 @@ ident				{letter}({letter}|{dec_digit})*
 
 "def"				{ ins_eol = 0; return yy::parser::token::DEF; }
 
+"<:"				{ ins_eol = 0; return yy::parser::token::TEMPLATE_START; }
+":>"				{ ins_eol = 0; return yy::parser::token::TEMPLATE_END; }
+
 "("				{ ins_eol = 0; return '('; }
 ")"				{ ins_eol = 1; return ')'; }
 "["				{ ins_eol = 0; return '['; }
@@ -163,13 +166,13 @@ ident				{letter}({letter}|{dec_digit})*
 "*="				{ ins_eol = 0; return yy::parser::token::MULTIPLY_EQUAL_TO; }
 "/="				{ ins_eol = 0; return yy::parser::token::DIVIDE_EQUAL_TO; }
 "%="				{ ins_eol = 0; return yy::parser::token::MODULUS_EQUAL_TO; }
+
 ">>="				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT_EQUAL_TO; }
 "<<="				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_EQUAL_TO; }
 ">>>="				{ ins_eol = 0; return yy::parser::token::RIGHT_SHIFT_US_EQUAL_TO; }
 "<<<="				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_US_EQUAL_TO; }
 "||="				{ ins_eol = 0; return yy::parser::token::LOGICAL_OR_EQUAL_TO; }
 "&&="				{ ins_eol = 0; return yy::parser::token::LOGICAL_AND_EQUAL_TO; }
-
 
 "+"				{ ins_eol = 0; return yy::parser::token::PLUS; }
 "-"				{ ins_eol = 0; return yy::parser::token::MINUS; }

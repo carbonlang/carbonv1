@@ -82,6 +82,8 @@ def main(int a, bool b) -> (int) {
 	struct Person p
 	auto p2 = f()
 
+	auto tpl = Calc<:int,float:>()
+
 	static atomic bool isActive = true
 	const int age = 200
 	register int i1 = 2x1100111011001110
