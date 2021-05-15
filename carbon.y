@@ -1781,11 +1781,17 @@ func_argument
 
 template
 		: TEMPLATE_START template_items TEMPLATE_END
+						{
+						}
 		;
 
 template_items
 		: template_items ',' type
+						{
+						}
 		| type
+						{
+						}
 		;
 
 /******************************************************************************************/
@@ -1949,9 +1955,15 @@ foreach_stmt
 		;
 
 foreach_expr
-		: type_name IDENTIFIER
+		: type IDENTIFIER
+						{
+						}
 		| AUTO IDENTIFIER
+						{
+						}
 		| IDENTIFIER
+						{
+						}
 		;
 
 while_stmt
