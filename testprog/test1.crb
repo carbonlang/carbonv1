@@ -233,6 +233,10 @@ private def calc(ptr : int a) -> () {
 	return
 }
 
-def hide<:T, S:>(T a, S b) -> (T) {
+def template1<:T, S:>(T a, S b) -> (T) {
 	return
+}
+
+def template2<:T,S:>(T a, S b) -> (int) {
+        struct Actor <:struct Producer<:struct Director<:int:>:>:> act1
 }

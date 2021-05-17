@@ -365,14 +365,14 @@ namespace_block
 		;
 
 func_defn
-		: access_modifier DEF IDENTIFIER template_def func_sign block
+		: access_modifier DEF IDENTIFIER template func_sign block
 						{
 							$$ = new FunctionDefn();
 							$$->am = $1;
 							$$->fn = $3;
 							$$->fs = $5;
 							$$->b = $6;
-							ALERT("[FunctionDefn::Template]");
+							DEBUG("[FunctionDefn::Template]");
 						}
 		| access_modifier DEF IDENTIFIER func_sign block
 						{
@@ -1186,26 +1186,56 @@ composite_type_defn
 		;
 
 struct_defn
-		: STRUCT IDENTIFIER '{' struct_union_fields '}' variable_ident_list
+		: STRUCT IDENTIFIER template '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							$$->ident = $2;
-							$$->f = $4;
+							// $$->ident = $2;
+							// $$->f = $6;
+							DEBUG("[StructDefn::Template]");
+						}
+		| STRUCT IDENTIFIER '{' struct_union_fields '}' variable_ident_list
+						{
+							$$ = new StructDefn();
+							// $$->ident = $2;
+							// $$->f = $5;
 							DEBUG("[StructDefn]");
+						}
+
+		| STRUCT IDENTIFIER template '{' struct_union_fields '}'
+						{
+							$$ = new StructDefn();
+							// $$->ident = "";
+							// $$->f = $6;
+							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT IDENTIFIER '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
-							$$->ident = "";
-							$$->f = $4;
+							// $$->ident = "";
+							// $$->f = $5;
 							DEBUG("[StructDefn]");
+						}
+		| STRUCT template '{' struct_union_fields '}' variable_ident_list
+						{
+							$$ = new StructDefn();
+							// $$->ident = "";
+							// $$->f = $5;
+							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							$$->ident = "";
-							$$->f = $3;
+							// $$->ident = "";
+							// $$->f = $4;
 							DEBUG("[StructDefn]");
+						}
+		| STRUCT template '{' struct_union_fields '}'
+						{
+							$$ = new StructDefn();
+							// This is useless
+							// $$->ident = "";
+							// $$->f = $4;
+							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT '{' struct_union_fields '}'
 						{
@@ -1795,20 +1825,6 @@ func_argument
 		;
 
 /*********************************** TEMPLATES ********************************************/
-
-template_def
-		: TEMPLATE_START template_def_items TEMPLATE_END
-						{
-						}
-
-template_def_items
-		: template_def_items ',' IDENTIFIER
-						{
-						}
-		| IDENTIFIER
-						{
-						}
-		;
 
 template
 		: TEMPLATE_START template_items TEMPLATE_END
