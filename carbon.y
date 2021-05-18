@@ -129,10 +129,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <int> source_file
 %nterm <TopLevel *> top_level
 %nterm <ImportDecl *> import_decl
-%nterm <FunctionDefn *> func_defn
-%nterm <AccessModifier *> access_modifier
+%nterm <VariableDef *> variable_def
+%nterm <TypeAlias *> type_alias
 %nterm <TypeFunction *> type_func
+%nterm <CompositeTypeDefn *> composite_type_defn
 %nterm <NamespaceDefn *> namespace_defn
+%nterm <FunctionDefn *> func_defn
+
+%nterm <AccessModifier *> access_modifier
 %nterm <NamespaceBlockList *> namespace_block_list
 %nterm <NamespaceBlock *> namespace_block
 
@@ -146,7 +150,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <Statements *> statements
 %nterm <Statement *> statement
-%nterm <VariableDef *> variable_def
 %nterm <IterationStmt *> iteration
 %nterm <ForStmt *> for_stmt
 %nterm <ForInit *> for_init
@@ -164,7 +167,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <StringLiteral *> str_lit
 %nterm <PointerLiteral * > ptr_lit
 %nterm <CompositeLiteral *> composite_lit
-%nterm <CompositeTypeDefn *> composite_type_defn
 %nterm <StructDefn *> struct_defn
 %nterm <UnionDefn *> union_defn
 %nterm <EnumDefn *> enum_defn
@@ -242,8 +244,7 @@ top_level
 						{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::TYPE_ALIAS;
-							// $$->ctd = $1;
-							$$->ctd->is_global = true;
+							$$->ta = $1;
 							DEBUG("[TopLevel::TypeAlias]");
 						}
 		| type_func EOL
@@ -257,7 +258,7 @@ top_level
 						{
 							$$ = new TopLevel();
 							$$->type = TopLevel::types::NAMESPACE_DEFN;
-							// $$->fd = $1;
+							$$->nsd = $1;
 							DEBUG("[TopLevel::NamespaceDefn]");
 						}
 		| func_defn EOL
@@ -408,7 +409,7 @@ func_sign
 							$$ = new FunctionSign();
 							$$->fp = $2;
 							$$->fr = $6;
-							DEBUG("[Block]");
+							DEBUG("[FuncSign]");
 						}
 		;
 
@@ -424,8 +425,7 @@ block
 func_param
 		: %empty
 						{
-							$$ = new FunctionParam();
-							$$->is_set = false;
+							/* Do nothing */
 							DEBUG("[FunctionParam]");
 						}
 		| func_param ',' type_identifier
@@ -437,7 +437,6 @@ func_param
 		| type_identifier
 						{
 							$$ = new FunctionParam();
-							$$->is_set = true;
 							$$->fpl.push_back($1);
 							DEBUG("[FunctionParam]");
 						}
@@ -446,8 +445,7 @@ func_param
 func_return
 		: %empty
 						{
-							$$ = new FunctionReturn();
-							$$->is_set = false;
+							/* Do nothing */
 							DEBUG("[FunctionReturn]");
 						}
 		| func_return ',' type_identifier
@@ -461,7 +459,6 @@ func_return
 							TypeIdentifier *ti = new TypeIdentifier();
 							ti->t = $3;
 							ti->ident = "";
-
 							$1->frl.push_back(ti);
 							$$ = $1;
 							DEBUG("[FunctionReturn]");
@@ -469,19 +466,15 @@ func_return
 		| type_identifier
 						{
 							$$ = new FunctionReturn();
-							$$->is_set = true;
 							$$->frl.push_back($1);
 							DEBUG("[FunctionReturn]");
 						}
 		| type
 						{
 							$$ = new FunctionReturn();
-							$$->is_set = true;
-
 							TypeIdentifier *ti = new TypeIdentifier();
 							ti->t = $1;
 							ti->ident = "";
-
 							$$->frl.push_back(ti);
 							DEBUG("[FunctionReturn]");
 						}
@@ -1886,6 +1879,7 @@ variable_ident_list
 type_alias
 		: TYPE IDENTIFIER EQUAL_TO type_name
 						{
+							$$ = new TypeAlias();
 							DEBUG("[TypeAlias]");
 						}
 

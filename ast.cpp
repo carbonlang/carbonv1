@@ -17,74 +17,32 @@
 #define ALERT(str) std::cout << "\033[42;31m" << str << "\033[0m\n"
 
 void SourceFile::codeGen() {
-	// std::list<TopLevel *>::iterator tli;
-	// for (tli = t.begin(); tli != t.end(); ++tli) {
-	//		(*tli)->codeGen();
-	// }
+	std::list<TopLevel *>::iterator tli;
+	for (tli = t.begin(); tli != t.end(); ++tli) {
+			(*tli)->codeGen();
+	}
 }
 
-/*
+
 void TopLevel::codeGen() {
-	if (type == TopLevel::types::FUNC_DEFN) {
-		fd->codeGen();
+	if (type == TopLevel::types::IMPORT_DECL) {
+		id->codeGen();
+	} else if (type == TopLevel::types::VARIABLE_DEF) {
+		vd->codeGen();
 	} else if (type == TopLevel::types::COMPOSITE_TYPE_DEFN) {
 		ctd->codeGen();
+	} else if (type == TopLevel::types::TYPE_ALIAS) {
+		ta->codeGen();
+	} else if (type == TopLevel::types::TYPE_FUNC) {
+		tf->codeGen();
+	} else if (type == TopLevel::types::NAMESPACE_DEFN) {
+		nsd->codeGen();
+	} else if (type == TopLevel::types::FUNC_DEFN) {
+		fd->codeGen();
 	}
 }
 
-void FunctionDefn::codeGen() {
-
-	llvm::FunctionType *func_type;
-
-	if (fs->fp->is_set) {
-		std::vector<llvm::Type *> func_param_vec;
-		std::list<TypeIdentifier *>::iterator tii;
-		for (tii = fs->fp->fpl.begin(); tii != fs->fp->fpl.end(); tii++) {
-			func_param_vec.push_back((*tii)->codeGen());
-		}
-		llvm::ArrayRef<llvm::Type *> func_param(func_param_vec);
-		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
-		// if (fs->fr->is_set) {
-		//	std::vector<llvm::Type *> func_return_vec;
-		//	std::list<TypeIdentifier *>::iterator tii;
-		//	for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
-		//		func_return_vec.push_back((*tii)->codeGen());
-		//	}
-		//	llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
-		//	func_type = llvm::FunctionType::get(func_return_vec, func_param, false);
-		// } else {
-		// }
-	} else {
-		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
-	}
-
-	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, fn, Module.get());
-
-	BB = llvm::BasicBlock::Create(Context, "", func);
-	Builder.SetInsertPoint(BB);
-
-	if (b) {
-		b->codeGen();
-	}
-
-	verifyFunction(*func);
-}
-
-void Block::codeGen() {
-	if (s) {
-		s->codeGen();
-	}
-}
-
-void Statements::codeGen() {
-	std::list<Statement *>::iterator si;
-	for (si = s.begin(); si != s.end(); ++si) {
-		if ((*si)->type == Statement::types::VARIABLE_DEF) {
-			(*si)->vds->codeGen();
-		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
-			(*si)->ctds->codeGen();
-		}
-	}
+void ImportDecl::codeGen() {
 }
 
 void VariableDef::codeGen() {
@@ -94,6 +52,7 @@ void VariableDef::codeGen() {
 
 	// static = internal global
 	// register = no effect
+	return;
 
 	if (type->type_name->type_name == TypeName::type_names::BOOL) {
 		llvm_type = llvm::Type::getInt8Ty(Context);
@@ -200,7 +159,6 @@ void VariableDef::codeGen() {
 		llvm_type = llvm::Type::getInt64Ty(Context);
 		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
 	}
-
 }
 
 void CompositeTypeDefn::codeGen() {
@@ -210,6 +168,74 @@ void CompositeTypeDefn::codeGen() {
 		u->codeGen(is_global);
 	} else if (type == CompositeTypeDefn::types::ENUM) {
 		e->codeGen(is_global);
+	}
+}
+
+void TypeAlias::codeGen() {
+}
+
+void TypeFunction::codeGen() {
+}
+
+void NamespaceDefn::codeGen() {
+}
+
+void FunctionDefn::codeGen() {
+
+	llvm::FunctionType *func_type;
+
+	if (fs->fp) {
+		/* Function with parameters */
+		std::vector<llvm::Type *> func_param_vec;
+		std::list<TypeIdentifier *>::iterator tii;
+		for (tii = fs->fp->fpl.begin(); tii != fs->fp->fpl.end(); tii++) {
+			func_param_vec.push_back((*tii)->codeGen());
+		}
+		llvm::ArrayRef<llvm::Type *> func_param(func_param_vec);
+
+		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
+		if (fs->fr) {
+		//	/* Function with return parameters */
+		//	std::vector<llvm::Type *> func_return_vec;
+		//	std::list<TypeIdentifier *>::iterator tii;
+		//	for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
+		//		func_return_vec.push_back((*tii)->codeGen());
+		//	}
+		//	llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
+		//	func_type = llvm::FunctionType::get(func_return_vec, func_param, false);
+		}
+	} else {
+		/* Function without parameters */
+		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
+	}
+
+	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, fn, Module.get());
+
+	BB = llvm::BasicBlock::Create(Context, "", func);
+
+	Builder.SetInsertPoint(BB);
+
+	if (b) {
+		b->codeGen();
+	}
+
+	verifyFunction(*func);
+}
+
+void Block::codeGen() {
+	if (s) {
+		// s->codeGen();
+	}
+}
+
+void Statements::codeGen() {
+	std::list<Statement *>::iterator si;
+	for (si = s.begin(); si != s.end(); ++si) {
+		if ((*si)->type == Statement::types::VARIABLE_DEF) {
+			(*si)->vds->codeGen();
+		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
+			(*si)->ctds->codeGen();
+		}
 	}
 }
 
@@ -407,4 +433,3 @@ llvm::Type *StructUnionField::codeGen() {
 	return llvm_type;
 
 }
-*/

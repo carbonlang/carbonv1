@@ -24,6 +24,7 @@ class ImportDecl;
 class FunctionDefn;
 class AccessModifier;
 class CompositeTypeDefn;
+class TypeAlias;
 class TypeFunction;
 class FunctionDefnList;
 class Block;
@@ -109,8 +110,9 @@ class TopLevel {
 		ImportDecl *id;
 		VariableDef *vd;
 		CompositeTypeDefn *ctd;
+		TypeAlias *ta;
 		TypeFunction *tf;
-		NamespaceDefn *nd;
+		NamespaceDefn *nsd;
 		FunctionDefn *fd;
 		void codeGen();
 };
@@ -120,6 +122,16 @@ class ImportDecl {
 		std::string import;
 		std::string from;
 		std::string as;
+		void codeGen();
+};
+
+class VariableDef {
+	public:
+		bool is_global = false;
+		std::string ident;
+		Type *type;
+		Literal *lit;
+		void codeGen();
 };
 
 class CompositeTypeDefn {
@@ -129,6 +141,34 @@ class CompositeTypeDefn {
 		StructDefn *s;
 		UnionDefn *u;
 		EnumDefn *e;
+		void codeGen();
+};
+
+class TypeAlias {
+	public:
+		void codeGen();
+};
+
+class TypeFunction {
+	public:
+		FunctionDefnList * fdl;
+		void codeGen();
+};
+
+class NamespaceDefn {
+	public:
+		std::string ident;
+		NamespaceBlockList *nsbl;
+		void codeGen();
+
+};
+
+class FunctionDefn {
+	public:
+		AccessModifier *am;
+		std::string fn;
+		FunctionSign *fs;
+		Block *b;
 		void codeGen();
 };
 
@@ -172,14 +212,6 @@ class EnumFields {
 		std::list<std::string> i;
 };
 
-class NamespaceDefn {
-	public:
-		std::string ident;
-		NamespaceBlockList *nsbl;
-		void codeGen();
-
-};
-
 class NamespaceBlockList {
 	public:
 		std::list<NamespaceBlock *> nsbl;
@@ -197,15 +229,6 @@ class NamespaceBlock {
 		void codeGen();
 };
 
-class FunctionDefn {
-	public:
-		AccessModifier *am;
-		Block *b;
-		std::string fn;
-		FunctionSign *fs;
-		void codeGen();
-};
-
 class FunctionSign {
 	public:
 		FunctionParam *fp;
@@ -214,19 +237,12 @@ class FunctionSign {
 
 class FunctionParam {
 	public:
-		bool is_set = false;
 		std::list<TypeIdentifier *> fpl;
 };
 
 class FunctionReturn {
 	public:
-		bool is_set = false;
 		std::list<TypeIdentifier *> frl;
-};
-
-class TypeFunction {
-	public:
-		FunctionDefnList * fdl;
 };
 
 class FunctionDefnList {
@@ -290,15 +306,6 @@ class Statement {
 		IterationStmt *is;
 		JumpStmt *js;
 		DeferStmt *ds;
-		void codeGen();
-};
-
-class VariableDef {
-	public:
-		bool is_global = false;
-		std::string ident;
-		Type *type;
-		Literal *lit;
 		void codeGen();
 };
 
