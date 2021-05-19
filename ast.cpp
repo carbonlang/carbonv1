@@ -235,9 +235,49 @@ void Statements::codeGen() {
 			(*si)->vds->codeGen();
 		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
 			(*si)->ctds->codeGen();
+		} else if ((*si)->type == Statement::types::TYPE_ALIAS) {
+			(*si)->ta->codeGen();
+		} else if ((*si)->type == Statement::types::EXPRESSION) {
+			(*si)->es->codeGen();
+		} else if ((*si)->type == Statement::types::ASSIGNMENT) {
+			(*si)->as->codeGen();
+		} else if ((*si)->type == Statement::types::SELECTION) {
+			(*si)->ss->codeGen();
+		} else if ((*si)->type == Statement::types::ITERATION) {
+			(*si)->is->codeGen();
+		} else if ((*si)->type == Statement::types::JUMP) {
+			(*si)->js->codeGen();
+		} else if ((*si)->type == Statement::types::DEFER) {
+			(*si)->ds->codeGen();
+		} else if ((*si)->type == Statement::types::BLOCK) {
+			(*si)->b->codeGen();
+		} else if ((*si)->type == Statement::types::LABEL) {
+			(*si)->ls->codeGen();
 		}
 	}
 }
+
+void ExpressionStmt::codeGen() {
+}
+
+void AssignmentStmt::codeGen() {
+}
+
+void SelectionStmt::codeGen() {
+}
+
+void IterationStmt::codeGen() {
+}
+
+void JumpStmt::codeGen() {
+}
+
+void DeferStmt::codeGen() {
+}
+
+void LabelStmt::codeGen() {
+}
+
 
 void StructDefn::codeGen(bool is_global = false) {
 	if (f) {

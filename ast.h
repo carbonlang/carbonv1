@@ -54,6 +54,7 @@ class SelectionStmt;
 class IterationStmt;
 class JumpStmt;
 class DeferStmt;
+class LabelStmt;
 
 class IfElseStmt;
 class IfBlock;
@@ -300,17 +301,21 @@ class Statement {
 			ITERATION, JUMP, DEFER, BLOCK, LABEL } type;
 		VariableDef *vds;
 		CompositeTypeDefn *ctds;
+		TypeAlias *ta;
 		ExpressionStmt *es;
 		AssignmentStmt *as;
 		SelectionStmt *ss;
 		IterationStmt *is;
 		JumpStmt *js;
 		DeferStmt *ds;
+		Block *b;
+		LabelStmt *ls;
 		void codeGen();
 };
 
 class ExpressionStmt {
-
+	public:
+		void codeGen();
 };
 
 class AssignmentStmt {
@@ -521,11 +526,17 @@ class JumpStmt {
 	public:
 		enum types { GOTO, CONTINUE, BREAK, RETURN } type;
 		std::string goto_ident;
+		void codeGen();
 };
 
 class DeferStmt {
 	public:
 		Block *b;
+		void codeGen();
+};
+
+class LabelStmt {
+	public:
 		void codeGen();
 };
 
