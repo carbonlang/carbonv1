@@ -130,6 +130,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <TopLevel *> top_level
 %nterm <ImportDecl *> import_decl
 %nterm <VariableDef *> variable_def
+%nterm <VarIdentExpList *> variable_ident_list
 %nterm <TypeAlias *> type_alias
 %nterm <TypeFunction *> type_func
 %nterm <CompositeTypeDefn *> composite_type_defn
@@ -326,6 +327,7 @@ namespace_block
 							$$ = new NamespaceBlock();
 							$$->type = NamespaceBlock::types::VARIABLE_DEF;
 							$$->vd = $1;
+							$$->vd->is_global = true;
 							DEBUG("[NS::VariableDef]");
 						}
 		| composite_type_defn EOL
@@ -1842,36 +1844,66 @@ variable_def
 		: type variable_ident_list
 						{
 							$$ = new VariableDef();
-							//$$->type = $1;
-							//$$->ident = $2;
-							//$$->lit = NULL;
-							DEBUG("[VariableDef]");
+							std::list<VarIdentExp *>::iterator viei;
+							for (viei = $2->viel.begin(); viei != $2->viel.end(); ++viei) {
+								(*viei)->t = $1;
+							}
+							$$->v = $2;
+							DEBUG("[VariableDef::Type]");
 						}
 		| AUTO variable_ident_list
 						{
 							$$ = new VariableDef();
-							//$$->type = $1;
-							//$$->ident = $2;
-							//$$->lit = NULL;
-							DEBUG("[AutoVariableDef]");
+							std::list<VarIdentExp *>::iterator viei;
+							for (viei = $2->viel.begin(); viei != $2->viel.end(); ++viei) {
+								(*viei)->t = new Type();
+								(*viei)->t->type_name = new TypeName();
+								(*viei)->t->type_name->type_name = TypeName::type_names::AUTO;
+							}
+							$$->v = $2;
+							DEBUG("[VariableDef::Auto]");
 						}
 		;
 
 variable_ident_list
 		: variable_ident_list ',' IDENTIFIER EQUAL_TO expression
 						{
-							DEBUG("[VariableDef::IdentifierEqLit]");
+							VarIdentExp *v = new VarIdentExp();
+							v->ident = $3;
+							v->t = NULL;
+							v->e = $5;
+							$1->viel.push_back(v);
+							$$ = $1;
+							DEBUG("[VariableDef::IdentifierEqExp]");
 						}
 		| variable_ident_list ',' IDENTIFIER
 						{
+							VarIdentExp *v = new VarIdentExp();
+							v->ident = $3;
+							v->t = NULL;
+							v->e = NULL;
+							$1->viel.push_back(v);
+							$$ = $1;
 							DEBUG("[VariableDef::Identifier]");
 						}
 		| IDENTIFIER EQUAL_TO expression
 						{
-							DEBUG("[VariableDef::IdentifierEqLit]");
+							$$ = new VarIdentExpList();
+							VarIdentExp *v = new VarIdentExp();
+							v->ident = $1;
+							v->t = NULL;
+							v->e = $3;
+							$$->viel.push_back(v);
+							DEBUG("[VariableDef::IdentifierEqExp]");
 						}
 		| IDENTIFIER
 						{
+							$$ = new VarIdentExpList();
+							VarIdentExp *v = new VarIdentExp();
+							v->ident = $1;
+							v->t = NULL;
+							v->e = NULL;
+							$$->viel.push_back(v);
 							DEBUG("[VariableDef::Identifier]");
 						}
 		;

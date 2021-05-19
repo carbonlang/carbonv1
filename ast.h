@@ -48,6 +48,8 @@ class CompositeLiteral;
 class Statements;
 class Statement;
 class VariableDef;
+class VarIdentExp;
+class VarIdentExpList;
 class ExpressionStmt;
 class AssignmentStmt;
 class SelectionStmt;
@@ -129,10 +131,20 @@ class ImportDecl {
 class VariableDef {
 	public:
 		bool is_global = false;
-		std::string ident;
-		Type *type;
-		Literal *lit;
+		VarIdentExpList *v;
 		void codeGen();
+};
+
+class VarIdentExpList {
+	public:
+		std::list<VarIdentExp *> viel;
+};
+
+class VarIdentExp {
+	public:
+		std::string ident;
+		Type *t;
+		Expression *e;
 };
 
 class CompositeTypeDefn {
@@ -267,7 +279,7 @@ class TypeName {
 		enum type_names { BOOL, CHAR, BYTE, INT, INT8, INT16, INT32, INT64, UINT, UINT8,
 			UINT16, UINT32, UINT64, FLOAT32, FLOAT64, FLOAT128, STRING, POINTER,
 			GENERIC_POINTER, STRUCT, STRUCT_TEMPLATE, UNION, UNION_TEMPLATE, ENUM,
-			FUNCTION, CUSTOM } type_name;
+			FUNCTION, CUSTOM, AUTO } type_name;
 };
 
 class Type {
@@ -594,6 +606,11 @@ class TypeIdentifier {
 		Type *t;
 		std::string ident;
 		llvm::Type *codeGen();
+};
+
+class LLVMVariableDef {
+	llvm::Type *llvm_type;
+	llvm::Value *llvm_val;
 };
 
 #endif /* AST_H */
