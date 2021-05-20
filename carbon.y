@@ -172,7 +172,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <UnionDefn *> union_defn
 %nterm <EnumDefn *> enum_defn
 %nterm <StructUnionFields *> struct_union_fields
-%nterm <StructUnionField *> struct_union_field
 %nterm <EnumFields *> enum_fields
 %nterm <TypeIdentifier *> type_identifier
 %nterm <FunctionSign *> func_sign
@@ -335,6 +334,7 @@ namespace_block
 							$$ = new NamespaceBlock();
 							$$->type = NamespaceBlock::types::COMPOSITE_TYPE_DEFN;
 							$$->ctd = $1;
+							$$->ctd->is_global = false;
 							DEBUG("[NS::CompositeTypeDefn]");
 						}
 		| type_alias EOL
@@ -1184,60 +1184,60 @@ struct_defn
 		: STRUCT IDENTIFIER template '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							// $$->ident = $2;
-							// $$->f = $6;
+							$$->ident = $2;
+							$$->f = $5;
 							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT IDENTIFIER '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							// $$->ident = $2;
-							// $$->f = $5;
+							$$->ident = $2;
+							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
 
 		| STRUCT IDENTIFIER template '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
-							// $$->ident = "";
-							// $$->f = $6;
+							$$->ident = "";
+							$$->f = $5;
 							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT IDENTIFIER '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
-							// $$->ident = "";
-							// $$->f = $5;
+							$$->ident = "";
+							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
 		| STRUCT template '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							// $$->ident = "";
-							// $$->f = $5;
+							$$->ident = "";
+							$$->f = $4;
 							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT '{' struct_union_fields '}' variable_ident_list
 						{
 							$$ = new StructDefn();
-							// $$->ident = "";
-							// $$->f = $4;
+							$$->ident = "";
+							$$->f = $3;
 							DEBUG("[StructDefn]");
 						}
 		| STRUCT template '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
 							// This is useless
-							// $$->ident = "";
-							// $$->f = $4;
+							$$->ident = "";
+							$$->f = $4;
 							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
 							// This is useless
-							// $$->ident = "";
-							// $$->f = $3;
+							$$->ident = "";
+							$$->f = $3;
 							DEBUG("[StructDefn]");
 						}
 		;
@@ -1268,8 +1268,8 @@ union_defn
 						{
 							$$ = new UnionDefn();
 							// This is useless
-							// $$->ident = "";
-							// $$->f = $3;
+							$$->ident = "";
+							$$->f = $3;
 							DEBUG("[UnionDefn]");
 						}
 		;
@@ -1300,8 +1300,8 @@ enum_defn
 						{
 							$$ = new EnumDefn();
 							// This is useless
-							// $$->ident = "";
-							// $$->f = $3;
+							$$->ident = "";
+							$$->f = $3;
 							DEBUG("[EnumDefn]");
 						}
 		;
@@ -1311,24 +1311,14 @@ struct_union_fields
 						{
 							/* empty */
 						}
-		| struct_union_fields struct_union_field
+		| struct_union_fields variable_def EOL
 						{
-							if (!$1) {
+							if ($1 == NULL) {
 								$1 = new StructUnionFields();
 							}
-							$1->suf.push_back($2);
+							$1->vdl.push_back($2);
 							$$ = $1;
 							DEBUG("[StructUnionFields]");
-						}
-		;
-
-struct_union_field
-		: type IDENTIFIER EOL
-						{
-							$$ = new StructUnionField();
-							$$->t = $1;
-							$$->ident = $2;
-							DEBUG("[StructUnionField]");
 						}
 		;
 

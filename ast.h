@@ -188,36 +188,29 @@ class FunctionDefn {
 class StructDefn {
 	public:
 		std::string ident;
+		bool is_global = false;
 		StructUnionFields *f;
-		void codeGen(bool);
+		void codeGen();
 };
 
 class UnionDefn {
 	public:
 		std::string ident;
+		bool is_global = false;
 		StructUnionFields *f;
-		void codeGen(bool);
+		void codeGen();
 };
 
 class EnumDefn {
 	public:
 		std::string ident;
 		EnumFields *f;
-		void codeGen(bool);
+		void codeGen();
 };
 
 class StructUnionFields {
 	public:
-		bool is_set = false;
-		std::list<StructUnionField *> suf;
-		void codeGen();
-};
-
-class StructUnionField {
-	public:
-		Type *t;
-		std::string ident;
-		llvm::Type *codeGen();
+		std::list<VariableDef *> vdl;
 };
 
 class EnumFields {
