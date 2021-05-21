@@ -820,8 +820,8 @@ statement
 						{
 							$$ = new Statement();
 							$$->type = Statement::types::COMPOSITE_TYPE_DEFN;
-							$$->ctds = $1;
-							$$->ctds->is_global = false;
+							$$->ctd = $1;
+							$$->ctd->is_global = false;
 							DEBUG("[Stmt:CompositeTypeDefnStmt]");
 						}
 		| type_alias EOL
@@ -1199,14 +1199,14 @@ struct_defn
 		| STRUCT IDENTIFIER template '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
-							$$->ident = "";
+							$$->ident = $2;
 							$$->f = $5;
 							DEBUG("[StructDefn::Template]");
 						}
 		| STRUCT IDENTIFIER '{' struct_union_fields '}'
 						{
 							$$ = new StructDefn();
-							$$->ident = "";
+							$$->ident = $2;
 							$$->f = $4;
 							DEBUG("[StructDefn]");
 						}
@@ -1313,7 +1313,7 @@ struct_union_fields
 						}
 		| struct_union_fields variable_def EOL
 						{
-							if ($1 == NULL) {
+							if (!$1) {
 								$1 = new StructUnionFields();
 							}
 							$1->vdl.push_back($2);

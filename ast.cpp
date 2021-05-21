@@ -32,7 +32,7 @@ void TopLevel::codeGen() {
 	} else if (type == TopLevel::types::VARIABLE_DEF) {
 		vd->codeGen();
 	} else if (type == TopLevel::types::COMPOSITE_TYPE_DEFN) {
-		ctd->codeGen();
+		ctd->codeGen(true);
 	} else if (type == TopLevel::types::TYPE_ALIAS) {
 		ta->codeGen();
 	} else if (type == TopLevel::types::TYPE_FUNC) {
@@ -177,13 +177,15 @@ void VariableDef::codeGen() {
 	*/
 }
 
-void CompositeTypeDefn::codeGen() {
+void CompositeTypeDefn::codeGen(bool is_global) {
 	if (type == CompositeTypeDefn::types::STRUCT) {
-		s->codeGen();
+		s->codeGen(is_global);
 	} else if (type == CompositeTypeDefn::types::UNION) {
-		u->codeGen();
+		u->codeGen(is_global);
 	} else if (type == CompositeTypeDefn::types::ENUM) {
-		e->codeGen();
+		e->codeGen(is_global);
+	} else {
+		ALERT("Error : CompositeTypeDefn");
 	}
 }
 
@@ -251,7 +253,7 @@ void Statements::codeGen() {
 		if ((*si)->type == Statement::types::VARIABLE_DEF) {
 			(*si)->vds->codeGen();
 		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
-			(*si)->ctds->codeGen();
+			(*si)->ctd->codeGen(false);
 		} else if ((*si)->type == Statement::types::TYPE_ALIAS) {
 			(*si)->ta->codeGen();
 		} else if ((*si)->type == Statement::types::EXPRESSION) {
@@ -268,10 +270,11 @@ void Statements::codeGen() {
 			(*si)->ds->codeGen();
 		} else if ((*si)->type == Statement::types::BLOCK) {
 			/* SEG FAULTS */
-			return;
-			(*si)->b->codeGen();
+			// (*si)->b->codeGen();
 		} else if ((*si)->type == Statement::types::LABEL) {
 			(*si)->ls->codeGen();
+		} else {
+			ALERT("Error : Statement");
 		}
 	}
 }
@@ -298,7 +301,7 @@ void LabelStmt::codeGen() {
 }
 
 
-void StructDefn::codeGen() {
+void StructDefn::codeGen(bool is_global) {
 	if (f) {
 		std::vector<llvm::Type *> struct_fields_vec;
 
@@ -316,7 +319,7 @@ void StructDefn::codeGen() {
 		if (is_global == true) {
 			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0);
 		} else {
-			// new llvm::AllocaInst(struct_type, 0, ident, BB);
+			new llvm::AllocaInst(struct_type, 0, ident, BB);
 		}
 	} else {
 		llvm::ArrayRef<llvm::Type *> struct_fields;
@@ -325,43 +328,44 @@ void StructDefn::codeGen() {
 		if (is_global == true) {
 			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0);
 		} else {
-			// new llvm::AllocaInst(struct_type, 0, ident, BB);
+			new llvm::AllocaInst(struct_type, 0, ident, BB);
 		}
 	}
 }
 
-void UnionDefn::codeGen() {
-	/*
+void UnionDefn::codeGen(bool is_global) {
 	if (f) {
-		if (f->is_set) {
-			std::vector<llvm::Type *> union_fields_vec;
-			std::list<StructUnionField *>::iterator sufi;
-			for (sufi = f->suf.begin(); sufi != f->suf.end(); sufi++) {
-				union_fields_vec.push_back(getLLVMType((*sufi)->t->type_name));
-			}
-			llvm::ArrayRef<llvm::Type *> union_fields(union_fields_vec);
-			llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
+		std::vector<llvm::Type *> union_fields_vec;
 
-			if (is_global) {
-				new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0);
-			} else {
-				llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(union_type, 0, ident, BB);
+		std::list<VariableDef *>::iterator vdi;
+		for (vdi = f->vdl.begin(); vdi != f->vdl.end(); vdi++) {
+			std::list<VarIdentExp *>::iterator viei;
+			for (viei = (*vdi)->v->viel.begin(); viei != (*vdi)->v->viel.end(); ++viei) {
+				union_fields_vec.push_back(getLLVMType((*viei)->t->type_name));
 			}
+		}
+
+		llvm::ArrayRef<llvm::Type *> union_fields(union_fields_vec);
+		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
+
+		if (is_global == true) {
+			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+		} else {
+			new llvm::AllocaInst(union_type, 0, ident, BB);
 		}
 	} else {
 		llvm::ArrayRef<llvm::Type *> union_fields;
 		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
 
-		if (is_global) {
+		if (is_global == true) {
 			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0);
 		} else {
-			llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(union_type, 0, ident, BB);
+			new llvm::AllocaInst(union_type, 0, ident, BB);
 		}
 	}
-	*/
 }
 
-void EnumDefn::codeGen() {
+void EnumDefn::codeGen(bool is_global) {
 
 }
 
@@ -421,7 +425,8 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		return llvm::Type::getInt64Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::AUTO) {
 		return llvm::Type::getInt64Ty(Context);
+	} else {
+		ALERT("Error : getLLVMType == NULL");
+		return NULL;
 	}
-	ALERT("NULL");
-	return NULL;
 }

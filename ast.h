@@ -154,7 +154,7 @@ class CompositeTypeDefn {
 		StructDefn *s;
 		UnionDefn *u;
 		EnumDefn *e;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class TypeAlias {
@@ -188,24 +188,22 @@ class FunctionDefn {
 class StructDefn {
 	public:
 		std::string ident;
-		bool is_global = false;
 		StructUnionFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class UnionDefn {
 	public:
 		std::string ident;
-		bool is_global = false;
 		StructUnionFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class EnumDefn {
 	public:
 		std::string ident;
 		EnumFields *f;
-		void codeGen();
+		void codeGen(bool);
 };
 
 class StructUnionFields {
@@ -305,7 +303,7 @@ class Statement {
 		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, EXPRESSION, ASSIGNMENT, SELECTION,
 			ITERATION, JUMP, DEFER, BLOCK, LABEL } type;
 		VariableDef *vds;
-		CompositeTypeDefn *ctds;
+		CompositeTypeDefn *ctd;
 		TypeAlias *ta;
 		ExpressionStmt *es;
 		AssignmentStmt *as;
