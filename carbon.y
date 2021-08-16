@@ -2009,10 +2009,10 @@ for_post
 		;
 
 foreach_stmt
-		: FOREACH '(' foreach_expr ',' foreach_expr IN IDENTIFIER ')'
+		: FOREACH '(' foreach_expr ',' foreach_expr  ')' IN IDENTIFIER
 						{
 						}
-		| FOREACH '(' foreach_expr IN IDENTIFIER ')'
+		| FOREACH '(' foreach_expr  ')' IN IDENTIFIER
 						{
 						}
 		;

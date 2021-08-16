@@ -90,9 +90,9 @@ def main(int a, bool b) -> (int) {
 
 	type xint = int8
 
-	foreach (auto a, auto c in arr) {
+	foreach (auto a, auto c) in arr {
 	}
-	foreach (auto ac, cc in list) {
+	foreach (auto ac, cc) in list {
 	}
 
 	struct Human {
