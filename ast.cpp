@@ -57,9 +57,9 @@ void VariableDef::codeGen() {
 	for (viei = v->viel.begin(); viei != v->viel.end(); ++viei) {
 		llvm_type = getLLVMType((*viei)->t->type_name);
 		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+			new llvm::GlobalVariable(*Module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + (*viei)->ident);
 		} else {
-			new llvm::AllocaInst(llvm_type, 0, (*viei)->ident, BB);
+			new llvm::AllocaInst(llvm_type, 0, parent_ns + (*viei)->ident, BB);
 		}
 	}
 /*
@@ -180,11 +180,11 @@ void VariableDef::codeGen() {
 
 void CompositeTypeDefn::codeGen(bool is_global) {
 	switch(type) {
-		case CompositeTypeDefn::types::STRUCT : s->codeGen(is_global);
+		case CompositeTypeDefn::types::STRUCT : s->codeGen(is_global, parent_ns);
 			break;
-		case CompositeTypeDefn::types::UNION : u->codeGen(is_global);
+		case CompositeTypeDefn::types::UNION : u->codeGen(is_global, parent_ns);
 			break;
-		case CompositeTypeDefn::types::ENUM : e->codeGen(is_global);
+		case CompositeTypeDefn::types::ENUM : e->codeGen(is_global, parent_ns);
 			break;
 		default : ALERT("Error : CompositeTypeDefn");
 	}
@@ -198,19 +198,44 @@ void TypeFunction::codeGen() {
 
 void NamespaceDefn::codeGen() {
 	std::list<NamespaceBlock *>::iterator nsbli;
+
 	for (nsbli = nsbl->nsbl.begin(); nsbli != nsbl->nsbl.end(); ++nsbli) {
 		switch ((*nsbli)->type) {
 			case NamespaceBlock::types::VARIABLE_DEF :
+				if (parent_ns == "") {
+					(*nsbli)->vd->parent_ns = ident + "__";
+				} else {
+					(*nsbli)->vd->parent_ns = parent_ns + ident  + "__";
+				}
+				(*nsbli)->vd->codeGen();
 				break;
 			case NamespaceBlock::types::COMPOSITE_TYPE_DEFN :
+				if (parent_ns == "") {
+					(*nsbli)->ctd->parent_ns = ident  + "__";
+				} else {
+					(*nsbli)->ctd->parent_ns = parent_ns + ident  + "__";
+				}
+				(*nsbli)->ctd->codeGen(true);
 				break;
 			case NamespaceBlock::types::TYPE_ALIAS :
 				break;
 			case NamespaceBlock::types::TYPE_FUNC :
 				break;
 			case NamespaceBlock::types::NAMESPACE_DEFN :
+				if (parent_ns == "") {
+					(*nsbli)->nd->parent_ns = ident + "__";
+				} else {
+					(*nsbli)->nd->parent_ns = parent_ns + ident + "__";
+				}
+				(*nsbli)->nd->codeGen();
 				break;
 			case NamespaceBlock::types::FUNC_DEFN :
+				if (parent_ns == "") {
+					(*nsbli)->fd->parent_ns = ident + "__";
+				} else {
+					(*nsbli)->fd->parent_ns = parent_ns + ident + "__";
+				}
+				(*nsbli)->fd->codeGen();
 				break;
 		}
 	}
@@ -245,7 +270,7 @@ void FunctionDefn::codeGen() {
 		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
 	}
 
-	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, fn, Module.get());
+	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, parent_ns + ident, Module.get());
 
 	BB = llvm::BasicBlock::Create(Context, "", func);
 
@@ -319,7 +344,7 @@ void LabelStmt::codeGen() {
 }
 
 
-void StructDefn::codeGen(bool is_global) {
+void StructDefn::codeGen(bool is_global, std::string parent_ns = "") {
 	if (f) {
 		std::vector<llvm::Type *> struct_fields_vec;
 
@@ -332,26 +357,26 @@ void StructDefn::codeGen(bool is_global) {
 		}
 
 		llvm::ArrayRef<llvm::Type *> struct_fields(struct_fields_vec);
-		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, ident);
+		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
 		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
-			new llvm::AllocaInst(struct_type, 0, ident, BB);
+			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
 		}
 	} else {
 		llvm::ArrayRef<llvm::Type *> struct_fields;
-		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, ident);
+		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
 		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
-			new llvm::AllocaInst(struct_type, 0, ident, BB);
+			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
 		}
 	}
 }
 
-void UnionDefn::codeGen(bool is_global) {
+void UnionDefn::codeGen(bool is_global, std::string parent_ns = "") {
 	if (f) {
 		std::vector<llvm::Type *> union_fields_vec;
 
@@ -364,26 +389,26 @@ void UnionDefn::codeGen(bool is_global) {
 		}
 
 		llvm::ArrayRef<llvm::Type *> union_fields(union_fields_vec);
-		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
+		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
 
 		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
-			new llvm::AllocaInst(union_type, 0, ident, BB);
+			new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
 		}
 	} else {
 		llvm::ArrayRef<llvm::Type *> union_fields;
-		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, ident);
+		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
 
 		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0);
+			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
-			new llvm::AllocaInst(union_type, 0, ident, BB);
+			new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
 		}
 	}
 }
 
-void EnumDefn::codeGen(bool is_global) {
+void EnumDefn::codeGen(bool is_global, std::string parent_ns = "") {
 
 }
 

@@ -370,7 +370,7 @@ func_defn
 						{
 							$$ = new FunctionDefn();
 							$$->am = $1;
-							$$->fn = $3;
+							$$->ident = $3;
 							$$->fs = $5;
 							$$->b = $6;
 							DEBUG("[FunctionDefn::Template]");
@@ -379,7 +379,7 @@ func_defn
 						{
 							$$ = new FunctionDefn();
 							$$->am = $1;
-							$$->fn = $3;
+							$$->ident = $3;
 							$$->fs = $4;
 							$$->b = $5;
 							DEBUG("[FunctionDefn]");

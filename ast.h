@@ -131,6 +131,7 @@ class ImportDecl {
 class VariableDef {
 	public:
 		bool is_global = false;
+		std::string parent_ns = "";
 		VarIdentExpList *v;
 		void codeGen();
 };
@@ -151,6 +152,7 @@ class CompositeTypeDefn {
 	public:
 		enum types { STRUCT, UNION, ENUM } type;
 		bool is_global = false;
+		std::string parent_ns = "";
 		StructDefn *s;
 		UnionDefn *u;
 		EnumDefn *e;
@@ -171,6 +173,7 @@ class TypeFunction {
 class NamespaceDefn {
 	public:
 		std::string ident;
+		std::string parent_ns;
 		NamespaceBlockList *nsbl;
 		void codeGen();
 
@@ -179,7 +182,8 @@ class NamespaceDefn {
 class FunctionDefn {
 	public:
 		AccessModifier *am;
-		std::string fn;
+		std::string parent_ns = "";
+		std::string ident;
 		FunctionSign *fs;
 		Block *b;
 		void codeGen();
@@ -189,21 +193,21 @@ class StructDefn {
 	public:
 		std::string ident;
 		StructUnionFields *f;
-		void codeGen(bool);
+		void codeGen(bool, std::string);
 };
 
 class UnionDefn {
 	public:
 		std::string ident;
 		StructUnionFields *f;
-		void codeGen(bool);
+		void codeGen(bool, std::string);
 };
 
 class EnumDefn {
 	public:
 		std::string ident;
 		EnumFields *f;
-		void codeGen(bool);
+		void codeGen(bool, std::string);
 };
 
 class StructUnionFields {
