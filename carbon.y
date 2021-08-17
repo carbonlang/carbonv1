@@ -68,7 +68,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> IMPORT FROM AS
 %token <std::string> STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
 %token <std::string> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
-%token <int> FUNC_RETURN
+%token <int> ARROW
 %token <std::string> IDENTIFIER
 %token <int> DEF
 %token <int> BOOL CHAR BYTE
@@ -98,8 +98,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> PLUS_EQUAL_TO MINUS_EQUAL_TO MULTIPLY_EQUAL_TO DIVIDE_EQUAL_TO MODULUS_EQUAL_TO
 %token <int> RIGHT_SHIFT_EQUAL_TO LEFT_SHIFT_EQUAL_TO RIGHT_SHIFT_US_EQUAL_TO LEFT_SHIFT_US_EQUAL_TO
 %token <int> LOGICAL_OR_EQUAL_TO LOGICAL_AND_EQUAL_TO
-
-%token <int> PTR_MEMBER
 
 %token <int> RETURN BREAK CONTINUE GOTO
 %token <int> FOR WHILE DO FOREACH IN
@@ -406,7 +404,7 @@ access_modifier
 		;
 
 func_sign
-		: '(' func_param ')' FUNC_RETURN '(' func_return ')'
+		: '(' func_param ')' ARROW '(' func_return ')'
 						{
 							$$ = new FunctionSign();
 							$$->fp = $2;
@@ -765,10 +763,10 @@ type_name
 		;
 
 function_type
-		: template '(' type_list ')' FUNC_RETURN '(' type_list ')'
+		: template '(' type_list ')' ARROW '(' type_list ')'
 						{
 						}
-		| '(' type_list ')' FUNC_RETURN '(' type_list ')'
+		| '(' type_list ')' ARROW '(' type_list ')'
 						{
 						}
 		;
@@ -1748,7 +1746,7 @@ postfix_expr
 		| postfix_expr '.' IDENTIFIER
 						{
 						}
-		| postfix_expr PTR_MEMBER IDENTIFIER
+		| postfix_expr ARROW IDENTIFIER
 						{
 						}
 		;
