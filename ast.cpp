@@ -27,20 +27,21 @@ void SourceFile::codeGen() {
 
 
 void TopLevel::codeGen() {
-	if (type == TopLevel::types::IMPORT_DECL) {
-		id->codeGen();
-	} else if (type == TopLevel::types::VARIABLE_DEF) {
-		vd->codeGen();
-	} else if (type == TopLevel::types::COMPOSITE_TYPE_DEFN) {
-		ctd->codeGen(true);
-	} else if (type == TopLevel::types::TYPE_ALIAS) {
-		ta->codeGen();
-	} else if (type == TopLevel::types::TYPE_FUNC) {
-		tf->codeGen();
-	} else if (type == TopLevel::types::NAMESPACE_DEFN) {
-		nsd->codeGen();
-	} else if (type == TopLevel::types::FUNC_DEFN) {
-		fd->codeGen();
+	switch (type) {
+		case TopLevel::types::IMPORT_DECL : id->codeGen();
+			break;
+		case TopLevel::types::VARIABLE_DEF : vd->codeGen();
+			break;
+		case TopLevel::types::COMPOSITE_TYPE_DEFN : ctd->codeGen(true);
+			break;
+		case TopLevel::types::TYPE_ALIAS : ta->codeGen();
+			break;
+		case TopLevel::types::TYPE_FUNC : tf->codeGen();
+			break;
+		case TopLevel::types::NAMESPACE_DEFN : nsd->codeGen();
+			break;
+		case TopLevel::types::FUNC_DEFN : fd->codeGen();
+			break;
 	}
 }
 
@@ -178,14 +179,14 @@ void VariableDef::codeGen() {
 }
 
 void CompositeTypeDefn::codeGen(bool is_global) {
-	if (type == CompositeTypeDefn::types::STRUCT) {
-		s->codeGen(is_global);
-	} else if (type == CompositeTypeDefn::types::UNION) {
-		u->codeGen(is_global);
-	} else if (type == CompositeTypeDefn::types::ENUM) {
-		e->codeGen(is_global);
-	} else {
-		ALERT("Error : CompositeTypeDefn");
+	switch(type) {
+		case CompositeTypeDefn::types::STRUCT : s->codeGen(is_global);
+			break;
+		case CompositeTypeDefn::types::UNION : u->codeGen(is_global);
+			break;
+		case CompositeTypeDefn::types::ENUM : e->codeGen(is_global);
+			break;
+		default : ALERT("Error : CompositeTypeDefn");
 	}
 }
 
@@ -196,6 +197,23 @@ void TypeFunction::codeGen() {
 }
 
 void NamespaceDefn::codeGen() {
+	std::list<NamespaceBlock *>::iterator nsbli;
+	for (nsbli = nsbl->nsbl.begin(); nsbli != nsbl->nsbl.end(); ++nsbli) {
+		switch ((*nsbli)->type) {
+			case NamespaceBlock::types::VARIABLE_DEF :
+				break;
+			case NamespaceBlock::types::COMPOSITE_TYPE_DEFN :
+				break;
+			case NamespaceBlock::types::TYPE_ALIAS :
+				break;
+			case NamespaceBlock::types::TYPE_FUNC :
+				break;
+			case NamespaceBlock::types::NAMESPACE_DEFN :
+				break;
+			case NamespaceBlock::types::FUNC_DEFN :
+				break;
+		}
+	}
 }
 
 void FunctionDefn::codeGen() {
