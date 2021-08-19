@@ -20,7 +20,7 @@ llvm::Type* getLLVMType(TypeName *);
 
 void SourceFile::codeGen() {
 	std::list<TopLevel *>::iterator tli;
-	for (tli = t.begin(); tli != t.end(); ++tli) {
+	for (tli = t.begin(); tli != t.end(); tli++) {
 		(*tli)->codeGen();
 	}
 }
@@ -54,7 +54,7 @@ void VariableDef::codeGen() {
 	llvm::Type *llvm_type;
 
 	std::list<VarIdentExp *>::iterator viei;
-	for (viei = v->viel.begin(); viei != v->viel.end(); ++viei) {
+	for (viei = v->viel.begin(); viei != v->viel.end(); viei++) {
 		llvm_type = getLLVMType((*viei)->t->type_name);
 		if (is_global == true) {
 			new llvm::GlobalVariable(*Module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + (*viei)->ident);
@@ -199,7 +199,7 @@ void TypeFunction::codeGen() {
 void NamespaceDefn::codeGen() {
 	std::list<NamespaceBlock *>::iterator nsbli;
 
-	for (nsbli = nsbl->nsbl.begin(); nsbli != nsbl->nsbl.end(); ++nsbli) {
+	for (nsbli = nsbl->nsbl.begin(); nsbli != nsbl->nsbl.end(); nsbli++) {
 		switch ((*nsbli)->type) {
 			case NamespaceBlock::types::VARIABLE_DEF :
 				if (parent_ns == "") {
@@ -292,7 +292,7 @@ void Block::codeGen() {
 void Statements::codeGen() {
 
 	std::list<Statement *>::iterator si;
-	for (si = s.begin(); si != s.end(); ++si) {
+	for (si = s.begin(); si != s.end(); si++) {
 		if ((*si)->type == Statement::types::VARIABLE_DEF) {
 			(*si)->vds->codeGen();
 		} else if ((*si)->type == Statement::types::COMPOSITE_TYPE_DEFN) {
@@ -317,7 +317,7 @@ void Statements::codeGen() {
 		} else if ((*si)->type == Statement::types::LABEL) {
 			(*si)->ls->codeGen();
 		} else {
-			ALERT("Error : Statement");
+			ALERT("Error : Statement type does not exists");
 		}
 	}
 }
@@ -326,6 +326,46 @@ void ExpressionStmt::codeGen() {
 }
 
 void AssignmentStmt::codeGen() {
+	std::list<LValue *>::iterator l_value_iter;
+	std::list<Expression *>::iterator expr_iter;
+
+	expr_iter = ptr_expr_list->expr_list.begin();
+
+	for (l_value_iter = ptr_l_value_list->l_value_list.begin();
+		l_value_iter != ptr_l_value_list->l_value_list.end();
+		l_value_iter++) {
+
+		if (expr_iter != ptr_expr_list->expr_list.end()) {
+			(*expr_iter)->codeGen();
+			expr_iter++;
+		}
+
+	}
+}
+
+void Expression::codeGen() {
+	switch (type) {
+		case Expression::types::UNARY :
+			unary_expr_ptr->codeGen();
+			break;
+		case Expression::types::BINARY :
+			binary_expr_ptr->codeGen();
+			break;
+		case Expression::types::EXPRESSION :
+			expr_ptr->codeGen();
+			break;
+		default :
+			ALERT("Error : Expression type does not exists");
+	}
+}
+
+void BinaryExpression::codeGen() {
+	left_expr_ptr->codeGen();
+	right_expr_ptr->codeGen();
+}
+
+void UnaryExpression::codeGen() {
+
 }
 
 void SelectionStmt::codeGen() {
@@ -351,7 +391,7 @@ void StructDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		std::list<VariableDef *>::iterator vdi;
 		for (vdi = f->vdl.begin(); vdi != f->vdl.end(); vdi++) {
 			std::list<VarIdentExp *>::iterator viei;
-			for (viei = (*vdi)->v->viel.begin(); viei != (*vdi)->v->viel.end(); ++viei) {
+			for (viei = (*vdi)->v->viel.begin(); viei != (*vdi)->v->viel.end(); viei++) {
 				struct_fields_vec.push_back(getLLVMType((*viei)->t->type_name));
 			}
 		}
@@ -383,7 +423,7 @@ void UnionDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		std::list<VariableDef *>::iterator vdi;
 		for (vdi = f->vdl.begin(); vdi != f->vdl.end(); vdi++) {
 			std::list<VarIdentExp *>::iterator viei;
-			for (viei = (*vdi)->v->viel.begin(); viei != (*vdi)->v->viel.end(); ++viei) {
+			for (viei = (*vdi)->v->viel.begin(); viei != (*vdi)->v->viel.end(); viei++) {
 				union_fields_vec.push_back(getLLVMType((*viei)->t->type_name));
 			}
 		}

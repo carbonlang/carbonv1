@@ -184,10 +184,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <AssignOp *> assign_op
 %nterm <LValue *> l_value
-%nterm <LValueList *> l_value_list
-%nterm <AssignmentStmt *> assignment_stmt
-
 %nterm <Expression *> expression
+%nterm <LValueList *> l_value_list
+%nterm <ExpressionList *> expression_list
+%nterm <AssignmentStmt *> assignment_stmt
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
 %nterm <NameSpaceIdent *> namespace_ident
@@ -841,7 +841,7 @@ statement
 						{
 							$$ = new Statement();
 							$$->type = Statement::types::ASSIGNMENT;
-							// $$->as = &$1;
+							$$->as = $1;
 							DEBUG("[Stmt:AssignStmt]");
 						}
 		| selection_stmt EOL
@@ -1431,27 +1431,42 @@ assign_op
 /******************************************************************************************/
 
 assignment_stmt
-		: l_value_list assign_op expression
+		: l_value_list assign_op expression_list
 						{
 							$$ = new AssignmentStmt();
-							$$->lvl = $1;
+							$$->ptr_l_value_list = $1;
 							$$->ao = $2;
-							$$->e = $3;
+							$$->ptr_expr_list = $3;
 							DEBUG("[AssignmentStmt]");
+						}
+		;
+
+expression_list
+		: expression_list ',' expression
+						{
+							$1->expr_list.push_back($3);
+							$$ = $1;
+							DEBUG("[Expression]");
+						}
+		| expression
+						{
+							$$ = new ExpressionList();
+							$$->expr_list.push_back($1);
+							DEBUG("[Expression]");
 						}
 		;
 
 l_value_list
 		: l_value_list ',' l_value
 						{
-							$1->lvl.push_back($3);
+							$1->l_value_list.push_back($3);
 							$$ = $1;
 							DEBUG("[LValueList]");
 						}
 		| l_value
 						{
 							$$ = new LValueList();
-							$$->lvl.push_back($1);
+							$$->l_value_list.push_back($1);
 							DEBUG("[LValue]");
 						}
 		;
@@ -1483,19 +1498,21 @@ expression
 						{
 							$$ = new Expression();
 							$$->type = Expression::types::UNARY;
-							$$->ue = $1;
+							$$->unary_expr_ptr = $1;
 							DEBUG("[UnaryExpr]");
 						}
 		| binary_expr
 						{
 							$$ = new Expression();
 							$$->type = Expression::types::BINARY;
-							$$->be = $1;
+							$$->binary_expr_ptr = $1;
 							DEBUG("[BinaryExpr]");
 						}
 		| '(' expression ')'
 						{
 							$$ = new Expression();
+							$$->type = Expression::types::EXPRESSION;
+							$$->expr_ptr = $2;
 							DEBUG("[()Expr]");
 						}
 		;
@@ -1505,168 +1522,168 @@ binary_expr
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::PLUS;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::+]");
 						}
 		| expression MINUS expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::MINUS;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::-]");
 						}
 		| expression MULTIPLY_OR_DEREF expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::MULTIPLY_OR_DEREF;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::*]");
 						}
 		| expression DIVIDE expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::DIVIDE;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::/]");
 						}
 		| expression MODULUS expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::MODULUS;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::%%]");
 						}
 		| expression RIGHT_SHIFT expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::RIGHT_SHIFT;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::>>]");
 						}
 		| expression LEFT_SHIFT expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::LEFT_SHIFT;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::<<]");
 						}
 		| expression RIGHT_SHIFT_US expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::RIGHT_SHIFT_US;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::>>>]");
 						}
 		| expression LEFT_SHIFT_US expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::LEFT_SHIFT_US;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::<<<]");
 						}
 		| expression LOGICAL_AND expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::LOGICAL_AND;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::&]");
 						}
 		| expression LOGICAL_OR expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::LOGICAL_OR;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::|]");
 						}
 		| expression IS_EQUAL expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_EQUAL;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::==]");
 						}
 		| expression IS_NOT_EQUAL expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_NOT_EQUAL;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::!=]");
 						}
 		| expression IS_LESS expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_LESS;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::<]");
 						}
 		| expression IS_GREATER expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_GREATER;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::>]");
 						}
 		| expression IS_LESS_OR_EQ expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_LESS_OR_EQ;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::<=]");
 						}
 		| expression IS_GREATER_OR_EQ expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::IS_GREATER_OR_EQ;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::>=]");
 						}
 		| expression BITWISE_AND expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::BITWISE_AND;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::&&]");
 						}
 		| expression BITWISE_OR expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::BITWISE_OR;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::||]");
 						}
 		| expression BITWISE_NOT expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::BITWISE_NOT;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::^]");
 						}
 		| expression BITWISE_XOR expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::BITWISE_XOR;
-							$$->le = $1;
-							$$->re = $3;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::&^]");
 						}
 		;
@@ -1676,42 +1693,42 @@ unary_expr
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_NOT;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::!]");
 						}
 		| U_2COMP expression
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_2COMP;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::~]");
 						}
 		| U_ADD_OF expression
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::U_ADD_OF;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::@]");
 						}
 		| MULTIPLY_OR_DEREF expression
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MULTIPLY_OR_DEREF;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::$]");
 						}
 		| PLUS expression
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::PLUS;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::+a]");
 						}
 		| MINUS expression
 						{
 							$$ = new UnaryExpression();
 							$$->type = UnaryExpression::types::MINUS;
-							//$$->ue = $2;
+							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::-a]");
 						}
 		| postfix_expr

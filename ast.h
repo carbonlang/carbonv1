@@ -86,9 +86,10 @@ class EnumFields;
 
 class AssignOp;
 
-class LValue;
 class LValueList;
+class ExpressionList;
 
+class LValue;
 class Expression;
 class UnaryExpression;
 class BinaryExpression;
@@ -327,9 +328,21 @@ class ExpressionStmt {
 
 class AssignmentStmt {
 	public:
-		LValueList *lvl;
+		LValueList *ptr_l_value_list;
 		AssignOp *ao;
-		Expression *e;
+		ExpressionList *ptr_expr_list;
+		void codeGen();
+};
+
+class LValueList {
+	public:
+		std::list<LValue *> l_value_list;
+		void codeGen();
+};
+
+class ExpressionList {
+	public:
+		std::list<Expression *> expr_list;
 		void codeGen();
 };
 
@@ -342,25 +355,19 @@ class LValue {
 		Index *i;
 };
 
-class LValueList {
-	public:
-		std::list<LValue *> lvl;
-		void codeGen();
-};
-
 class Expression {
 	public:
-		enum types { UNARY, BINARY } type;
-		UnaryExpression *ue;
-		BinaryExpression *be;
+		enum types { UNARY, BINARY, EXPRESSION } type;
+		UnaryExpression *unary_expr_ptr;
+		BinaryExpression *binary_expr_ptr;
+		Expression *expr_ptr;
 		void codeGen();
 };
 
 class UnaryExpression {
 	public:
 		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY_OR_DEREF, PLUS, MINUS, BRACES, OPERAND } type;
-		UnaryExpression *ue;
-		Expression *e;
+		Expression *expr_ptr;
 		Operand *o;
 		void codeGen();
 };
@@ -371,8 +378,8 @@ class BinaryExpression {
 			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR, IS_EQUAL, IS_NOT_EQUAL,
 			IS_LESS, IS_GREATER, IS_LESS_OR_EQ, IS_GREATER_OR_EQ,
 			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;
-		Expression *le;
-		Expression *re;
+		Expression *left_expr_ptr;
+		Expression *right_expr_ptr;
 		void codeGen();
 };
 
