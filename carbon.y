@@ -190,7 +190,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <AssignmentStmt *> assignment_stmt
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
-%nterm <NameSpaceIdent *> namespace_ident
+%nterm <PostfixExpression *> postfix_expr
+%nterm <IdentWithNamespace *> ident_with_ns
 %nterm <FunctionCallOp *> func_call_op
 %nterm <ReturnArgumentList *> return_argument_list
 %nterm <CaseBlock *> case_block
@@ -1434,9 +1435,9 @@ assignment_stmt
 		: l_value_list assign_op expression_list
 						{
 							$$ = new AssignmentStmt();
-							$$->ptr_l_value_list = $1;
+							$$->l_value_list_ptr = $1;
 							$$->ao = $2;
-							$$->ptr_expr_list = $3;
+							$$->expr_list_ptr = $3;
 							DEBUG("[AssignmentStmt]");
 						}
 		;
@@ -1734,57 +1735,82 @@ unary_expr
 		| postfix_expr
 						{
 							$$ = new UnaryExpression();
-							//$$->type = UnaryExpression::types::BRACES;
-							//$$->e = $2;
-							DEBUG("[UnaryExpr::()]");
+							$$->type = UnaryExpression::types::POSTFIX_EXPR;
+							$$->postfix_expr_ptr = $1;
+							DEBUG("[UnaryExpr::PostfixExpr]");
 						}
-		| '[' type_name ']' expression %prec "type_cast"
+		| '[' type_name ']' expression		%prec "type_cast"
 						{
-							// There is a S-R conflict between (int)a + b hence
+							// Note : There is a S-R conflict between (int)a + b hence
 							// give [int]a higher priority usng %prec
 							$$ = new UnaryExpression();
+							$$->type = UnaryExpression::types::TYPE_CAST;
+							$$->expr_ptr = $4;
+							DEBUG("[UnaryExpr::TypeCastExpr]");
 						}
 		| literal
 						{
 							$$ = new UnaryExpression();
+							$$->type = UnaryExpression::types::LITERAL;
+							$$->lit_ptr = $1;
+							DEBUG("[UnaryExpr::LiteralExpr]");
 						}
 		;
 
 postfix_expr
-		: namespace_ident
+		: ident_with_ns
 						{
+							$$ = new PostfixExpression();
+							$$->type = PostfixExpression::types::IDENT_WITH_NS;
+							$$->ident_with_ns_ptr = $1;
+							DEBUG("[PostfixExpr::IdentWithNS]");
 						}
 		| postfix_expr '[' expression ']'
 						{
+							$$ = new PostfixExpression();
+							$$->type = PostfixExpression::types::ARRAY;
+							$$->postfix_expr_ptr = $1;
+							$$->array_expr_ptr = $3;
+							DEBUG("[PostfixExpr::Array]");
 						}
 		| postfix_expr func_call_op
 						{
+							$$ = new PostfixExpression();
+							$$->type = PostfixExpression::types::FUNCTION_CALL;
+							$$->postfix_expr_ptr = $1;
+							$$->func_call_op_ptr = $2;
+							DEBUG("[PostfixExpr::FuncCall]");
 						}
 		| postfix_expr '.' IDENTIFIER
 						{
+							$$ = new PostfixExpression();
+							$$->type = PostfixExpression::types::DOT_OP;
+							$$->postfix_expr_ptr = $1;
+							$$->dot_ident = $3;
+							DEBUG("[PostfixExpr::DotIdent]");
 						}
 		| postfix_expr ARROW IDENTIFIER
 						{
+							$$ = new PostfixExpression();
+							$$->type = PostfixExpression::types::ARROW_OP;
+							$$->postfix_expr_ptr = $1;
+							$$->arrow_ident = $3;
+							DEBUG("[PostfixExpr::ArrowIdent]");
 						}
 		;
 
-namespace_ident
+ident_with_ns
 		: IDENTIFIER
 						{
-							$$ = new NameSpaceIdent;
+							$$ = new IdentWithNamespace;
 							$$->ident = $1;
-							$$->is_dot_NameSpaceIdent = false;
-							$$->is_ptr_NameSpaceIdent = false;
-							DEBUG("[Identifier]");
+							DEBUG("[IdentWithNamespace]");
 						}
-		| namespace_ident SCOPE_RESOLUTION IDENTIFIER
+		| ident_with_ns SCOPE_RESOLUTION IDENTIFIER
 						{
-							$$ = new NameSpaceIdent;
+							$$ = new IdentWithNamespace;
 							$$->ident = $3;
-							$$->is_dot_NameSpaceIdent = true;
-							$$->is_ptr_NameSpaceIdent = false;
-							$$->dot_NameSpaceIdent = $1;
-							DEBUG("[Identifier::X::Y]");
+							DEBUG("[IdentWithNamespace::X::Y]");
 						}
 		;
 

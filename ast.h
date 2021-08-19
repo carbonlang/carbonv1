@@ -93,8 +93,9 @@ class LValue;
 class Expression;
 class UnaryExpression;
 class BinaryExpression;
+class PostfixExpression;
 class Operand;
-class NameSpaceIdent;
+class IdentWithNamespace;
 class Index;
 class FunctionCallOp;
 class ReturnArgumentList;
@@ -328,9 +329,9 @@ class ExpressionStmt {
 
 class AssignmentStmt {
 	public:
-		LValueList *ptr_l_value_list;
+		LValueList *l_value_list_ptr;
+		ExpressionList *expr_list_ptr;
 		AssignOp *ao;
-		ExpressionList *ptr_expr_list;
 		void codeGen();
 };
 
@@ -366,9 +367,11 @@ class Expression {
 
 class UnaryExpression {
 	public:
-		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY_OR_DEREF, PLUS, MINUS, BRACES, OPERAND } type;
+		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY_OR_DEREF, PLUS, MINUS, BRACES,
+			POSTFIX_EXPR, TYPE_CAST, LITERAL } type;
 		Expression *expr_ptr;
-		Operand *o;
+		PostfixExpression *postfix_expr_ptr;
+		Literal *lit_ptr;
 		void codeGen();
 };
 
@@ -380,6 +383,18 @@ class BinaryExpression {
 			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;
 		Expression *left_expr_ptr;
 		Expression *right_expr_ptr;
+		void codeGen();
+};
+
+class PostfixExpression {
+	public:
+		enum types { IDENT_WITH_NS, ARRAY, FUNCTION_CALL, DOT_OP, ARROW_OP } type;
+		IdentWithNamespace *ident_with_ns_ptr;
+		Expression *array_expr_ptr;
+		FunctionCallOp *func_call_op_ptr; // TODO
+		std::string dot_ident;
+		std::string arrow_ident;
+		PostfixExpression *postfix_expr_ptr;
 		void codeGen();
 };
 
@@ -395,19 +410,15 @@ class Operand {
 	public:
 		enum types { LITERAL, QUALIFIED_IDENT, INDEX, FUNCTION_CALL } type;
 		Literal *l;
-		NameSpaceIdent *nsi;
+		IdentWithNamespace *nsi;
 		Index *i;
 		FunctionCallOp *fco;
 		void codeGen();
 };
 
-class NameSpaceIdent {
+class IdentWithNamespace {
 	public:
 		std::string ident;
-		bool is_dot_NameSpaceIdent = false;
-		bool is_ptr_NameSpaceIdent = false;
-		NameSpaceIdent *dot_NameSpaceIdent;
-		NameSpaceIdent *ptr_NameSpaceIdent;
 		void codeGen();
 };
 
@@ -492,7 +503,6 @@ class IterationStmt {
 		WhileStmt *w;
 		DoWhileStmt *dw;
 		void codeGen();
-
 };
 
 class ForStmt {

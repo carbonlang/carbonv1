@@ -329,13 +329,13 @@ void AssignmentStmt::codeGen() {
 	std::list<LValue *>::iterator l_value_iter;
 	std::list<Expression *>::iterator expr_iter;
 
-	expr_iter = ptr_expr_list->expr_list.begin();
+	expr_iter = expr_list_ptr->expr_list.begin();
 
-	for (l_value_iter = ptr_l_value_list->l_value_list.begin();
-		l_value_iter != ptr_l_value_list->l_value_list.end();
+	for (l_value_iter = l_value_list_ptr->l_value_list.begin();
+		l_value_iter != l_value_list_ptr->l_value_list.end();
 		l_value_iter++) {
 
-		if (expr_iter != ptr_expr_list->expr_list.end()) {
+		if (expr_iter != expr_list_ptr->expr_list.end()) {
 			(*expr_iter)->codeGen();
 			expr_iter++;
 		}
@@ -365,6 +365,42 @@ void BinaryExpression::codeGen() {
 }
 
 void UnaryExpression::codeGen() {
+	switch (type) {
+		case U_NOT :
+			expr_ptr->codeGen();
+			break;
+		case U_2COMP :
+			expr_ptr->codeGen();
+			break;
+		case U_ADD_OF :
+			expr_ptr->codeGen();
+			break;
+		case MULTIPLY_OR_DEREF :
+			expr_ptr->codeGen();
+			break;
+		case PLUS :
+			expr_ptr->codeGen();
+			break;
+		case MINUS :
+			expr_ptr->codeGen();
+			break;
+		case BRACES :
+			expr_ptr->codeGen();
+			break;
+		case POSTFIX_EXPR :
+			postfix_expr_ptr->codeGen();
+			break;
+		case TYPE_CAST :
+			expr_ptr->codeGen();
+			break;
+		case LITERAL :
+			break;
+		default :
+			ALERT("Error : Unary Expression type does not exists");
+	}
+}
+
+void PostfixExpression::codeGen() {
 
 }
 
