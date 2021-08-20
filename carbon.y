@@ -89,13 +89,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <std::string> FLOAT_LIT CHAR_LIT
 
 %token <int> EQUAL_TO
-%token <int> PLUS MINUS MULTIPLY_OR_DEREF DIVIDE MODULUS
+%token <int> PLUS MINUS STAR DIVIDE MODULUS
 %token <int> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token <int> IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token <int> LOGICAL_OR LOGICAL_AND
 %token <int> BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 
-%token <int> PLUS_EQUAL_TO MINUS_EQUAL_TO MULTIPLY_EQUAL_TO DIVIDE_EQUAL_TO MODULUS_EQUAL_TO
+%token <int> PLUS_EQUAL_TO MINUS_EQUAL_TO STAR_EQUAL_TO DIVIDE_EQUAL_TO MODULUS_EQUAL_TO
 %token <int> RIGHT_SHIFT_EQUAL_TO LEFT_SHIFT_EQUAL_TO RIGHT_SHIFT_US_EQUAL_TO LEFT_SHIFT_US_EQUAL_TO
 %token <int> LOGICAL_OR_EQUAL_TO LOGICAL_AND_EQUAL_TO
 
@@ -113,7 +113,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> EOL
 
-%left PLUS MINUS MULTIPLY_OR_DEREF DIVIDE MODULUS
+%left PLUS MINUS STAR DIVIDE MODULUS
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
@@ -1362,11 +1362,11 @@ assign_op
 							$$->type = AssignOp::types::MINUS_EQUAL_TO;
 							DEBUG("[-=]");
 						}
-		| MULTIPLY_EQUAL_TO
+		| STAR_EQUAL_TO
 						{
 							$$ = new AssignOp();
 							$$->is_compound = true;
-							$$->type = AssignOp::types::MULTIPLY_EQUAL_TO;
+							$$->type = AssignOp::types::STAR_EQUAL_TO;
 							DEBUG("[-=]");
 						}
 		| DIVIDE_EQUAL_TO
@@ -1535,10 +1535,10 @@ binary_expr
 							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::-]");
 						}
-		| expression MULTIPLY_OR_DEREF expression
+		| expression STAR expression
 						{
 							$$ = new BinaryExpression();
-							$$->type = BinaryExpression::types::MULTIPLY_OR_DEREF;
+							$$->type = BinaryExpression::types::STAR;
 							$$->left_expr_ptr = $1;
 							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::*]");
@@ -1711,10 +1711,10 @@ unary_expr
 							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::@]");
 						}
-		| MULTIPLY_OR_DEREF expression
+		| STAR expression
 						{
 							$$ = new UnaryExpression();
-							$$->type = UnaryExpression::types::MULTIPLY_OR_DEREF;
+							$$->type = UnaryExpression::types::STAR;
 							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::$]");
 						}

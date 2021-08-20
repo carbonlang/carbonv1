@@ -367,7 +367,7 @@ class Expression {
 
 class UnaryExpression {
 	public:
-		enum types { U_NOT, U_2COMP, U_ADD_OF, MULTIPLY_OR_DEREF, PLUS, MINUS, BRACES,
+		enum types { U_NOT, U_2COMP, U_ADD_OF, STAR, PLUS, MINUS, BRACES,
 			POSTFIX_EXPR, TYPE_CAST, LITERAL } type;
 		Expression *expr_ptr;
 		PostfixExpression *postfix_expr_ptr;
@@ -377,7 +377,7 @@ class UnaryExpression {
 
 class BinaryExpression {
 	public:
-		enum types { PLUS, MINUS, MULTIPLY_OR_DEREF, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
+		enum types { PLUS, MINUS, STAR, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
 			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR, IS_EQUAL, IS_NOT_EQUAL,
 			IS_LESS, IS_GREATER, IS_LESS_OR_EQ, IS_GREATER_OR_EQ,
 			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;
@@ -400,7 +400,7 @@ class PostfixExpression {
 
 class AssignOp {
 	public:
-		enum types { PLUS_EQUAL_TO, MINUS_EQUAL_TO, MULTIPLY_EQUAL_TO, DIVIDE_EQUAL_TO, MODULUS_EQUAL_TO,
+		enum types { PLUS_EQUAL_TO, MINUS_EQUAL_TO, STAR_EQUAL_TO, DIVIDE_EQUAL_TO, MODULUS_EQUAL_TO,
 			RIGHT_SHIFT_EQUAL_TO, LEFT_SHIFT_EQUAL_TO, RIGHT_SHIFT_US_EQUAL_TO, LEFT_SHIFT_US_EQUAL_TO,
 			LOGICAL_OR_EQUAL_TO, LOGICAL_AND_EQUAL_TO } type;
 		bool is_compound = false;

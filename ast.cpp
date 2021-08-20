@@ -375,7 +375,7 @@ void UnaryExpression::codeGen() {
 		case U_ADD_OF :
 			expr_ptr->codeGen();
 			break;
-		case MULTIPLY_OR_DEREF :
+		case STAR :
 			expr_ptr->codeGen();
 			break;
 		case PLUS :
