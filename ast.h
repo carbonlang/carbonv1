@@ -567,13 +567,14 @@ class LabelStmt {
 class Literal {
 	public:
 		enum types { BOOL, INT, FLOAT, CHAR, STRING, POINTER, COMPOSITE } type;
-		BooleanLiteral *boolean;
-		IntegerLiteral *integer;
-		FloatLiteral *floating;
-		CharLiteral *character;
-		StringLiteral *string;
-		PointerLiteral *pointer;
-		CompositeLiteral *composite;
+		BooleanLiteral *boolean_ptr;
+		IntegerLiteral *integer_ptr;
+		FloatLiteral *floating_ptr;
+		CharLiteral *character_ptr;
+		StringLiteral *string_ptr;
+		PointerLiteral *pointer_ptr;
+		CompositeLiteral *composite_ptr;
+		void codeGen();
 };
 
 class BooleanLiteral {

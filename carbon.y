@@ -897,49 +897,49 @@ literal
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::BOOL;
-							$$->boolean = $1;
+							$$->boolean_ptr = $1;
 							DEBUG("[Literal::Boolean]");
 						}
 		| int_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::INT;
-							$$->integer = $1;
+							$$->integer_ptr = $1;
 							DEBUG("[Literal::Integer]");
 						}
 		| float_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::FLOAT;
-							$$->floating = $1;
+							$$->floating_ptr = $1;
 							DEBUG("[Literal::Float]");
 						}
 		| char_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::CHAR;
-							$$->character = $1;
+							$$->character_ptr = $1;
 							DEBUG("[Literal::Char]");
 						}
 		| str_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::STRING;
-							$$->string = $1;
+							$$->string_ptr = $1;
 							DEBUG("[Literal::String]");
 						}
 		| ptr_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::POINTER;
-							$$->pointer = $1;
+							$$->pointer_ptr = $1;
 							DEBUG("[Literal::Pointer]");
 						}
 		| composite_lit
 						{
 							$$ = new Literal();
 							$$->type = Literal::types::COMPOSITE;
-							$$->composite = $1;
+							$$->composite_ptr = $1;
 							DEBUG("[Literal::Composite]");
 						}
 		;

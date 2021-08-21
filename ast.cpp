@@ -394,6 +394,7 @@ void UnaryExpression::codeGen() {
 			expr_ptr->codeGen();
 			break;
 		case LITERAL :
+			lit_ptr->codeGen();
 			break;
 		default :
 			ALERT("Error : Unary Expression type does not exists");
@@ -402,6 +403,35 @@ void UnaryExpression::codeGen() {
 
 void PostfixExpression::codeGen() {
 
+}
+
+void Literal::codeGen() {
+	switch (type) {
+		case BOOL :
+			switch (boolean_ptr->type) {
+				case BooleanLiteral::types::TRUE :
+					break;
+				case BooleanLiteral::types::FALSE :
+					break;
+				default :
+					ALERT("Error : Boolean literal type does not exists");
+			}
+			break;
+		case INT :
+			break;
+		case FLOAT :
+			break;
+		case CHAR :
+			break;
+		case STRING :
+			break;
+		case POINTER :
+			break;
+		case COMPOSITE :
+			break;
+		default :
+			ALERT("Error : Literal type does not exists");
+	}
 }
 
 void SelectionStmt::codeGen() {
