@@ -993,7 +993,7 @@ int_lit
 							std::string oct_str = $1;
 							oct_str.erase(0, 2);
 
-							$$->reg_size = 64;
+							$$->reg_size = 64; /* TODO + NEG */
 
 							$$->value = stol(oct_str, nullptr, 8);
 
@@ -1006,7 +1006,7 @@ int_lit
 
 							std::string dec_str = $1;
 
-							$$->reg_size = 64;
+							$$->reg_size = 64; /* TODO */
 
 							$$->value = stol(dec_str, nullptr, 10);
 

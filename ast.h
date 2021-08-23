@@ -574,7 +574,7 @@ class Literal {
 		StringLiteral *string_ptr;
 		PointerLiteral *pointer_ptr;
 		CompositeLiteral *composite_ptr;
-		void codeGen();
+		llvm::Value * codeGen();
 };
 
 class BooleanLiteral {

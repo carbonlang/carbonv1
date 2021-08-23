@@ -405,21 +405,44 @@ void PostfixExpression::codeGen() {
 
 }
 
-void Literal::codeGen() {
+llvm::Value * Literal::codeGen() {
 	switch (type) {
 		case BOOL :
 			switch (boolean_ptr->type) {
 				case BooleanLiteral::types::TRUE :
-					break;
+					return llvm::ConstantInt::getTrue(Context);
 				case BooleanLiteral::types::FALSE :
-					break;
+					return llvm::ConstantInt::getFalse(Context);
 				default :
 					ALERT("Error : Boolean literal type does not exists");
+					return NULL;
 			}
 			break;
 		case INT :
-			break;
+			ALERT(integer_ptr->reg_size);
+			return llvm::ConstantInt::get(
+				llvm::IntegerType::get(Context, integer_ptr->reg_size),
+				integer_ptr->value,
+				false);
 		case FLOAT :
+			ALERT(floating_ptr->value);
+			switch (floating_ptr->reg_size) {
+				case 32 :
+					return llvm::ConstantFP::get(
+						llvm::Type::getFloatTy(Context),
+						floating_ptr->value);
+				case 64 :
+					return llvm::ConstantFP::get(
+						llvm::Type::getDoubleTy(Context),
+						floating_ptr->value);
+				case 128 :
+					return llvm::ConstantFP::get(
+						llvm::Type::getFP128Ty(Context),
+						floating_ptr->value);
+				default :
+					ALERT("Error : Floating literal size does not exists");
+					return NULL;
+			}
 			break;
 		case CHAR :
 			break;
@@ -432,6 +455,7 @@ void Literal::codeGen() {
 		default :
 			ALERT("Error : Literal type does not exists");
 	}
+	return NULL;
 }
 
 void SelectionStmt::codeGen() {
