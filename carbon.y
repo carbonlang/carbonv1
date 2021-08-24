@@ -1123,36 +1123,42 @@ str_lit
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::STR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::Str]");
 						}
 		| WSTR_LITERAL
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::WSTR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::WStr]");
 						}
 		| U8STR_LITERAL
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::U8STR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::U8Str]");
 						}
 		| U16STR_LITERAL
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::U16STR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::U16Str]");
 						}
 		| U32STR_LITERAL
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::U32STR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::U32Str]");
 						}
 		| RSTR_LITERAL
 						{
 							$$ = new StringLiteral();
 							$$->type = StringLiteral::types::RSTR_LITERAL;
+							$$->string_literal = $1;
 							DEBUG("[Literal::String::RStr]");
 						}
 		;

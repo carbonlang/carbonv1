@@ -426,6 +426,7 @@ llvm::Value * Literal::codeGen() {
 				false);
 		case FLOAT :
 			// ALERT(floating_ptr->value);
+			/* Floating point can be 32, 64, 128 bits wide */
 			switch (floating_ptr->reg_size) {
 				case 32 :
 					return llvm::ConstantFP::get(
@@ -445,8 +446,17 @@ llvm::Value * Literal::codeGen() {
 			}
 			break;
 		case CHAR :
+			/* Integer 8 below represents 8-bits */
+			return llvm::ConstantInt::get(
+				llvm::IntegerType::get(Context, 8),
+				character_ptr->value,
+				false);
 			break;
 		case STRING :
+			return llvm::ConstantDataArray::getString(
+				Context,
+				llvm::StringRef(string_ptr->string_literal),
+				true);
 			break;
 		case POINTER :
 			break;
