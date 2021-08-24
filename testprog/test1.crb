@@ -73,14 +73,11 @@ def main(int a, bool b) -> (int) {
 	char c1 = 'a'
 	char c2 = '\n'
 	char c3 = 25
-	string s2 = r'this is a test'
-	string s1 = r"this is a test"
-	string s4 = 'this is a test'
-	string s3 = "this is a test"
-	string s5 = r'''this is a test'''
-	string s6 = r"""this is a test"""
-	string s8 = '''this is a test'''
-	string s7 = """this is a test"""
+	string s2 = w"this is a test"
+	string s1 = u8"this is a test"
+	string s4 = u16"this is a test"
+	string s3 = u32"this is a test"
+	string s5 = r"this is a test"
 	ptr : int p1 = null
 	ptr : struct Person s1
 	struct Person p
@@ -226,6 +223,7 @@ def main(int a, bool b) -> (int) {
 
 	/* Literal check */
 	z = 100 + 1 + true - 40 + false * 40.45 / 2.3545674e12
+	c = 'a' + '\b' + '\n' + 'z' + 'Z' + '1' + '\\'
 
 	return a + b, c
 }

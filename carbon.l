@@ -54,8 +54,8 @@ float_2				{dec_digit}+{float_exp}
 float_3				"."{dec_digit}+{float_exp}
 float_lit			("+"|"-")?{float_1}|{float_2}|{float_3}
 
-escape_char			\\("a"|"b"|"f"|"n"|"r"|"t"|"v")
-char_lit			"'"([a-zA-z]|{escape_char})"'"
+/* escape_char			\\("a"|"b"|"f"|"n"|"r"|"t"|"v") */
+/* char_lit			"'"([a-zA-z]|{escape_char})"'" */
 
 letter				[a-zA-Z_]
 ident				{letter}({letter}|{dec_digit})*
@@ -153,17 +153,14 @@ ident				{letter}({letter}|{dec_digit})*
 
 {float_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::FLOAT_LIT; }
 
-{char_lit}			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
+\'[^']*\'			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::CHAR_LIT; }
 
-\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::STR1_LITERAL; }
-\'[^']*\'			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::STR2_LITERAL; }
-"r"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::RSTR1_LITERAL; }
-"r"\'[^']*\'			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::RSTR2_LITERAL; }
-
-\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HSTR1_LITERAL; }
-\'\'\'[^''']*\'\'\'		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HSTR2_LITERAL; }
-"r"\"\"\"[^"""]*\"\"\"		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HRSTR1_LITERAL; }
-"r"\'\'\'[^''']*\'\'\'		{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::HRSTR2_LITERAL; }
+\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::STR_LITERAL; }
+"w"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::WSTR_LITERAL; }
+"u8"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::U8STR_LITERAL; }
+"u16"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::U16STR_LITERAL; }
+"u32"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::U32STR_LITERAL; }
+"r"\"[^"]*\"			{ ins_eol = 1; yylval.build<std::string>(text()); return yy::parser::token::RSTR_LITERAL; }
 
 "<:"				{ ins_eol = 0; return yy::parser::token::TEMPLATE_START; }
 ":>"				{ ins_eol = 0; return yy::parser::token::TEMPLATE_END; }

@@ -66,8 +66,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %token <int> NAMESAPCE
 %token <int> IMPORT FROM AS
-%token <std::string> STR1_LITERAL STR2_LITERAL RSTR1_LITERAL RSTR2_LITERAL
-%token <std::string> HSTR1_LITERAL HSTR2_LITERAL HRSTR1_LITERAL HRSTR2_LITERAL
+%token <std::string> STR_LITERAL WSTR_LITERAL U8STR_LITERAL U16STR_LITERAL U32STR_LITERAL
+%token <std::string> RSTR_LITERAL
 %token <int> ARROW
 %token <std::string> IDENTIFIER
 %token <int> DEF
@@ -270,7 +270,7 @@ top_level
 		;
 
 import_decl
-		: IMPORT STR1_LITERAL FROM STR1_LITERAL AS STR1_LITERAL
+		: IMPORT STR_LITERAL FROM STR_LITERAL AS STR_LITERAL
 						{
 							$$ = new ImportDecl();
 							$$->import = $2;
@@ -278,14 +278,14 @@ import_decl
 							$$->as = $6;
 							DEBUG("[ImportFromAs]");
 						}
-		| IMPORT STR1_LITERAL FROM STR1_LITERAL
+		| IMPORT STR_LITERAL FROM STR_LITERAL
 						{
 							$$ = new ImportDecl();
 							$$->import = $2;
 							$$->from = $4;
 							DEBUG("[ImportFrom]");
 						}
-		| IMPORT STR1_LITERAL
+		| IMPORT STR_LITERAL
 						{
 							$$ = new ImportDecl();
 							$$->import = $2;
@@ -1060,58 +1060,100 @@ char_lit
 		: CHAR_LIT
 						{
 							$$ = new CharLiteral();
+							int str_size = $1.size();
+							if (str_size < 3) {
+								ALERT("Invalid char literal");
+							} else if (str_size > 4) {
+								ALERT("Invalid char literal");
+							} else if (str_size == 3) {
+								$$->value = (int)$1.at(1);
+							} else if (str_size == 4) {
+								if ($1.at(1) != '\\') {
+									ALERT("Invalid escape sequence");
+								}
+								switch ($1.at(2)) {
+									// a=7 b=8 f=12 n=10 r=13 t=9 v=11
+									// sq=39 dq=34 q=63 bs=92
+									case 'a' :
+										$$->value = 7;
+										break;
+									case 'b' :
+										$$->value = 8;
+										break;
+									case 'f' :
+										$$->value = 12;
+										break;
+									case 'n' :
+										$$->value = 10;
+										break;
+									case 'r' :
+										$$->value = 13;
+										break;
+									case 't' :
+										$$->value = 9;
+										break;
+									case 'v' :
+										$$->value = 11;
+										break;
+									case '\'' :
+										$$->value = 39;
+										break;
+									case '\"' :
+										$$->value = 34;
+										break;
+									case '\?' :
+										$$->value = 63;
+										break;
+									case '\\' :
+										$$->value = 92;
+										break;
+									default :
+										$$->value = 0;
+										ALERT("Invalid escape sequence");
+										break;
+
+								}
+							}
 							DEBUG("[Literal::Char]");
 						}
 		;
 
 str_lit
-		: STR1_LITERAL
+		: STR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::STR1;
-							DEBUG("[Literal::String::Str1]");
+							$$->type = StringLiteral::types::STR_LITERAL;
+							DEBUG("[Literal::String::Str]");
 						}
-		| STR2_LITERAL
+		| WSTR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::STR2;
-							DEBUG("[Literal::String::Str2]");
+							$$->type = StringLiteral::types::WSTR_LITERAL;
+							DEBUG("[Literal::String::WStr]");
 						}
-		| RSTR1_LITERAL
+		| U8STR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::RSTR1;
-							DEBUG("[Literal::String::RStr1]");
+							$$->type = StringLiteral::types::U8STR_LITERAL;
+							DEBUG("[Literal::String::U8Str]");
 						}
-		| RSTR2_LITERAL
+		| U16STR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::RSTR2;
-							DEBUG("[Literal::String::RStr2]");
+							$$->type = StringLiteral::types::U16STR_LITERAL;
+							DEBUG("[Literal::String::U16Str]");
 						}
-		| HSTR1_LITERAL
+		| U32STR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::HSTR1;
-							DEBUG("[Literal::String::HStr1]");
+							$$->type = StringLiteral::types::U32STR_LITERAL;
+							DEBUG("[Literal::String::U32Str]");
 						}
-		| HSTR2_LITERAL
+		| RSTR_LITERAL
 						{
 							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::HSTR2;
-							DEBUG("[Literal::String::HStr2]");
-						}
-		| HRSTR1_LITERAL
-						{
-							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::HRSTR1;
-							DEBUG("[Literal::String::HRStr1]");
-						}
-		| HRSTR2_LITERAL
-						{
-							$$ = new StringLiteral();
-							$$->type = StringLiteral::types::HRSTR2;
-							DEBUG("[Literal::String::HRStr2]");
+							$$->type = StringLiteral::types::RSTR_LITERAL;
+							DEBUG("[Literal::String::RStr]");
 						}
 		;
 

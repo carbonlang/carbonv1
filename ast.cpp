@@ -419,13 +419,13 @@ llvm::Value * Literal::codeGen() {
 			}
 			break;
 		case INT :
-			ALERT(integer_ptr->reg_size);
+			// ALERT(integer_ptr->reg_size);
 			return llvm::ConstantInt::get(
 				llvm::IntegerType::get(Context, integer_ptr->reg_size),
 				integer_ptr->value,
 				false);
 		case FLOAT :
-			ALERT(floating_ptr->value);
+			// ALERT(floating_ptr->value);
 			switch (floating_ptr->reg_size) {
 				case 32 :
 					return llvm::ConstantFP::get(

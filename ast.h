@@ -597,12 +597,12 @@ class FloatLiteral {
 
 class CharLiteral {
 	public:
-		char char_literal;
+		int value;
 };
 
 class StringLiteral {
 	public:
-		enum types { STR1, STR2, RSTR1, RSTR2, HSTR1, HSTR2, HRSTR1, HRSTR2 } type;
+		enum types { STR_LITERAL, WSTR_LITERAL, U8STR_LITERAL, U16STR_LITERAL, U32STR_LITERAL, RSTR_LITERAL } type;
 		std::string string_literal;
 };
 
