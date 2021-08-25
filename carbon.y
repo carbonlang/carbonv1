@@ -166,6 +166,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <StringLiteral *> str_lit
 %nterm <PointerLiteral * > ptr_lit
 %nterm <CompositeLiteral *> composite_lit
+%nterm <CompositeLiteralItemList *> composite_lit_item_list
+%nterm <CompositeLiteralItem *> composite_lit_item
 %nterm <StructDefn *> struct_defn
 %nterm <UnionDefn *> union_defn
 %nterm <EnumDefn *> enum_defn
@@ -1172,32 +1174,45 @@ ptr_lit
 		;
 
 composite_lit
-		: '{' composite_lit_list '}'
+		: '{' composite_lit_item_list '}'
 						{
 							/* For struct, union, arrays, etc */
 							$$ = new CompositeLiteral();
+							$$->composite_lit_item_list_ptr = $2;
 							DEBUG("[Literal::Composite]");
 						}
 		;
 
-composite_lit_list
-		: composite_lit_element
+composite_lit_item_list
+		: composite_lit_item_list ',' composite_lit_item
 						{
+							$1->composite_lit_item_list.push_back($3);
+							$$ = $1;
+							DEBUG("[CompositeLitList]");
 						}
-		| composite_lit_list ',' composite_lit_element
+		| composite_lit_item
 						{
+							$$ = new CompositeLiteralItemList();
+							$$->composite_lit_item_list.push_back($1);
+							DEBUG("[CompositeLitList]");
 						}
 		;
 
-composite_lit_element
+composite_lit_item
 		: expression
 						{
+							$$ = new CompositeLiteralItem();
+							$$->exp_ptr = $1;
+							DEBUG("[CompositeLitListItem::Exp]");
 						}
 		| IDENTIFIER ':' expression
 						{
+							$$ = new CompositeLiteralItem();
+							$$->ident = $1;
+							$$->exp_ptr = $3;
+							DEBUG("[CompositeLitListItem::IdentExp]");
 						}
 		;
-
 
 /******************************************************************************************/
 /******************************* COMPOSITE TYPE DEFINITION ********************************/

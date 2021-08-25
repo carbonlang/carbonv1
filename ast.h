@@ -44,6 +44,8 @@ class CharLiteral;
 class StringLiteral;
 class PointerLiteral;
 class CompositeLiteral;
+class CompositeLiteralItemList;
+class CompositeLiteralItem;
 
 class Statements;
 class Statement;
@@ -612,6 +614,22 @@ class PointerLiteral {
 
 class CompositeLiteral {
 	public:
+		CompositeLiteralItemList *composite_lit_item_list_ptr;
+		void codeGen();
+};
+
+class CompositeLiteralItemList {
+	public:
+		std::list<CompositeLiteralItem *> composite_lit_item_list;
+		void codeGen();
+};
+
+class CompositeLiteralItem {
+	public:
+		enum types { EXPRESSION, IDENTIFIER_EXPRESSION } type;
+		Expression *exp_ptr;
+		std::string ident;
+		void codeGen();
 };
 
 class TypeIdentifier {

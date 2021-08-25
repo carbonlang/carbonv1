@@ -459,6 +459,9 @@ llvm::Value * Literal::codeGen() {
 				true);
 			break;
 		case POINTER :
+			/* TODO */
+			return llvm::ConstantPointerNull::get(
+				llvm::Type::getInt8PtrTy(Context));
 			break;
 		case COMPOSITE :
 			break;

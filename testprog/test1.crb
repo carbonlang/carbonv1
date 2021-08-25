@@ -225,6 +225,7 @@ def main(int a, bool b) -> (int) {
 	z = 100 + 1 + true - 40 + false * 40.45 / 2.3545674e12
 	c = 'a' + '\b' + '\n' + 'z' + 'Z' + '1' + '\\'
 	str = "string" + w"wide string" + u8"u8 sring" + u16"u16 sring" + u32"u32 sring" + r"raw sring"
+	p1 = {name : "carbon", 2, age : 3, {1, 2}}
 
 	return a + b, c
 }
