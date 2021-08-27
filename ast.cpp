@@ -343,10 +343,10 @@ void AssignmentStmt::codeGen() {
 	}
 }
 
-void Expression::codeGen() {
+llvm::Value * Expression::codeGen() {
 	switch (type) {
 		case Expression::types::UNARY :
-			unary_expr_ptr->codeGen();
+			return unary_expr_ptr->codeGen();
 			break;
 		case Expression::types::BINARY :
 			binary_expr_ptr->codeGen();
@@ -357,6 +357,7 @@ void Expression::codeGen() {
 		default :
 			ALERT("Error : Expression type does not exists");
 	}
+	return NULL;
 }
 
 void BinaryExpression::codeGen() {
@@ -364,7 +365,7 @@ void BinaryExpression::codeGen() {
 	right_expr_ptr->codeGen();
 }
 
-void UnaryExpression::codeGen() {
+llvm::Value * UnaryExpression::codeGen() {
 	switch (type) {
 		case U_NOT :
 			expr_ptr->codeGen();
@@ -394,11 +395,12 @@ void UnaryExpression::codeGen() {
 			expr_ptr->codeGen();
 			break;
 		case LITERAL :
-			lit_ptr->codeGen();
+			return lit_ptr->codeGen();
 			break;
 		default :
 			ALERT("Error : Unary Expression type does not exists");
 	}
+	return NULL;
 }
 
 void PostfixExpression::codeGen() {

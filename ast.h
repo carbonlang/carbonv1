@@ -351,11 +351,10 @@ class ExpressionList {
 
 class LValue {
 	public:
-		enum types { POSTFIX_EXPR, ADDR_OF_UNARY_EXP, PTR_TO_UNARY_EXP, OPERAND_INDEX } type;
-		// QualifiedIdent *qi;
-		UnaryExpression *ue;
-		Operand *o;
-		Index *i;
+		enum types { POSTFIX_EXPR, PTR_TO_EXP, UNDERSCORE } type;
+		Expression *expr_ptr;
+		PostfixExpression *postfix_expr_ptr;
+		void codeGen();
 };
 
 class Expression {
@@ -364,7 +363,7 @@ class Expression {
 		UnaryExpression *unary_expr_ptr;
 		BinaryExpression *binary_expr_ptr;
 		Expression *expr_ptr;
-		void codeGen();
+		llvm::Value * codeGen();
 };
 
 class UnaryExpression {
@@ -374,7 +373,7 @@ class UnaryExpression {
 		Expression *expr_ptr;
 		PostfixExpression *postfix_expr_ptr;
 		Literal *lit_ptr;
-		void codeGen();
+		llvm::Value * codeGen();
 };
 
 class BinaryExpression {

@@ -227,6 +227,8 @@ def main(int a, bool b) -> (int) {
 	str = "string" + w"wide string" + u8"u8 sring" + u16"u16 sring" + u32"u32 sring" + r"raw sring"
 	p1 = {name : "carbon", 2, age : 3, {1, 2}}
 
+	a = b->c.d[4].v->d[5]
+
 	return a + b, c
 }
 

@@ -1074,8 +1074,7 @@ char_lit
 									ALERT("Invalid escape sequence");
 								}
 								switch ($1.at(2)) {
-									// a=7 b=8 f=12 n=10 r=13 t=9 v=11
-									// sq=39 dq=34 q=63 bs=92
+									// ASCII value of escape sequence
 									case 'a' :
 										$$->value = 7;
 										break;
@@ -1539,20 +1538,21 @@ l_value
 		: postfix_expr
 						{
 							$$ = new LValue();
-							// $$->type = LValue::types::POSTFIX_EXPR;
-							// $$->qi = $1;
-							DEBUG("[LValue::QualifiedIdent]");
+							$$->type = LValue::types::POSTFIX_EXPR;
+							$$->postfix_expr_ptr = $1;
+							DEBUG("[LValue::PostfixExpr]");
 						}
 		| U_POINTER expression
 						{
 							$$ = new LValue();
-							// $$->type = LValue::types::PTR_TO_UNARY_EXP;
-							// $$->ue = $2;
-							DEBUG("[LValue::PtrToUnaryExpr]");
+							$$->type = LValue::types::PTR_TO_EXP;
+							$$->expr_ptr = $2;
+							DEBUG("[LValue::PointerToExpr]");
 						}
 		| '_'
 						{
 							$$ = new LValue();
+							$$->type = LValue::types::UNDERSCORE;
 							DEBUG("[LValue::_]");
 						}
 		;
