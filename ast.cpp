@@ -339,8 +339,28 @@ void AssignmentStmt::codeGen() {
 			(*expr_iter)->codeGen();
 			expr_iter++;
 		}
-
 	}
+	/* Test code */
+	llvm::AllocaInst * var1 = new llvm::AllocaInst(llvm::Type::getInt32Ty(Context), 0,"abc", BB);
+	llvm::Value *val1 = llvm::ConstantInt::get(
+			llvm::IntegerType::get(Context, 32),
+			1000,
+			false);
+	Builder.CreateStore(var1, val1, false);
+
+}
+
+std::string LValue::codeGen() {
+	switch (type) {
+		case POSTFIX_EXPR :
+			return postfix_expr_ptr->codeGen();
+			break;
+		case PTR_TO_EXP :
+			break;
+		case UNDERSCORE :
+			break;
+	}
+	return "";
 }
 
 llvm::Value * Expression::codeGen() {
@@ -403,8 +423,25 @@ llvm::Value * UnaryExpression::codeGen() {
 	return NULL;
 }
 
-void PostfixExpression::codeGen() {
+std::string PostfixExpression::codeGen() {
+	switch (type) {
+		case IDENT_WITH_NS :
+			return ident_with_ns_ptr->codeGen();
+			break;
+		case ARRAY :
+			break;
+		case FUNCTION_CALL :
+			break;
+		case DOT_OP :
+			break;
+		case ARROW_OP :
+			break;
+	}
+	return "";
+}
 
+ std::string IdentWithNamespace::codeGen() {
+	return ident;
 }
 
 llvm::Value * Literal::codeGen() {

@@ -354,7 +354,7 @@ class LValue {
 		enum types { POSTFIX_EXPR, PTR_TO_EXP, UNDERSCORE } type;
 		Expression *expr_ptr;
 		PostfixExpression *postfix_expr_ptr;
-		void codeGen();
+		std::string codeGen();
 };
 
 class Expression {
@@ -396,7 +396,7 @@ class PostfixExpression {
 		std::string dot_ident;
 		std::string arrow_ident;
 		PostfixExpression *postfix_expr_ptr;
-		void codeGen();
+		std::string codeGen();
 };
 
 class AssignOp {
@@ -420,7 +420,7 @@ class Operand {
 class IdentWithNamespace {
 	public:
 		std::string ident;
-		void codeGen();
+		std::string codeGen();
 };
 
 class Index {

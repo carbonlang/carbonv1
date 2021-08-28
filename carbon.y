@@ -1863,17 +1863,17 @@ postfix_expr
 		;
 
 ident_with_ns
-		: IDENTIFIER
+		: ident_with_ns SCOPE_RESOLUTION IDENTIFIER
+						{
+							$$ = $1;
+							$$->ident = $$->ident + "::" + $3;
+							DEBUG("[IdentWithNamespace::X::Y]");
+						}
+		| IDENTIFIER
 						{
 							$$ = new IdentWithNamespace;
 							$$->ident = $1;
 							DEBUG("[IdentWithNamespace]");
-						}
-		| ident_with_ns SCOPE_RESOLUTION IDENTIFIER
-						{
-							$$ = new IdentWithNamespace;
-							$$->ident = $3;
-							DEBUG("[IdentWithNamespace::X::Y]");
 						}
 		;
 
