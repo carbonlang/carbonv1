@@ -232,6 +232,8 @@ def main(int a, bool b) -> (int) {
 	return a + b, c
 }
 
+int a = 100
+
 public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
 	int z = 0
 	ptr : (int , int) -> (bool) f1

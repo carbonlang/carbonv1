@@ -11,10 +11,15 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/IR/ValueSymbolTable.h"
 
 #include "ast.h"
 
 #define ALERT(str) std::cout << "\033[42;31m" << str << "\033[0m\n"
+
+/* Pointer to global and current function symbol table as stored in LLVM */
+llvm::ValueSymbolTable *global_symbol_table_ptr;
+llvm::ValueSymbolTable *func_symbol_table_ptr;
 
 llvm::Type* getLLVMType(TypeName *);
 
@@ -27,6 +32,9 @@ void SourceFile::codeGen() {
 
 
 void TopLevel::codeGen() {
+	/* Save pointer to global symbol table */
+	global_symbol_table_ptr = &((*Module).getValueSymbolTable());
+
 	switch (type) {
 		case TopLevel::types::IMPORT_DECL : id->codeGen();
 			break;
@@ -62,6 +70,7 @@ void VariableDef::codeGen() {
 			new llvm::AllocaInst(llvm_type, 0, parent_ns + (*viei)->ident, BB);
 		}
 	}
+
 /*
 	llvm::Type *llvm_type;
 	llvm::Value *val;
@@ -276,9 +285,15 @@ void FunctionDefn::codeGen() {
 
 	Builder.SetInsertPoint(BB);
 
+	/* Save pointer to function symbol table */
+	func_symbol_table_ptr = func->getValueSymbolTable();
+
 	if (b) {
 		b->codeGen();
 	}
+
+	/* Set pointer to function symbol table to NULL at end of function */
+	func_symbol_table_ptr = NULL;
 
 	verifyFunction(*func);
 }
@@ -341,6 +356,7 @@ void AssignmentStmt::codeGen() {
 		}
 	}
 	/* Test code */
+
 	llvm::AllocaInst * var1 = new llvm::AllocaInst(llvm::Type::getInt32Ty(Context), 0,"abc", BB);
 	llvm::Value *val1 = llvm::ConstantInt::get(
 			llvm::IntegerType::get(Context, 32),
