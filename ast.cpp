@@ -15,7 +15,8 @@
 
 #include "ast.h"
 
-#define ALERT(str) std::cout << "\033[42;31m" << str << "\033[0m\n"
+#define ALERT(str) std::cout << "\033[49;32m" << str << "\033[0m\n"
+#define ERROR(str) std::cout << "\033[49;31m" << str << "\033[0m\n"
 
 /* Pointer to global and current function symbol table as stored in LLVM */
 llvm::ValueSymbolTable *global_symbol_table_ptr;
@@ -65,8 +66,14 @@ void VariableDef::codeGen() {
 	for (viei = v->viel.begin(); viei != v->viel.end(); viei++) {
 		llvm_type = getLLVMType((*viei)->t->type_name);
 		if (is_global == true) {
+			if (global_symbol_table_ptr->lookup(parent_ns + (*viei)->ident)) {
+				ERROR("Global variable '" + parent_ns + (*viei)->ident + "' already defined previously");
+			}
 			new llvm::GlobalVariable(*Module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + (*viei)->ident);
 		} else {
+			if (func_symbol_table_ptr->lookup(parent_ns + (*viei)->ident)) {
+				ERROR("Function variable '" + parent_ns + (*viei)->ident + "' already defined previously");
+			}
 			new llvm::AllocaInst(llvm_type, 0, parent_ns + (*viei)->ident, BB);
 		}
 	}
@@ -195,7 +202,7 @@ void CompositeTypeDefn::codeGen(bool is_global) {
 			break;
 		case CompositeTypeDefn::types::ENUM : e->codeGen(is_global, parent_ns);
 			break;
-		default : ALERT("Error : CompositeTypeDefn");
+		default : ERROR("Error : CompositeTypeDefn");
 	}
 }
 
@@ -332,7 +339,7 @@ void Statements::codeGen() {
 		} else if ((*si)->type == Statement::types::LABEL) {
 			(*si)->ls->codeGen();
 		} else {
-			ALERT("Error : Statement type does not exists");
+			ERROR("Error : Statement type does not exists");
 		}
 	}
 }
@@ -346,27 +353,26 @@ void AssignmentStmt::codeGen() {
 
 	expr_iter = expr_list_ptr->expr_list.begin();
 
+	llvm::Value *l_val = NULL;
+	llvm::Value *expr_val = NULL;
+
 	for (l_value_iter = l_value_list_ptr->l_value_list.begin();
 		l_value_iter != l_value_list_ptr->l_value_list.end();
 		l_value_iter++) {
 
 		if (expr_iter != expr_list_ptr->expr_list.end()) {
-			(*expr_iter)->codeGen();
+			l_val = (*l_value_iter)->codeGen();
+			expr_val = (*expr_iter)->codeGen();
+			/* TODO */
+			if (l_val && expr_val) {
+				Builder.CreateStore(l_val, expr_val, false);
+			}
 			expr_iter++;
 		}
 	}
-	/* Test code */
-
-	llvm::AllocaInst * var1 = new llvm::AllocaInst(llvm::Type::getInt32Ty(Context), 0,"abc", BB);
-	llvm::Value *val1 = llvm::ConstantInt::get(
-			llvm::IntegerType::get(Context, 32),
-			1000,
-			false);
-	Builder.CreateStore(var1, val1, false);
-
 }
 
-std::string LValue::codeGen() {
+llvm::Value * LValue::codeGen() {
 	switch (type) {
 		case POSTFIX_EXPR :
 			return postfix_expr_ptr->codeGen();
@@ -376,7 +382,7 @@ std::string LValue::codeGen() {
 		case UNDERSCORE :
 			break;
 	}
-	return "";
+	return NULL;
 }
 
 llvm::Value * Expression::codeGen() {
@@ -391,7 +397,7 @@ llvm::Value * Expression::codeGen() {
 			expr_ptr->codeGen();
 			break;
 		default :
-			ALERT("Error : Expression type does not exists");
+			ERROR("Error : Expression type does not exists");
 	}
 	return NULL;
 }
@@ -434,12 +440,12 @@ llvm::Value * UnaryExpression::codeGen() {
 			return lit_ptr->codeGen();
 			break;
 		default :
-			ALERT("Error : Unary Expression type does not exists");
+			ERROR("Error : Unary Expression type does not exists");
 	}
 	return NULL;
 }
 
-std::string PostfixExpression::codeGen() {
+llvm::Value * PostfixExpression::codeGen() {
 	switch (type) {
 		case IDENT_WITH_NS :
 			return ident_with_ns_ptr->codeGen();
@@ -453,11 +459,21 @@ std::string PostfixExpression::codeGen() {
 		case ARROW_OP :
 			break;
 	}
-	return "";
+	return NULL;
 }
 
- std::string IdentWithNamespace::codeGen() {
-	return ident;
+llvm::Value * IdentWithNamespace::codeGen() {
+	llvm::Value *val = NULL;
+	if (func_symbol_table_ptr) {
+		val = func_symbol_table_ptr->lookup(ident);
+	}
+	if (!val) {
+		val = global_symbol_table_ptr->lookup(ident);
+	}
+	if (!val) {
+		ERROR("Variable '" + ident + "' not found");
+	}
+	return val;
 }
 
 llvm::Value * Literal::codeGen() {
@@ -469,7 +485,7 @@ llvm::Value * Literal::codeGen() {
 				case BooleanLiteral::types::FALSE :
 					return llvm::ConstantInt::getFalse(Context);
 				default :
-					ALERT("Error : Boolean literal type does not exists");
+					ERROR("Error : Boolean literal type does not exists");
 					return NULL;
 			}
 			break;
@@ -496,7 +512,7 @@ llvm::Value * Literal::codeGen() {
 						llvm::Type::getFP128Ty(Context),
 						floating_ptr->value);
 				default :
-					ALERT("Error : Floating literal size does not exists");
+					ERROR("Error : Floating literal size does not exists");
 					return NULL;
 			}
 			break;
@@ -521,7 +537,7 @@ llvm::Value * Literal::codeGen() {
 		case COMPOSITE :
 			break;
 		default :
-			ALERT("Error : Literal type does not exists");
+			ERROR("Error : Literal type does not exists");
 	}
 	return NULL;
 }
@@ -667,7 +683,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 	} else if (tn->type_name == TypeName::type_names::AUTO) {
 		return llvm::Type::getInt64Ty(Context);
 	} else {
-		ALERT("Error : getLLVMType == NULL");
+		ERROR("Error : getLLVMType == NULL");
 		return NULL;
 	}
 }
