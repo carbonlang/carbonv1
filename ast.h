@@ -368,7 +368,7 @@ class Expression {
 
 class UnaryExpression {
 	public:
-		enum types { U_NOT, U_2COMP, U_ADD_OF, STAR, PLUS, MINUS, BRACES,
+		enum types { U_NOT, U_COMP, U_ADD_OF, STAR, PLUS, MINUS,
 			POSTFIX_EXPR, TYPE_CAST, LITERAL } type;
 		Expression *expr_ptr;
 		PostfixExpression *postfix_expr_ptr;

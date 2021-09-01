@@ -230,11 +230,18 @@ def main(int a, bool b) -> (int) {
 	a = b->c.d[4].v->d[5]
 	Math::calc::sum = 100
 
+	/* Assignment to Literal */
 	z = 100
 	z = 10.456
 	z = 'a'
 	z = '\n'
 	z = "this is a string"
+
+	/* Unary operator */
+	a = !50
+	a = ~50
+	a = -50
+	a = +50
 
 	return a + b, c
 }

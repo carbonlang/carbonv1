@@ -365,7 +365,7 @@ void AssignmentStmt::codeGen() {
 			expr_val = (*expr_iter)->codeGen();
 			/* TODO */
 			if (l_val && expr_val) {
-				Builder.CreateStore(l_val, expr_val, false);
+				Builder.CreateStore(expr_val, l_val, false);
 			}
 			expr_iter++;
 		}
@@ -408,12 +408,21 @@ void BinaryExpression::codeGen() {
 }
 
 llvm::Value * UnaryExpression::codeGen() {
+	llvm::Value * val;
 	switch (type) {
 		case U_NOT :
-			expr_ptr->codeGen();
+			val = expr_ptr->codeGen();
+			/* TODO : Incorrect : cmp ne 0 -> xor with true -> zext */
+			if (val) {
+				return Builder.CreateNot(val);
+			}
 			break;
-		case U_2COMP :
-			expr_ptr->codeGen();
+		case U_COMP :
+			val = expr_ptr->codeGen();
+			/* TODO : Incorrect */
+			if (val) {
+				return Builder.CreateXor(val, -1);
+			}
 			break;
 		case U_ADD_OF :
 			expr_ptr->codeGen();
@@ -422,19 +431,19 @@ llvm::Value * UnaryExpression::codeGen() {
 			expr_ptr->codeGen();
 			break;
 		case PLUS :
-			expr_ptr->codeGen();
+			return expr_ptr->codeGen();
 			break;
 		case MINUS :
-			expr_ptr->codeGen();
-			break;
-		case BRACES :
-			expr_ptr->codeGen();
+			val = expr_ptr->codeGen();
+			if (val) {
+				return Builder.CreateNeg(val);
+			}
 			break;
 		case POSTFIX_EXPR :
-			postfix_expr_ptr->codeGen();
+			// return postfix_expr_ptr->codeGen();
 			break;
 		case TYPE_CAST :
-			expr_ptr->codeGen();
+			return expr_ptr->codeGen();
 			break;
 		case LITERAL :
 			return lit_ptr->codeGen();
