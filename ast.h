@@ -368,7 +368,7 @@ class Expression {
 
 class UnaryExpression {
 	public:
-		enum types { U_NOT, U_COMP, U_ADD_OF, STAR, PLUS, MINUS,
+		enum types { U_NOT, U_COMPLEMENT, U_ADD_OF, STAR, PLUS, MINUS,
 			POSTFIX_EXPR, TYPE_CAST, LITERAL } type;
 		Expression *expr_ptr;
 		PostfixExpression *postfix_expr_ptr;
@@ -384,7 +384,7 @@ class BinaryExpression {
 			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;
 		Expression *left_expr_ptr;
 		Expression *right_expr_ptr;
-		void codeGen();
+		llvm::Value * codeGen();
 };
 
 class PostfixExpression {

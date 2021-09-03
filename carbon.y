@@ -119,7 +119,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %left LOGICAL_OR LOGICAL_AND
 %left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
 %precedence U_NOT
-%precedence U_COMP
+%precedence U_COMPLEMENT
 %precedence U_ADD_OF
 
 %precedence "type_cast"
@@ -1760,10 +1760,10 @@ unary_expr
 							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::!]");
 						}
-		| U_COMP expression
+		| U_COMPLEMENT expression
 						{
 							$$ = new UnaryExpression();
-							$$->type = UnaryExpression::types::U_COMP;
+							$$->type = UnaryExpression::types::U_COMPLEMENT;
 							$$->expr_ptr = $2;
 							DEBUG("[UnaryExpr::~]");
 						}

@@ -391,7 +391,7 @@ llvm::Value * Expression::codeGen() {
 			return unary_expr_ptr->codeGen();
 			break;
 		case Expression::types::BINARY :
-			binary_expr_ptr->codeGen();
+			return binary_expr_ptr->codeGen();
 			break;
 		case Expression::types::EXPRESSION :
 			expr_ptr->codeGen();
@@ -402,26 +402,89 @@ llvm::Value * Expression::codeGen() {
 	return NULL;
 }
 
-void BinaryExpression::codeGen() {
-	left_expr_ptr->codeGen();
-	right_expr_ptr->codeGen();
+llvm::Value * BinaryExpression::codeGen() {
+	llvm::Value *l_exp;
+	llvm::Value *r_exp;
+	l_exp = left_expr_ptr->codeGen();
+	r_exp = right_expr_ptr->codeGen();
+	/* TODO */
+	if (!l_exp || !r_exp) {
+		return NULL;
+	}
+	switch (type) {
+		case PLUS :
+			return Builder.CreateAdd(l_exp, r_exp);
+			break;
+		case MINUS :
+			return Builder.CreateSub(l_exp, r_exp);
+			break;
+		case STAR :
+			return Builder.CreateMul(l_exp, r_exp);
+			break;
+		case DIVIDE :
+			return Builder.CreateUDiv(l_exp, r_exp);
+			break;
+		case MODULUS :
+			break;
+		case RIGHT_SHIFT :
+			break;
+		case LEFT_SHIFT :
+			break;
+		case RIGHT_SHIFT_US :
+			break;
+		case LEFT_SHIFT_US :
+			break;
+		case LOGICAL_AND :
+			break;
+		case LOGICAL_OR :
+			break;
+		case IS_EQUAL :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, l_exp, r_exp);
+			break;
+		case IS_NOT_EQUAL :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, l_exp, r_exp);
+			break;
+		case IS_LESS :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, l_exp, r_exp);
+			break;
+		case IS_GREATER :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGT, l_exp, r_exp);
+			break;
+		case IS_LESS_OR_EQ :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, l_exp, r_exp);
+			break;
+		case IS_GREATER_OR_EQ :
+			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGE, l_exp, r_exp);
+			break;
+		case BITWISE_AND :
+			break;
+		case BITWISE_OR :
+			break;
+		case BITWISE_NOT :
+			break;
+		case BITWISE_XOR :
+			break;
+		default :
+			ERROR("Error : Binary Expression type does not exists");
+	}
+	return NULL;
 }
 
 llvm::Value * UnaryExpression::codeGen() {
-	llvm::Value * val;
+	llvm::Value *val;
 	switch (type) {
 		case U_NOT :
 			val = expr_ptr->codeGen();
 			/* TODO : Incorrect : cmp ne 0 -> xor with true -> zext */
 			if (val) {
-				return Builder.CreateNot(val);
+				return Builder.CreateNeg(val);
 			}
 			break;
-		case U_COMP :
+		case U_COMPLEMENT :
 			val = expr_ptr->codeGen();
 			/* TODO : Incorrect */
 			if (val) {
-				return Builder.CreateXor(val, -1);
+				return Builder.CreateNeg(val);
 			}
 			break;
 		case U_ADD_OF :
@@ -440,7 +503,7 @@ llvm::Value * UnaryExpression::codeGen() {
 			}
 			break;
 		case POSTFIX_EXPR :
-			// return postfix_expr_ptr->codeGen();
+			return postfix_expr_ptr->codeGen();
 			break;
 		case TYPE_CAST :
 			return expr_ptr->codeGen();

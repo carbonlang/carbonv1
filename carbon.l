@@ -215,7 +215,7 @@ ident				{letter}({letter}|{dec_digit})*
 "&^"				{ ins_eol = 0; return yy::parser::token::BITWISE_XOR; }
 
 "!"				{ ins_eol = 0; return yy::parser::token::U_NOT; }
-"~"				{ ins_eol = 0; return yy::parser::token::U_COMP; }
+"~"				{ ins_eol = 0; return yy::parser::token::U_COMPLEMENT; }
 "$"				{ ins_eol = 0; return yy::parser::token::U_POINTER; }
 "@"				{ ins_eol = 0; return yy::parser::token::U_ADD_OF; }
 
