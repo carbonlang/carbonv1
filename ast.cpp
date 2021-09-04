@@ -427,14 +427,19 @@ llvm::Value * BinaryExpression::codeGen() {
 		case MODULUS :
 			break;
 		case RIGHT_SHIFT :
+			return Builder.CreateAShr(l_exp, r_exp);
 			break;
 		case LEFT_SHIFT :
+			return Builder.CreateShl(l_exp, r_exp);
 			break;
 		case RIGHT_SHIFT_US :
+			return Builder.CreateLShr(l_exp, r_exp);
 			break;
 		case LEFT_SHIFT_US :
+			return Builder.CreateShl(l_exp, r_exp);
 			break;
 		case LOGICAL_AND :
+			return Builder.CreateLogicalAnd(l_exp, r_exp);
 			break;
 		case LOGICAL_OR :
 			break;
@@ -457,12 +462,15 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGE, l_exp, r_exp);
 			break;
 		case BITWISE_AND :
+			return Builder.CreateAnd(l_exp, r_exp);
 			break;
 		case BITWISE_OR :
+			return Builder.CreateOr(l_exp, r_exp);
 			break;
 		case BITWISE_NOT :
 			break;
 		case BITWISE_XOR :
+			return Builder.CreateXor(l_exp, r_exp);
 			break;
 		default :
 			ERROR("Error : Binary Expression type does not exists");

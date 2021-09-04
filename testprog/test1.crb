@@ -248,6 +248,15 @@ def main(int a, bool b) -> (int) {
 	z = a * b
 	z = a / b
 
+	z = a >> b
+	z = a << b
+	z = a >> 5
+	z = a << 5
+	z = a >>> b
+	z = a <<< b
+	z = a >>> 5
+	z = a <<< 5
+
 	return a + b, c
 }
 
