@@ -93,7 +93,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %token <int> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %token <int> IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %token <int> LOGICAL_OR LOGICAL_AND
-%token <int> BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
+%token <int> BITWISE_AND BITWISE_OR BITWISE_XOR BITWISE_AND_NOT
 
 %token <int> PLUS_EQUAL_TO MINUS_EQUAL_TO STAR_EQUAL_TO DIVIDE_EQUAL_TO MODULUS_EQUAL_TO
 %token <int> RIGHT_SHIFT_EQUAL_TO LEFT_SHIFT_EQUAL_TO RIGHT_SHIFT_US_EQUAL_TO LEFT_SHIFT_US_EQUAL_TO
@@ -117,7 +117,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %left RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_US LEFT_SHIFT_US
 %left IS_EQUAL IS_NOT_EQUAL IS_LESS IS_GREATER IS_LESS_OR_EQ IS_GREATER_OR_EQ
 %left LOGICAL_OR LOGICAL_AND
-%left BITWISE_AND BITWISE_OR BITWISE_NOT BITWISE_XOR
+%left BITWISE_AND BITWISE_OR BITWISE_XOR BITWISE_AND_NOT
 %precedence U_NOT
 %precedence U_COMPLEMENT
 %precedence U_ADD_OF
@@ -1734,18 +1734,18 @@ binary_expr
 							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::||]");
 						}
-		| expression BITWISE_NOT expression
-						{
-							$$ = new BinaryExpression();
-							$$->type = BinaryExpression::types::BITWISE_NOT;
-							$$->left_expr_ptr = $1;
-							$$->right_expr_ptr = $3;
-							DEBUG("[BinaryExpr::^]");
-						}
 		| expression BITWISE_XOR expression
 						{
 							$$ = new BinaryExpression();
 							$$->type = BinaryExpression::types::BITWISE_XOR;
+							$$->left_expr_ptr = $1;
+							$$->right_expr_ptr = $3;
+							DEBUG("[BinaryExpr::^]");
+						}
+		| expression BITWISE_AND_NOT expression
+						{
+							$$ = new BinaryExpression();
+							$$->type = BinaryExpression::types::BITWISE_AND_NOT;
 							$$->left_expr_ptr = $1;
 							$$->right_expr_ptr = $3;
 							DEBUG("[BinaryExpr::&^]");

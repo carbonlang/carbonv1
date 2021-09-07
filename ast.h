@@ -381,7 +381,7 @@ class BinaryExpression {
 		enum types { PLUS, MINUS, STAR, DIVIDE, MODULUS, RIGHT_SHIFT, LEFT_SHIFT,
 			RIGHT_SHIFT_US, LEFT_SHIFT_US, LOGICAL_AND, LOGICAL_OR, IS_EQUAL, IS_NOT_EQUAL,
 			IS_LESS, IS_GREATER, IS_LESS_OR_EQ, IS_GREATER_OR_EQ,
-			BITWISE_AND, BITWISE_OR, BITWISE_NOT, BITWISE_XOR } type;
+			BITWISE_AND, BITWISE_OR, BITWISE_XOR, BITWISE_AND_NOT } type;
 		Expression *left_expr_ptr;
 		Expression *right_expr_ptr;
 		llvm::Value * codeGen();

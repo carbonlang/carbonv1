@@ -439,9 +439,10 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateShl(l_exp, r_exp);
 			break;
 		case LOGICAL_AND :
-			return Builder.CreateLogicalAnd(l_exp, r_exp);
+			//return Builder.CreateLogicalAnd(l_exp, r_exp);
 			break;
 		case LOGICAL_OR :
+			//return Builder.CreateLogicalOr(l_exp, r_exp);
 			break;
 		case IS_EQUAL :
 			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, l_exp, r_exp);
@@ -467,9 +468,10 @@ llvm::Value * BinaryExpression::codeGen() {
 		case BITWISE_OR :
 			return Builder.CreateOr(l_exp, r_exp);
 			break;
-		case BITWISE_NOT :
-			break;
 		case BITWISE_XOR :
+			return Builder.CreateXor(l_exp, r_exp);
+			break;
+		case BITWISE_AND_NOT :
 			return Builder.CreateXor(l_exp, r_exp);
 			break;
 		default :

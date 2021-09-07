@@ -209,10 +209,11 @@ ident				{letter}({letter}|{dec_digit})*
 "<<<"				{ ins_eol = 0; return yy::parser::token::LEFT_SHIFT_US; }
 "||"				{ ins_eol = 0; return yy::parser::token::LOGICAL_OR; }
 "&&"				{ ins_eol = 0; return yy::parser::token::LOGICAL_AND; }
+
 "&"				{ ins_eol = 0; return yy::parser::token::BITWISE_AND; }
 "|"				{ ins_eol = 0; return yy::parser::token::BITWISE_OR; }
-"^"				{ ins_eol = 0; return yy::parser::token::BITWISE_NOT; }
-"&^"				{ ins_eol = 0; return yy::parser::token::BITWISE_XOR; }
+"^"				{ ins_eol = 0; return yy::parser::token::BITWISE_XOR; }
+"&^"				{ ins_eol = 0; return yy::parser::token::BITWISE_AND_NOT; }
 
 "!"				{ ins_eol = 0; return yy::parser::token::U_NOT; }
 "~"				{ ins_eol = 0; return yy::parser::token::U_COMPLEMENT; }
