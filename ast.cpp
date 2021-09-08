@@ -425,6 +425,7 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateUDiv(l_exp, r_exp);
 			break;
 		case MODULUS :
+			return Builder.CreateURem(l_exp, r_exp);
 			break;
 		case RIGHT_SHIFT :
 			return Builder.CreateAShr(l_exp, r_exp);
@@ -472,6 +473,7 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateXor(l_exp, r_exp);
 			break;
 		case BITWISE_AND_NOT :
+			/* TODO */
 			return Builder.CreateXor(l_exp, r_exp);
 			break;
 		default :

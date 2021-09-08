@@ -256,6 +256,7 @@ def main(int a, bool b) -> (int) {
 	z = a <<< b
 	z = a >>> 5
 	z = a <<< 5
+	z = 75 % 50
 
 	return a + b, c
 }
