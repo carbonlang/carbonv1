@@ -257,7 +257,8 @@ def main(int a, bool b) -> (int) {
 	z = a >>> 5
 	z = a <<< 5
 	z = 75 % 50
-
+	z = @a
+	z = *s1
 	return a + b, c
 }
 

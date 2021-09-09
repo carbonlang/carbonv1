@@ -78,120 +78,7 @@ void VariableDef::codeGen() {
 		}
 	}
 
-/*
-	llvm::Type *llvm_type;
-	llvm::Value *val;
-
-	// static = internal global
-	// register = no effect
-	return;
-
-	if (type->type_name->type_name == TypeName::type_names::BOOL) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			if (lit->boolean->type == BooleanLiteral::types::TRUE) {
-				val = llvm::ConstantInt::get(Context, llvm::APInt(8, 1, true));
-			} else {
-				val = llvm::ConstantInt::get(Context, llvm::APInt(8, 0, true));
-			}
-			llvm::StoreInst* stinst = new llvm::StoreInst(val, llvm_alloca_inst, false, BB);
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::CHAR) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(8, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::BYTE) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(8, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::INT) {
-		llvm_type = llvm::Type::getInt64Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(64, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::INT8) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(8, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::INT16) {
-		llvm_type = llvm::Type::getInt16Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(16, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::INT32) {
-		llvm_type = llvm::Type::getInt32Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(32, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::INT64) {
-		llvm_type = llvm::Type::getInt64Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(64, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::UINT) {
-		llvm_type = llvm::Type::getInt64Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(64, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::UINT8) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(8, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::UINT16) {
-		llvm_type = llvm::Type::getInt16Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(16, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::UINT32) {
-		llvm_type = llvm::Type::getInt32Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(32, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::UINT64) {
-		llvm_type = llvm::Type::getInt64Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantInt::get(Context, llvm::APInt(64, lit->integer->value, true));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::FLOAT32) {
-		llvm_type = llvm::Type::getFloatTy(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-		if (lit) {
-			// val = llvm::ConstantFP::get(Context, llvm::APFloat(lit->floating->value));
-		}
-	} else if (type->type_name->type_name == TypeName::type_names::FLOAT64) {
-		llvm_type = llvm::Type::getDoubleTy(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	} else if (type->type_name->type_name == TypeName::type_names::FLOAT128) {
-		llvm_type = llvm::Type::getFP128Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	} else if (type->type_name->type_name == TypeName::type_names::STRING) {
-		llvm_type = llvm::Type::getInt8Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	} else if (type->type_name->type_name == TypeName::type_names::POINTER) {
-		llvm_type = llvm::Type::getInt64PtrTy(Context, 0);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	} else if (type->type_name->type_name == TypeName::type_names::CUSTOM) {
-		llvm_type = llvm::Type::getInt64Ty(Context);
-		llvm::AllocaInst *llvm_alloca_inst = new llvm::AllocaInst(llvm_type, 0, ident, BB);
-	}
-	*/
+	/* llvm::StoreInst* stinst = new llvm::StoreInst(val, llvm_alloca_inst, false, BB); */
 }
 
 void CompositeTypeDefn::codeGen(bool is_global) {
@@ -385,6 +272,7 @@ llvm::Value * LValue::codeGen() {
 	return NULL;
 }
 
+/* COVERED ALL CASES */
 llvm::Value * Expression::codeGen() {
 	switch (type) {
 		case Expression::types::UNARY :
@@ -394,7 +282,7 @@ llvm::Value * Expression::codeGen() {
 			return binary_expr_ptr->codeGen();
 			break;
 		case Expression::types::EXPRESSION :
-			expr_ptr->codeGen();
+			return expr_ptr->codeGen();
 			break;
 		default :
 			ERROR("Error : Expression type does not exists");
@@ -402,6 +290,7 @@ llvm::Value * Expression::codeGen() {
 	return NULL;
 }
 
+/* COVERED ALL CASES */
 llvm::Value * BinaryExpression::codeGen() {
 	llvm::Value *l_exp;
 	llvm::Value *r_exp;
@@ -409,7 +298,7 @@ llvm::Value * BinaryExpression::codeGen() {
 	r_exp = right_expr_ptr->codeGen();
 	/* TODO */
 	if (!l_exp || !r_exp) {
-		ERROR("NULL EXPR");
+		ERROR("NULL BINARY EXPR");
 		return NULL;
 	}
 	switch (type) {
@@ -495,42 +384,68 @@ llvm::Value * BinaryExpression::codeGen() {
 	return NULL;
 }
 
+/* COVERED ALL CASES */
 llvm::Value * UnaryExpression::codeGen() {
 	llvm::Value *val;
 	switch (type) {
 		case U_NOT :
-			val = expr_ptr->codeGen();
 			/* TODO : Incorrect : cmp ne 0 -> xor with true -> zext */
+			val = expr_ptr->codeGen();
 			if (val) {
 				return Builder.CreateNeg(val);
+			} else {
+				ERROR("NULL UNARY EXPR");
 			}
 			break;
 		case U_COMPLEMENT :
+			/* TODO */
 			val = expr_ptr->codeGen();
-			/* TODO : Incorrect */
 			if (val) {
 				return Builder.CreateNeg(val);
+			} else {
+				ERROR("NULL UNARY EXPR");
 			}
 			break;
 		case U_ADD_OF :
-			expr_ptr->codeGen();
+			/* TODO */
+			val = expr_ptr->codeGen();
+			if (val) {
+				return Builder.CreateGEP(val,
+					llvm::ConstantInt::get(llvm::IntegerType::get(Context, 8), 0, false));
+			} else {
+				ERROR("NULL UNARY EXPR");
+			}
 			break;
 		case STAR :
-			expr_ptr->codeGen();
+			/* TODO */
+			val = expr_ptr->codeGen();
+			if (val) {
+				return Builder.CreateLoad(val);
+			} else {
+				ERROR("NULL UNARY EXPR");
+			}
 			break;
 		case PLUS :
-			return expr_ptr->codeGen();
+			val = expr_ptr->codeGen();
+			if (val) {
+				return val;
+			} else {
+				ERROR("NULL UNARY EXPR");
+			}
 			break;
 		case MINUS :
 			val = expr_ptr->codeGen();
 			if (val) {
 				return Builder.CreateNeg(val);
+			} else {
+				ERROR("NULL UNARY EXPR");
 			}
 			break;
 		case POSTFIX_EXPR :
 			return postfix_expr_ptr->codeGen();
 			break;
 		case TYPE_CAST :
+			/* TODO */
 			return expr_ptr->codeGen();
 			break;
 		case LITERAL :
