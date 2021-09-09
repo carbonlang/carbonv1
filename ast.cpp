@@ -409,6 +409,7 @@ llvm::Value * BinaryExpression::codeGen() {
 	r_exp = right_expr_ptr->codeGen();
 	/* TODO */
 	if (!l_exp || !r_exp) {
+		ERROR("NULL EXPR");
 		return NULL;
 	}
 	switch (type) {
@@ -440,10 +441,22 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateShl(l_exp, r_exp);
 			break;
 		case LOGICAL_AND :
+			/* TODO */
 			//return Builder.CreateLogicalAnd(l_exp, r_exp);
+			// return Builder.CreateICmpNE(l_exp, r_exp);
+			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01562
+			return Builder.CreateSelect(l_exp, r_exp,
+				llvm::ConstantInt::getNullValue(r_exp->getType()));
 			break;
 		case LOGICAL_OR :
+			/* TODO */
 			//return Builder.CreateLogicalOr(l_exp, r_exp);
+			// return Builder.CreateICmpNE(l_exp, r_exp);
+			// return Builder.CreateSelect(l_exp,
+			//	llvm::ConstantInt::getAllOnesValue(r_exp->getType()),r_exp);
+			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01568
+			return Builder.CreateSelect(l_exp, r_exp,
+				llvm::ConstantInt::getNullValue(r_exp->getType()));
 			break;
 		case IS_EQUAL :
 			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, l_exp, r_exp);
