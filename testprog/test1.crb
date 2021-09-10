@@ -259,6 +259,7 @@ def main(int a, bool b) -> (int) {
 	z = 75 % 50
 	z = @a
 	z = *s1
+	z = a[b]
 	return a + b, c
 }
 

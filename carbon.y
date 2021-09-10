@@ -189,6 +189,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Expression *> expression
 %nterm <LValueList *> l_value_list
 %nterm <ExpressionList *> expression_list
+%nterm <FunctionCallStmt *> func_call_stmt
 %nterm <AssignmentStmt *> assignment_stmt
 %nterm <UnaryExpression *> unary_expr
 %nterm <BinaryExpression *> binary_expr
@@ -836,9 +837,9 @@ statement
 		| func_call_stmt EOL
 						{
 							$$ = new Statement();
-							$$->type = Statement::types::EXPRESSION;
-							// $$->es = &$1;
-							DEBUG("[Stmt:ExprStmt]");
+							$$->type = Statement::types::FUNCTION_CALL;
+							$$->fcs = $1;
+							DEBUG("[Stmt:FunctionCallStmt]");
 						}
 		| assignment_stmt EOL
 						{
@@ -2012,6 +2013,9 @@ type_alias
 func_call_stmt
 		: postfix_expr func_call_op
 						{
+							$$ = new FunctionCallStmt();
+							$$->postfix_expr_ptr = $1;
+							$$->func_call_op_ptr = $2;
 							DEBUG("[FunctionCall]");
 						}
 		;

@@ -52,7 +52,7 @@ class Statement;
 class VariableDef;
 class VarIdentExp;
 class VarIdentExpList;
-class ExpressionStmt;
+class FunctionCallStmt;
 class AssignmentStmt;
 class SelectionStmt;
 class IterationStmt;
@@ -308,12 +308,12 @@ class Statements {
 
 class Statement {
 	public:
-		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, EXPRESSION, ASSIGNMENT, SELECTION,
+		enum types { VARIABLE_DEF, COMPOSITE_TYPE_DEFN, TYPE_ALIAS, FUNCTION_CALL, ASSIGNMENT, SELECTION,
 			ITERATION, JUMP, DEFER, BLOCK, LABEL } type;
 		VariableDef *vds;
 		CompositeTypeDefn *ctd;
 		TypeAlias *ta;
-		ExpressionStmt *es;
+		FunctionCallStmt *fcs;
 		AssignmentStmt *as;
 		SelectionStmt *ss;
 		IterationStmt *is;
@@ -324,8 +324,10 @@ class Statement {
 		void codeGen();
 };
 
-class ExpressionStmt {
+class FunctionCallStmt {
 	public:
+		PostfixExpression *postfix_expr_ptr;
+		FunctionCallOp *func_call_op_ptr;
 		void codeGen();
 };
 

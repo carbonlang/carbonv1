@@ -208,8 +208,8 @@ void Statements::codeGen() {
 			(*si)->ctd->codeGen(false);
 		} else if ((*si)->type == Statement::types::TYPE_ALIAS) {
 			(*si)->ta->codeGen();
-		} else if ((*si)->type == Statement::types::EXPRESSION) {
-			(*si)->es->codeGen();
+		} else if ((*si)->type == Statement::types::FUNCTION_CALL) {
+			(*si)->fcs->codeGen();
 		} else if ((*si)->type == Statement::types::ASSIGNMENT) {
 			(*si)->as->codeGen();
 		} else if ((*si)->type == Statement::types::SELECTION) {
@@ -231,7 +231,8 @@ void Statements::codeGen() {
 	}
 }
 
-void ExpressionStmt::codeGen() {
+void FunctionCallStmt::codeGen() {
+	llvm::Value *val = postfix_expr_ptr->codeGen();
 }
 
 void AssignmentStmt::codeGen() {
@@ -386,7 +387,7 @@ llvm::Value * BinaryExpression::codeGen() {
 
 /* COVERED ALL CASES */
 llvm::Value * UnaryExpression::codeGen() {
-	llvm::Value *val;
+	llvm::Value *val = NULL;
 	switch (type) {
 		case U_NOT :
 			/* TODO : Incorrect : cmp ne 0 -> xor with true -> zext */
@@ -458,11 +459,20 @@ llvm::Value * UnaryExpression::codeGen() {
 }
 
 llvm::Value * PostfixExpression::codeGen() {
+	llvm::Value *val = NULL;
 	switch (type) {
 		case IDENT_WITH_NS :
 			return ident_with_ns_ptr->codeGen();
 			break;
 		case ARRAY :
+			/* TODO */
+			val = postfix_expr_ptr->codeGen();
+			if (val) {
+				return Builder.CreateGEP(val,
+					array_expr_ptr->codeGen());
+			} else {
+				ERROR("NULL POSTFIX EXPR");
+			}
 			break;
 		case FUNCTION_CALL :
 			break;
@@ -547,6 +557,7 @@ llvm::Value * Literal::codeGen() {
 				llvm::Type::getInt8PtrTy(Context));
 			break;
 		case COMPOSITE :
+			/* TODO */
 			break;
 		default :
 			ERROR("Error : Literal type does not exists");
