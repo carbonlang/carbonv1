@@ -196,6 +196,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <PostfixExpression *> postfix_expr
 %nterm <IdentWithNamespace *> ident_with_ns
 %nterm <FunctionCallOp *> func_call_op
+%nterm <FunctionArgumentList *> func_argument_list
+%nterm <FunctionArgument *> func_argument
 %nterm <ReturnArgumentList *> return_argument_list
 %nterm <CaseBlock *> case_block
 
@@ -1882,13 +1884,13 @@ func_call_op
 		: '(' func_argument_list ')'
 						{
 							$$ = new FunctionCallOp;
-							// $$->el = $2;
+							$$->func_arg_list_ptr = $2;
 							DEBUG("[FunctionCallOp]");
 						}
 		| template '(' func_argument_list ')'
 						{
 							$$ = new FunctionCallOp;
-							// $$->el = $2;
+							$$->func_arg_list_ptr = $3;
 							DEBUG("[FunctionCallOp::Template]");
 						}
 		;
@@ -1896,21 +1898,40 @@ func_call_op
 func_argument_list
 		: %empty
 						{
+							$$ = new FunctionArgumentList();
+							$$->is_set = false;
+							DEBUG("[FunctionArgumentNo]");
 						}
 		| func_argument_list ',' func_argument
 						{
+							$1->func_arg_list.push_back($3);
+							$$ = $1;
+							DEBUG("[FunctionArgument]");
 						}
 		| func_argument
 						{
+							$$ = new FunctionArgumentList();
+							$$->is_set = true;
+							$$->func_arg_list.push_back($1);
+							DEBUG("[FunctionArgument]");
 						}
 		;
 
 func_argument
 		: expression
 						{
+							$$ = new FunctionArgument();
+							$$->expr_ptr = $1;
+							$$->is_ident = false;
+							DEBUG("[FunctionArgument]");
 						}
 		| IDENTIFIER EQUAL_TO expression
 						{
+							$$ = new FunctionArgument();
+							$$->expr_ptr = $3;
+							$$->is_ident = true;
+							$$->ident = $1;
+							DEBUG("[FunctionArgumentWithIdent]");
 						}
 		;
 

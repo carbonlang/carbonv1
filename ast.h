@@ -100,6 +100,8 @@ class Operand;
 class IdentWithNamespace;
 class Index;
 class FunctionCallOp;
+class FunctionArgumentList;
+class FunctionArgument;
 class ReturnArgumentList;
 
 class TypeIdentifier;
@@ -434,8 +436,21 @@ class Index {
 class FunctionCallOp {
 	public:
 		bool is_set = false;
-		// ExpressionList *el;
+		FunctionArgumentList *func_arg_list_ptr;
 		void codeGen();
+};
+
+class FunctionArgumentList {
+	public :
+		bool is_set = false;
+		std::list<FunctionArgument *> func_arg_list;
+};
+
+class FunctionArgument {
+	public :
+		Expression *expr_ptr;
+		bool is_ident = false;
+		std::string ident;
 };
 
 class ReturnArgumentList {
