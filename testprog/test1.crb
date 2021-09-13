@@ -52,6 +52,12 @@ extend GlobalPerson {
 extend GlobalPerson1 {
 }
 
+public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
+	int z = 0
+	ptr : (int , int) -> (bool) f1
+	return
+}
+
 /* The "main" function is entry point of the program. * This is test for multi-line comment */
 def main(int a, bool b) -> (int) {
 	bool a, b = false, c = true, d
@@ -81,7 +87,7 @@ def main(int a, bool b) -> (int) {
 	ptr : int p1 = null
 	ptr : struct Person ss1
 	struct Person p
-	auto p2 = f()
+	auto p2 = run()
 
 	auto tpl = Calc<:int,float:>()
 
@@ -157,6 +163,9 @@ def main(int a, bool b) -> (int) {
 	// int in_comment = 0
 	int after_comment = 0 /* this is a post comment
 	on two separate lines */
+
+	run()
+	a = run()
 
 	if (a > b) {
 		a = b
@@ -264,12 +273,6 @@ def main(int a, bool b) -> (int) {
 }
 
 int a = 100
-
-public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
-	int z = 0
-	ptr : (int , int) -> (bool) f1
-	return
-}
 
 private def calc(ptr : int a) -> () {
 	return
