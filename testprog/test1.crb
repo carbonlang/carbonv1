@@ -20,7 +20,9 @@ ns Global {
 }
 
 struct GlobalPerson {
-	int i1
+	int32 i1
+	int64 i2
+	float f1
 	char c1
 }
 
@@ -148,7 +150,7 @@ def main(int a, bool b) -> (int) {
 	z = a+++-b
 
 	c = a[a] + b(100, c)
-	b = -c + a.b->c
+	// b = -c + a.b->c
 	a = b[10][100][20]
 	a = [int](b + [float32]c)
 
@@ -269,6 +271,8 @@ def main(int a, bool b) -> (int) {
 	z = @a
 	z = *s1
 	z = a[b]
+
+	z = GlobalPerson.i1
 	return a + b, c
 }
 

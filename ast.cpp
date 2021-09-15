@@ -474,6 +474,7 @@ llvm::Value * UnaryExpression::codeGen() {
 
 llvm::Value * PostfixExpression::codeGen() {
 	llvm::Value *val = NULL;
+	llvm::Function *callee = NULL;
 	switch (type) {
 		case IDENT_WITH_NS :
 			return ident_with_ns_ptr->codeGen();
@@ -485,14 +486,50 @@ llvm::Value * PostfixExpression::codeGen() {
 				return Builder.CreateGEP(val,
 					array_expr_ptr->codeGen());
 			} else {
-				ERROR("NULL POSTFIX EXPR");
+				ERROR("NULL POSTFIX ARRAY EXPR");
 			}
 			break;
 		case FUNCTION_CALL :
+			/* TODO */
+			val = postfix_expr_ptr->codeGen();
+			if (val) {
+				callee = Module->getFunction(val->getName().data());
+				if (callee) {
+					return Builder.CreateCall(callee);
+				} else {
+					ERROR("NULL POSTFIX FUNCTION CALLEE");
+				}
+			} else {
+				ERROR("NULL POSTFIX FUNCTION CALL");
+			}
 			break;
 		case DOT_OP :
+			/* TODO */
+			val = postfix_expr_ptr->codeGen();
+			if (val) {
+				if (val->getType()->isStructTy()) {
+					return Builder.CreateStructGEP(val, 0);
+				} else {
+					ERROR(val->getName().data());
+					ERROR("POSTFIX DOT_OP EXPR : NOT A STRUCT");
+				}
+			} else {
+				ERROR("NULL POSTFIX DOT_OP EXPR");
+			}
 			break;
 		case ARROW_OP :
+			/* TODO */
+			val = postfix_expr_ptr->codeGen();
+			if (val) {
+				if (val->getType()->isStructTy()) {
+					return Builder.CreateStructGEP(val, 0);
+				} else {
+					ERROR(val->getName().data());
+					ERROR("POSTFIX DOT_OP EXPR : NOT A STRUCT");
+				}
+			} else {
+				ERROR("NULL POSTFIX ARROW_OP EXPR");
+			}
 			break;
 	}
 	return NULL;
