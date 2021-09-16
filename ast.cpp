@@ -233,20 +233,23 @@ void Statements::codeGen() {
 
 void FunctionCallStmt::codeGen() {
 	llvm::Value *val = postfix_expr_ptr->codeGen();
-
-	/* Function with parameters */
-	std::vector<llvm::Value *> func_arg_vec;
-	std::list<FunctionArgument *>::iterator exp_itr;
-	for (exp_itr = func_call_op_ptr->func_arg_list_ptr->func_arg_list.begin();
-		exp_itr != func_call_op_ptr->func_arg_list_ptr->func_arg_list.end(); exp_itr++) {
-		func_arg_vec.push_back((*exp_itr)->expr_ptr->codeGen());
+	if (val) {
+		/* Function with parameters */
+		std::vector<llvm::Value *> func_arg_vec;
+		std::list<FunctionArgument *>::iterator exp_itr;
+		for (exp_itr = func_call_op_ptr->func_arg_list_ptr->func_arg_list.begin();
+			exp_itr != func_call_op_ptr->func_arg_list_ptr->func_arg_list.end(); exp_itr++) {
+			func_arg_vec.push_back((*exp_itr)->expr_ptr->codeGen());
+		}
+		llvm::Function *func_callee = Module->getFunction(val->getName());
+		if (!func_callee) {
+			ERROR("Unknown function referenced");
+			return;
+		}
+		Builder.CreateCall(func_callee, func_arg_vec);
+	} else {
+		ERROR("Error : Function call statement");
 	}
-	llvm::Function *func_callee = Module->getFunction("run");
-	if (!func_callee) {
-		ERROR("Unknown function referenced");
-		return;
-	}
-	Builder.CreateCall(func_callee, func_arg_vec);
 }
 
 void AssignmentStmt::codeGen() {

@@ -60,6 +60,10 @@ public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
 	return
 }
 
+public def stop() -> () {
+	return
+}
+
 /* The "main" function is entry point of the program. * This is test for multi-line comment */
 def main(int a, bool b) -> (int) {
 	bool a, b = false, c = true, d
@@ -273,6 +277,7 @@ def main(int a, bool b) -> (int) {
 	z = a[b]
 
 	z = GlobalPerson.i1
+	stop()
 	return a + b, c
 }
 
