@@ -507,10 +507,13 @@ llvm::Value * PostfixExpression::codeGen() {
 			/* TODO */
 			val = postfix_expr_ptr->codeGen();
 			if (val) {
-				if (val->getType()->isStructTy()) {
-					return Builder.CreateStructGEP(val, 0);
+				if (val->getType()->isPointerTy()) {
+					if (val->getType()->getPointerElementType()->isStructTy()) {
+						return Builder.CreateStructGEP(val, 0);
+					} else {
+						ERROR("POSTFIX DOT_OP EXPR : NOT A STRUCT");
+					}
 				} else {
-					ERROR(val->getName().data());
 					ERROR("POSTFIX DOT_OP EXPR : NOT A STRUCT");
 				}
 			} else {
@@ -521,11 +524,14 @@ llvm::Value * PostfixExpression::codeGen() {
 			/* TODO */
 			val = postfix_expr_ptr->codeGen();
 			if (val) {
-				if (val->getType()->isStructTy()) {
-					return Builder.CreateStructGEP(val, 0);
+				if (val->getType()->isPointerTy()) {
+					if (val->getType()->getPointerElementType()->isStructTy()) {
+						return Builder.CreateStructGEP(val, 0);
+					} else {
+						ERROR("POSTFIX ARROW_OP EXPR : NOT A STRUCT");
+					}
 				} else {
-					ERROR(val->getName().data());
-					ERROR("POSTFIX DOT_OP EXPR : NOT A STRUCT");
+					ERROR("POSTFIX ARROW_OP EXPR : NOT A STRUCT");
 				}
 			} else {
 				ERROR("NULL POSTFIX ARROW_OP EXPR");
