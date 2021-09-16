@@ -221,8 +221,7 @@ void Statements::codeGen() {
 		} else if ((*si)->type == Statement::types::DEFER) {
 			(*si)->ds->codeGen();
 		} else if ((*si)->type == Statement::types::BLOCK) {
-			/* SEG FAULTS */
-			// (*si)->b->codeGen();
+			(*si)->b->codeGen();
 		} else if ((*si)->type == Statement::types::LABEL) {
 			(*si)->ls->codeGen();
 		} else {

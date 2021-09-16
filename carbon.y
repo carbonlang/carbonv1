@@ -882,7 +882,7 @@ statement
 						{
 							$$ = new Statement();
 							$$->type = Statement::types::BLOCK;
-							// $$->ds = $1;
+							$$->b = $1;
 							DEBUG("[Stmt:BlockStmt]");
 						}
 		| label_stmt EOL
