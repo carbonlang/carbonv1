@@ -31,7 +31,6 @@ void SourceFile::codeGen() {
 	}
 }
 
-
 void TopLevel::codeGen() {
 	/* Save pointer to global symbol table */
 	global_symbol_table_ptr = &((*Module).getValueSymbolTable());
@@ -625,6 +624,62 @@ llvm::Value * Literal::codeGen() {
 }
 
 void SelectionStmt::codeGen() {
+	switch (type) {
+		case IF_ELSE :
+			ies->codeGen();
+			break;
+		case SWITCH :
+			ss->codeGen();
+			break;
+		default :
+			ERROR("Error : Selection stmt type does not exists");
+	}
+}
+
+void IfElseStmt::codeGen() {
+	// https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl05.html
+
+	llvm::Value *cond = if_block->e->codeGen();
+	if (!cond) {
+		return;
+	}
+
+	Builder.CreateICmpNE(cond, Builder.getInt1(0), "ifcond");
+	llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(Context, "then", TheFunction);
+	llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(Context, "else");
+	llvm::BasicBlock *EndIfBB = llvm::BasicBlock::Create(Context, "endif");
+
+	Builder.CreateCondBr(cond, ThenBB, ElseBB);
+
+	Builder.SetInsertPoint(ThenBB);
+	if_block->b->codeGen();
+	Builder.CreateBr(EndIfBB);
+	// ThenBB = Builder.GetInsertBlock();
+
+	if (else_block) {
+		TheFunction->getBasicBlockList().push_back(ElseBB);
+		Builder.SetInsertPoint(ElseBB);
+			if (else_block->is_set_if_else) {
+				/* if - else if - block */
+			} else {
+				/* if - else - block */
+				else_block->b->codeGen();
+			}
+		Builder.CreateBr(EndIfBB);
+		// ElseBB = Builder.GetInsertBlock();
+	}
+
+	TheFunction->getBasicBlockList().push_back(EndIfBB);
+	Builder.SetInsertPoint(EndIfBB);
+
+	//llvm::PHINode *Phi = Builder.CreatePHI(llvm::Type::getInt32Ty(Context), 2, "iftmp");
+	//Phi->addIncoming(Builder.getInt32(10), ThenBB);
+	//Phi->addIncoming(Builder.getInt32(20), ElseBB);
+}
+
+void SwitchStmt::codeGen() {
+	ALERT("IN SWITCH");
 }
 
 void IterationStmt::codeGen() {
