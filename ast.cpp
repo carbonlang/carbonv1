@@ -688,6 +688,24 @@ void SwitchStmt::codeGen() {
 }
 
 void IterationStmt::codeGen() {
+	switch (type) {
+		case FOR :
+			f->codeGen();
+			break;
+		case WHILE :
+			w->codeGen();
+			break;
+		case DO_WHILE :
+			dw->codeGen();
+			break;
+		case FOREACH :
+			break;
+		default :
+			ERROR("Error : Iteration stmt type does not exists");
+	}
+}
+
+void ForStmt::codeGen() {
 }
 
 void JumpStmt::codeGen() {
