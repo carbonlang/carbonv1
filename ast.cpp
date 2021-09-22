@@ -650,7 +650,11 @@ void IfElseStmt::codeGen() {
 	llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(Context, "else");
 	llvm::BasicBlock *EndIfBB = llvm::BasicBlock::Create(Context, "endif");
 
-	Builder.CreateCondBr(cond, ThenBB, ElseBB);
+	if (else_block) {
+		Builder.CreateCondBr(cond, ThenBB, ElseBB);
+	} else {
+		Builder.CreateCondBr(cond, ThenBB, EndIfBB);
+	}
 
 	Builder.SetInsertPoint(ThenBB);
 	if_block->b->codeGen();
@@ -662,6 +666,7 @@ void IfElseStmt::codeGen() {
 		Builder.SetInsertPoint(ElseBB);
 			if (else_block->is_set_if_else) {
 				/* if - else if - block */
+				else_block->if_else->codeGen();
 			} else {
 				/* if - else - block */
 				else_block->b->codeGen();

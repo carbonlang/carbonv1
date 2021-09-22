@@ -173,6 +173,9 @@ def main(int a, bool b) -> (int) {
 	run()
 	a = run()
 
+	int x = 0
+	int y = 0
+
 	if (a > b) {
 		a = b
 	}
@@ -278,6 +281,11 @@ def main(int a, bool b) -> (int) {
 
 	z = GlobalPerson.i1
 	stop()
+	if (a < b) {
+		j = k
+	} else {
+		j = k
+	}
 	return a + b, c
 }
 
