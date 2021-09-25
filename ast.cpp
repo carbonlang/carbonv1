@@ -644,16 +644,16 @@ void IfElseStmt::codeGen() {
 		return;
 	}
 
-	Builder.CreateICmpNE(cond, Builder.getInt1(0), "ifcond");
-	llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
-	llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(Context, "then", TheFunction);
+	llvm::Value *cmp_value = Builder.CreateICmpNE(cond, Builder.getInt1(0), "ifcond");
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(Context, "then", Function);
 	llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(Context, "else");
 	llvm::BasicBlock *EndIfBB = llvm::BasicBlock::Create(Context, "endif");
 
 	if (else_block) {
-		Builder.CreateCondBr(cond, ThenBB, ElseBB);
+		Builder.CreateCondBr(cmp_value, ThenBB, ElseBB);
 	} else {
-		Builder.CreateCondBr(cond, ThenBB, EndIfBB);
+		Builder.CreateCondBr(cmp_value, ThenBB, EndIfBB);
 	}
 
 	Builder.SetInsertPoint(ThenBB);
@@ -662,7 +662,7 @@ void IfElseStmt::codeGen() {
 	// ThenBB = Builder.GetInsertBlock();
 
 	if (else_block) {
-		TheFunction->getBasicBlockList().push_back(ElseBB);
+		Function->getBasicBlockList().push_back(ElseBB);
 		Builder.SetInsertPoint(ElseBB);
 			if (else_block->is_set_if_else) {
 				/* if - else if - block */
@@ -675,7 +675,7 @@ void IfElseStmt::codeGen() {
 		// ElseBB = Builder.GetInsertBlock();
 	}
 
-	TheFunction->getBasicBlockList().push_back(EndIfBB);
+	Function->getBasicBlockList().push_back(EndIfBB);
 	Builder.SetInsertPoint(EndIfBB);
 
 	//llvm::PHINode *Phi = Builder.CreatePHI(llvm::Type::getInt32Ty(Context), 2, "iftmp");
@@ -706,6 +706,70 @@ void IterationStmt::codeGen() {
 }
 
 void ForStmt::codeGen() {
+	/* Initial condition section */
+	if (i->is_set) {
+		switch (i->type) {
+			case ForInit::types::ASSIGN_STMT :
+				i->assign_stmt_ptr->codeGen();
+				break;
+			case ForInit::types::VARIABLE_DEF_STMT :
+				i->var_def_stmt_ptr->codeGen();
+				break;
+			default :
+				ERROR("Error : For init type does not exists");
+		}
+	}
+
+	/* Start loop section */
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *ForConditionBB = llvm::BasicBlock::Create(Context, "for-condition", Function);
+	llvm::BasicBlock *ForLoopBB = llvm::BasicBlock::Create(Context, "for-loop");
+	llvm::BasicBlock *EndForBB = llvm::BasicBlock::Create(Context, "end-for");
+
+	Builder.CreateBr(ForConditionBB);
+
+	Builder.SetInsertPoint(ForConditionBB);
+
+	llvm::Value *cond_value;
+	llvm::Value *cmp_value;
+
+	if (c->is_set) {
+		cond_value = c->e->codeGen();
+		if (!cond_value) {
+			return;
+		}
+		cmp_value = Builder.CreateICmpNE(cond_value, Builder.getInt1(0));
+		Builder.CreateCondBr(cmp_value, ForLoopBB, EndForBB);
+	} else {
+		Builder.CreateBr(ForLoopBB);
+	}
+
+	// Start insertion in LoopBB.
+	Function->getBasicBlockList().push_back(ForLoopBB);
+	Builder.SetInsertPoint(ForLoopBB);
+	b->codeGen();
+
+	/* Post loop section */
+	if (p->is_set) {
+		switch (p->type) {
+			case ForPost::types::ASSIGN_STMT :
+				p->assign_stmt_ptr->codeGen();
+				break;
+			default :
+				ERROR("Error : For init type does not exists");
+		}
+	}
+
+	Builder.CreateBr(ForConditionBB);
+
+	Function->getBasicBlockList().push_back(EndForBB);
+	Builder.SetInsertPoint(EndForBB);
+}
+
+void WhileStmt::codeGen() {
+}
+
+void DoWhileStmt::codeGen() {
 }
 
 void JumpStmt::codeGen() {

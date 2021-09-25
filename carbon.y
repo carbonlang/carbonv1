@@ -2079,6 +2079,7 @@ for_stmt
 							$$->i = $3;
 							$$->c = $5;
 							$$->p = $7;
+							$$->b = $9;
 							DEBUG("[ForStmt]");
 						}
 		;
@@ -2093,11 +2094,17 @@ for_init
 		| assignment_stmt
 						{
 							$$ = new ForInit();
+							$$->is_set = true;
+							$$->type = ForInit::types::ASSIGN_STMT;
+							$$->assign_stmt_ptr = $1;
 							DEBUG("[ForStmt::Init]");
 						}
 		| variable_def
 						{
 							$$ = new ForInit();
+							$$->is_set = true;
+							$$->type = ForInit::types::VARIABLE_DEF_STMT;
+							$$->var_def_stmt_ptr = $1;
 							DEBUG("[ForStmt::Init]");
 						}
 		;
@@ -2128,11 +2135,9 @@ for_post
 		| assignment_stmt
 						{
 							$$ = new ForPost();
-							DEBUG("[ForStmt::Post]");
-						}
-		| variable_def
-						{
-							$$ = new ForPost();
+							$$->is_set = true;
+							$$->type = ForPost::types::ASSIGN_STMT;
+							$$->assign_stmt_ptr = $1;
 							DEBUG("[ForStmt::Post]");
 						}
 		;

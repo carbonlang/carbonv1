@@ -201,7 +201,7 @@ def main(int a, bool b) -> (int) {
 		x = 0
 	}
 
-	for (int c = 0; c < 100; c += 1) {
+	for (c = 0; c < a; c += 1) {
 		/* math.inc(x) */
 	}
 
@@ -286,6 +286,7 @@ def main(int a, bool b) -> (int) {
 	} else {
 		j = k
 	}
+
 	return a + b, c
 }
 

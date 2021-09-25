@@ -528,12 +528,16 @@ class ForStmt {
 		ForInit *i;
 		ForCondition *c;
 		ForPost *p;
+		Block *b;
 		void codeGen();
 };
 
 class ForInit {
 	public:
 		bool is_set = false;
+		enum types { ASSIGN_STMT, VARIABLE_DEF_STMT } type;
+		AssignmentStmt *assign_stmt_ptr;
+		VariableDef *var_def_stmt_ptr;
 		void codeGen();
 };
 
@@ -547,6 +551,8 @@ class ForCondition {
 class ForPost {
 	public:
 		bool is_set = false;
+		enum types { ASSIGN_STMT, VARIABLE_DEF_STMT } type;
+		AssignmentStmt *assign_stmt_ptr;
 		void codeGen();
 };
 
