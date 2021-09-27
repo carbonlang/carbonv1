@@ -65,8 +65,9 @@ class IfBlock;
 class ElseBlock;
 
 class SwitchStmt;
+class CaseBlocks;
 class CaseBlock;
-class CaseExpressionStmt;
+class CaseExpressionList;
 
 class ForStmt;
 class ForInit;
@@ -492,25 +493,32 @@ class ElseBlock {
 
 class SwitchStmt {
 	public:
-		Expression *e;
-		CaseBlock *c;
+		bool is_set_exp = false;
 		bool is_set_default = false;
+		Expression *e;
+		CaseBlocks *c;
 		Statements *default_s;
 		void codeGen();
 
 };
 
-class CaseBlock {
+class CaseBlocks {
 	public:
-		bool is_set = false;
-		std::list<CaseExpressionStmt *> case_expression_stmt;
+		std::list<CaseBlock *> case_block_list;
 		void codeGen();
 };
 
-class CaseExpressionStmt {
+class CaseBlock {
 	public:
-		Expression *e;
-		Statements *s;
+		bool is_set = false;
+		CaseExpressionList *case_expr_list_ptr;
+		Block *b;
+		void codeGen();
+};
+
+class CaseExpressionList {
+	public:
+		std::list<Expression *> expr_list;
 		void codeGen();
 };
 

@@ -183,6 +183,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <SwitchStmt *> switch_stmt
 %nterm <IfBlock *> if_block
 %nterm <ElseBlock *> else_block
+%nterm <CaseBlocks *> case_blocks
+%nterm <CaseBlock *> case_block
+%nterm <CaseExpressionList *> case_expression_list
 
 %nterm <AssignOp *> assign_op
 %nterm <LValue *> l_value
@@ -199,7 +202,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <FunctionArgumentList *> func_argument_list
 %nterm <FunctionArgument *> func_argument
 %nterm <ReturnArgumentList *> return_argument_list
-%nterm <CaseBlock *> case_block
 
 %nterm <JumpStmt *> jump_stmt
 
@@ -2267,14 +2269,19 @@ switch_stmt
 		: SWITCH '(' expression ')' '{' case_blocks '}'
 						{
 							$$ = new SwitchStmt();
-							//$$->e = $3;
-							//$$->c = $6;
-							//$$->is_set_default = false;
+							$$->is_set_exp = true;
+							$$->is_set_default = false;
+							$$->e = $3;
+							$$->c = $6;
 							DEBUG("[SwitchStmt::SwitchCase]");
 						}
 		| SWITCH  '{' case_blocks '}'
 						{
 							$$ = new SwitchStmt();
+							$$->is_set_exp = false;
+							$$->is_set_default = false;
+							$$->e = NULL;
+							$$->c = $3;
 							DEBUG("[SwitchStmt::SwitchCaseDefault]");
 						}
 		;
@@ -2282,9 +2289,16 @@ switch_stmt
 case_blocks
 		: %empty
 						{
+							/* empty */
 						}
 		| case_blocks case_block EOL
 						{
+							if (!$1) {
+								$1 = new CaseBlocks();
+							}
+							$1->case_block_list.push_back($2);
+							$$ = $1;
+							DEBUG("[SwitchStmt::CaseBlocks]");
 						}
 		;
 
@@ -2292,16 +2306,14 @@ case_block
 		: CASE '(' case_expression_list ')' block
 						{
 							$$ = new CaseBlock();
-							//$$->is_set = true;
-							//CaseExpressionStmt *ce = new CaseExpressionStmt();
-							//ce->e = $2;
-							//ce->s = $4;
-							//$$->case_expression_stmt.push_back(ce);
+							$$->case_expr_list_ptr = $3;
+							$$->b = $5;
 							DEBUG("[CaseBlock]");
 						}
 		| DEFAULT block
 						{
 							$$ = new CaseBlock();
+							$$->b = $2;
 							DEBUG("[CaseBlock]");
 						}
 		;
@@ -2309,9 +2321,16 @@ case_block
 case_expression_list
 		: case_expression_list ',' expression
 						{
+							$1->expr_list.push_back($3);
+							$$ = $1;
+							DEBUG("[SwitchStmt::CaseExpression]");
+
 						}
 		| expression
 						{
+							$$ = new CaseExpressionList();
+							$$->expr_list.push_back($1);
+							DEBUG("[SwitchStmt::CaseExpression]");
 						}
 		;
 
