@@ -724,7 +724,7 @@ void ForStmt::codeGen() {
 	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
 	llvm::BasicBlock *ForConditionBB = llvm::BasicBlock::Create(Context, "for-condition", Function);
 	llvm::BasicBlock *ForLoopBB = llvm::BasicBlock::Create(Context, "for-loop");
-	llvm::BasicBlock *EndForBB = llvm::BasicBlock::Create(Context, "end-for");
+	llvm::BasicBlock *ForEndBB = llvm::BasicBlock::Create(Context, "for-end");
 
 	Builder.CreateBr(ForConditionBB);
 
@@ -739,7 +739,7 @@ void ForStmt::codeGen() {
 			return;
 		}
 		cmp_value = Builder.CreateICmpNE(cond_value, Builder.getInt1(0));
-		Builder.CreateCondBr(cmp_value, ForLoopBB, EndForBB);
+		Builder.CreateCondBr(cmp_value, ForLoopBB, ForEndBB);
 	} else {
 		Builder.CreateBr(ForLoopBB);
 	}
@@ -762,11 +762,41 @@ void ForStmt::codeGen() {
 
 	Builder.CreateBr(ForConditionBB);
 
-	Function->getBasicBlockList().push_back(EndForBB);
-	Builder.SetInsertPoint(EndForBB);
+	Function->getBasicBlockList().push_back(ForEndBB);
+	Builder.SetInsertPoint(ForEndBB);
 }
 
 void WhileStmt::codeGen() {
+
+	/* Start loop section */
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *WhileConditionBB = llvm::BasicBlock::Create(Context, "while-condition", Function);
+	llvm::BasicBlock *WhilerLoopBB = llvm::BasicBlock::Create(Context, "while-loop");
+	llvm::BasicBlock *WhileEndBB = llvm::BasicBlock::Create(Context, "while-end");
+
+	Builder.CreateBr(WhileConditionBB);
+
+	Builder.SetInsertPoint(WhileConditionBB);
+
+	llvm::Value *cond_value;
+	llvm::Value *cmp_value;
+
+	cond_value = e->codeGen();
+	if (!cond_value) {
+		return;
+	}
+	cmp_value = Builder.CreateICmpNE(cond_value, Builder.getInt1(0));
+	Builder.CreateCondBr(cmp_value, WhilerLoopBB, WhileEndBB);
+
+	// Start insertion in LoopBB.
+	Function->getBasicBlockList().push_back(WhilerLoopBB);
+	Builder.SetInsertPoint(WhilerLoopBB);
+	b->codeGen();
+
+	Builder.CreateBr(WhileConditionBB);
+
+	Function->getBasicBlockList().push_back(WhileEndBB);
+	Builder.SetInsertPoint(WhileEndBB);
 }
 
 void DoWhileStmt::codeGen() {

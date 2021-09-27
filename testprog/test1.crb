@@ -222,7 +222,7 @@ def main(int a, bool b) -> (int) {
 	}
 
 	label1:
-	while (x < 100) {
+	while (x < y) {
 		x += 1
 		x -= 1
 	}
