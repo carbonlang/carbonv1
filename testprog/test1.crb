@@ -240,6 +240,10 @@ def main(int a, bool b) -> (int) {
 	ptr : struct Person<:int,float:> p4
 	ptr : <:bool:>(int,float) -> (bool) fx
 
+	do {
+		x = x + 1
+	} while (x < y)
+
 	/* Literal check */
 	z = 100 + 1 + true - 40 + false * 40.45 / 2.3545674e12
 	c = 'a' + '\b' + '\n' + 'z' + 'Z' + '1' + '\\'

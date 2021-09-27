@@ -2174,7 +2174,7 @@ while_stmt
 		;
 
 dowhile_stmt
-		: DO block WHILE '(' expression ')'
+		: DO block WHILE '(' expression ')' EOL
 						{
 							$$ = new DoWhileStmt();
 							$$->b = $2;

@@ -767,17 +767,16 @@ void ForStmt::codeGen() {
 }
 
 void WhileStmt::codeGen() {
-
-	/* Start loop section */
 	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
 	llvm::BasicBlock *WhileConditionBB = llvm::BasicBlock::Create(Context, "while-condition", Function);
-	llvm::BasicBlock *WhilerLoopBB = llvm::BasicBlock::Create(Context, "while-loop");
+	llvm::BasicBlock *WhileLoopBB = llvm::BasicBlock::Create(Context, "while-loop");
 	llvm::BasicBlock *WhileEndBB = llvm::BasicBlock::Create(Context, "while-end");
 
 	Builder.CreateBr(WhileConditionBB);
 
 	Builder.SetInsertPoint(WhileConditionBB);
 
+	// Check while condition
 	llvm::Value *cond_value;
 	llvm::Value *cmp_value;
 
@@ -786,11 +785,11 @@ void WhileStmt::codeGen() {
 		return;
 	}
 	cmp_value = Builder.CreateICmpNE(cond_value, Builder.getInt1(0));
-	Builder.CreateCondBr(cmp_value, WhilerLoopBB, WhileEndBB);
+	Builder.CreateCondBr(cmp_value, WhileLoopBB, WhileEndBB);
 
 	// Start insertion in LoopBB.
-	Function->getBasicBlockList().push_back(WhilerLoopBB);
-	Builder.SetInsertPoint(WhilerLoopBB);
+	Function->getBasicBlockList().push_back(WhileLoopBB);
+	Builder.SetInsertPoint(WhileLoopBB);
 	b->codeGen();
 
 	Builder.CreateBr(WhileConditionBB);
@@ -800,6 +799,29 @@ void WhileStmt::codeGen() {
 }
 
 void DoWhileStmt::codeGen() {
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *DoWhileLoopBB = llvm::BasicBlock::Create(Context, "do-while-loop", Function);
+	llvm::BasicBlock *DoWhileEndBB = llvm::BasicBlock::Create(Context, "do-while-end");
+
+	Builder.CreateBr(DoWhileLoopBB);
+
+	// Start insertion in LoopBB.
+	Builder.SetInsertPoint(DoWhileLoopBB);
+	b->codeGen();
+
+	// Check while condition
+	llvm::Value *cond_value;
+	llvm::Value *cmp_value;
+
+	cond_value = e->codeGen();
+	if (!cond_value) {
+		return;
+	}
+	cmp_value = Builder.CreateICmpNE(cond_value, Builder.getInt1(0));
+	Builder.CreateCondBr(cmp_value, DoWhileLoopBB, DoWhileEndBB);
+
+	Function->getBasicBlockList().push_back(DoWhileEndBB);
+	Builder.SetInsertPoint(DoWhileEndBB);
 }
 
 void JumpStmt::codeGen() {
