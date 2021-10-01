@@ -593,6 +593,7 @@ class DeferStmt {
 
 class LabelStmt {
 	public:
+		std::string ident;
 		void codeGen();
 };
 

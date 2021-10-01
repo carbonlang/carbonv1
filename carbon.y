@@ -204,6 +204,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <ReturnArgumentList *> return_argument_list
 
 %nterm <JumpStmt *> jump_stmt
+%nterm <LabelStmt *> label_stmt
 
 %start source_file
 
@@ -891,6 +892,7 @@ statement
 						{
 							$$ = new Statement();
 							$$->type = Statement::types::LABEL;
+							$$->ls = $1;
 							DEBUG("[Stmt:LabelStmt]");
 						}
 		;
@@ -2197,7 +2199,9 @@ defer_stmt
 label_stmt
 		: IDENTIFIER ':'
 						{
-
+							$$ = new LabelStmt();
+							$$->ident = $1;
+							DEBUG("[Label]");
 						}
 		;
 

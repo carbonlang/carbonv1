@@ -22,6 +22,9 @@
 llvm::ValueSymbolTable *global_symbol_table_ptr;
 llvm::ValueSymbolTable *func_symbol_table_ptr;
 
+/* List of unlinked basic block for a function. Used in label / goto statements */
+std::map<std::string, llvm::BasicBlock *> UnlinkedBBMap;
+
 llvm::Type* getLLVMType(TypeName *);
 
 void SourceFile::codeGen() {
@@ -180,6 +183,9 @@ void FunctionDefn::codeGen() {
 
 	/* Save pointer to function symbol table */
 	func_symbol_table_ptr = func->getValueSymbolTable();
+
+	/* Initialize UnlinkedBBMap, remove all old entries */
+	UnlinkedBBMap.clear();
 
 	if (b) {
 		b->codeGen();
@@ -825,12 +831,94 @@ void DoWhileStmt::codeGen() {
 }
 
 void JumpStmt::codeGen() {
+	/* For GOTO */
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::Function::BasicBlockListType &bb_list = Function->getBasicBlockList();
+
+	llvm::BasicBlock *UnlinkedBB;
+	std::map<std::string, llvm::BasicBlock *>::iterator UnlinkedBB_iter;
+
+	switch (type) {
+		case GOTO :
+			ALERT("GOTO : " + goto_ident);
+			/* Check for existing label */
+			for (llvm::Function::BasicBlockListType::iterator bb_iter = bb_list.begin(); bb_iter != bb_list.end(); bb_iter++) {
+				/* If label found jump to that label by a branch instrucion */
+				if (bb_iter->getName().data() == goto_ident) {
+					Builder.CreateBr(&(*bb_iter));
+					return;
+				}
+			}
+
+			/* Iterate through the UnlinkedBBMap first to check if same goto statement has created a basic block in advance */
+			UnlinkedBB_iter = UnlinkedBBMap.begin();
+			while (UnlinkedBB_iter != UnlinkedBBMap.end()) {
+				/* If existing unlinked BasicBlock to same named goto is found, jump to it */
+				if (UnlinkedBB_iter->first == goto_ident) {
+					ALERT("FOUND SAME NAMED UNLINKED GOTO. JUMP.");
+					/* Jump to the unlinked BasicBlock */
+					UnlinkedBB = UnlinkedBB_iter->second;
+					Builder.CreateBr(UnlinkedBB);
+					return;
+				} else {
+					++UnlinkedBB_iter;
+				}
+			}
+
+			ALERT("CREATE A UNLINKED BASICBLOCK.");
+			/* Since existing label not found, and no previous same goto has created a unlinked BasicBlock, create
+			 * a new unlinked BasicBlock in advance, add it to UnlinkedBBMap and write a jump instruction to it.
+			 * Unlinked BasicBlock is not linked to any function
+			 */
+			UnlinkedBB = llvm::BasicBlock::Create(Context, goto_ident);
+			/* Add unlinked BasicBlock & goto indentifier to UnlinkedBBMap */
+			UnlinkedBBMap.insert(std::pair<std::string, llvm::BasicBlock *>(goto_ident, UnlinkedBB));
+			/* Jump to the unlinked BasicBlock */
+			Builder.CreateBr(UnlinkedBB);
+			return;
+			break;
+		default :
+			ERROR("Error : Jump statement type does not exists");
+	}
 }
 
 void DeferStmt::codeGen() {
 }
 
 void LabelStmt::codeGen() {
+	llvm::BasicBlock *LabelBB;
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+
+	ALERT("LABEL : " + ident);
+
+	/* Check for existing label */
+	llvm::Function::BasicBlockListType &bb_list = Function->getBasicBlockList();
+	for (llvm::Function::BasicBlockListType::iterator bb_iter = bb_list.begin(); bb_iter != bb_list.end(); bb_iter++) {
+		if (bb_iter->getName().data() == ident) {
+			ERROR("Error : Basic block already exists");
+			return;
+		}
+	}
+
+	/* Iterate through the UnlinkedBBMap first to check if any goto statement has created a basic block in advance */
+	std::map<std::string, llvm::BasicBlock *>::iterator UnlinkedBB_iter = UnlinkedBBMap.begin();
+	while (UnlinkedBB_iter != UnlinkedBBMap.end()) {
+		if (UnlinkedBB_iter->first == ident) {
+			ALERT("FOUND UNLINKED BB. CREATE LABEL.");
+			LabelBB = UnlinkedBB_iter->second;
+			LabelBB->insertInto(Function);
+			Builder.SetInsertPoint(LabelBB);
+			/* Remove from UnlinkedBBMap since label generated */
+			UnlinkedBBMap.erase(UnlinkedBB_iter++);
+			return;
+		} else {
+			++UnlinkedBB_iter;
+		}
+	}
+
+	/* Insert basic block after label */
+	LabelBB = llvm::BasicBlock::Create(Context, ident, Function);
+	Builder.SetInsertPoint(LabelBB);
 }
 
 

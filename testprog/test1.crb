@@ -291,6 +291,25 @@ def main(int a, bool b) -> (int) {
 		j = k
 	}
 
+	c = 0
+jmp1:
+	b = 1000
+	x = 0
+jmp2:
+	x = x + 1
+	goto jmp5
+jmp3:
+	z = 100
+jmp4:
+	z = z + 200
+	goto jmp5
+jmp6:
+	c = c + 100
+	b = 1
+jmp5:
+	c = 0
+	b = 0
+
 	return a + b, c
 }
 
