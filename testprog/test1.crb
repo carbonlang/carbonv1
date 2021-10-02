@@ -225,6 +225,7 @@ def main(int a, bool b) -> (int) {
 	while (x < y) {
 		x += 1
 		x -= 1
+		continue
 	}
 
 	defer {
@@ -242,6 +243,7 @@ def main(int a, bool b) -> (int) {
 
 	do {
 		x = x + 1
+		break
 	} while (x < y)
 
 	/* Literal check */

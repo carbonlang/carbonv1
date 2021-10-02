@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -24,6 +25,10 @@ llvm::ValueSymbolTable *func_symbol_table_ptr;
 
 /* List of unlinked basic block for a function. Used in label / goto statements */
 std::map<std::string, llvm::BasicBlock *> UnlinkedBBMap;
+
+/* Stack of BasicBlock for break / continue in for, while, do-while */
+std::stack<llvm::BasicBlock *> ContinueStack;
+std::stack<llvm::BasicBlock *> BreakStack;
 
 llvm::Type* getLLVMType(TypeName *);
 
@@ -193,6 +198,14 @@ void FunctionDefn::codeGen() {
 
 	/* Set pointer to function symbol table to NULL at end of function */
 	func_symbol_table_ptr = NULL;
+
+	/* Clear the ContinueStack & BreakStack at end of function. By default it should be empty at this stage */
+	while (!ContinueStack.empty()) {
+		ContinueStack.pop();
+	}
+	while (!BreakStack.empty()) {
+		ContinueStack.pop();
+	}
 
 	verifyFunction(*func);
 }
@@ -732,6 +745,10 @@ void ForStmt::codeGen() {
 	llvm::BasicBlock *ForLoopBB = llvm::BasicBlock::Create(Context, "for-loop");
 	llvm::BasicBlock *ForEndBB = llvm::BasicBlock::Create(Context, "for-end");
 
+	/* Setup ContinueStack & BreakStack for continue and break stmt */
+	ContinueStack.push(ForConditionBB);
+	BreakStack.push(ForEndBB);
+
 	Builder.CreateBr(ForConditionBB);
 
 	Builder.SetInsertPoint(ForConditionBB);
@@ -770,6 +787,10 @@ void ForStmt::codeGen() {
 
 	Function->getBasicBlockList().push_back(ForEndBB);
 	Builder.SetInsertPoint(ForEndBB);
+
+	/* Reset the ContinueStack & BreakStack */
+	ContinueStack.pop();
+	BreakStack.pop();
 }
 
 void WhileStmt::codeGen() {
@@ -777,6 +798,10 @@ void WhileStmt::codeGen() {
 	llvm::BasicBlock *WhileConditionBB = llvm::BasicBlock::Create(Context, "while-condition", Function);
 	llvm::BasicBlock *WhileLoopBB = llvm::BasicBlock::Create(Context, "while-loop");
 	llvm::BasicBlock *WhileEndBB = llvm::BasicBlock::Create(Context, "while-end");
+
+	/* Setup ContinueStack & BreakStack for continue and break stmt */
+	ContinueStack.push(WhileConditionBB);
+	BreakStack.push(WhileEndBB);
 
 	Builder.CreateBr(WhileConditionBB);
 
@@ -802,12 +827,20 @@ void WhileStmt::codeGen() {
 
 	Function->getBasicBlockList().push_back(WhileEndBB);
 	Builder.SetInsertPoint(WhileEndBB);
+
+	/* Reset the ContinueStack & BreakStack */
+	ContinueStack.pop();
+	BreakStack.pop();
 }
 
 void DoWhileStmt::codeGen() {
 	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
 	llvm::BasicBlock *DoWhileLoopBB = llvm::BasicBlock::Create(Context, "do-while-loop", Function);
 	llvm::BasicBlock *DoWhileEndBB = llvm::BasicBlock::Create(Context, "do-while-end");
+
+	/* Setup ContinueStack & BreakStack for continue and break stmt */
+	ContinueStack.push(DoWhileLoopBB);
+	BreakStack.push(DoWhileEndBB);
 
 	Builder.CreateBr(DoWhileLoopBB);
 
@@ -828,6 +861,10 @@ void DoWhileStmt::codeGen() {
 
 	Function->getBasicBlockList().push_back(DoWhileEndBB);
 	Builder.SetInsertPoint(DoWhileEndBB);
+
+	/* Reset the ContinueStack & BreakStack */
+	ContinueStack.pop();
+	BreakStack.pop();
 }
 
 void JumpStmt::codeGen() {
@@ -837,6 +874,9 @@ void JumpStmt::codeGen() {
 
 	llvm::BasicBlock *UnlinkedBB;
 	std::map<std::string, llvm::BasicBlock *>::iterator UnlinkedBB_iter;
+
+	/* For continue */
+	llvm::BasicBlock *currentBB;
 
 	switch (type) {
 		case GOTO :
@@ -876,6 +916,30 @@ void JumpStmt::codeGen() {
 			/* Jump to the unlinked BasicBlock */
 			Builder.CreateBr(UnlinkedBB);
 			return;
+			break;
+		case CONTINUE :
+			if (ContinueStack.empty()) {
+				ERROR("Error : continue statement not in a loop");
+				return;
+			}
+			currentBB = ContinueStack.top();
+			ALERT("CONTINUE : ");
+			ALERT(currentBB->getName().data());
+			Builder.CreateBr(currentBB);
+			return;
+			break;
+		case BREAK :
+			if (BreakStack.empty()) {
+				ERROR("Error : break statement not in a loop");
+				return;
+			}
+			currentBB = BreakStack.top();
+			ALERT("BREAK : ");
+			ALERT(currentBB->getName().data());
+			Builder.CreateBr(currentBB);
+			return;
+			break;
+		case  RETURN :
 			break;
 		default :
 			ERROR("Error : Jump statement type does not exists");
