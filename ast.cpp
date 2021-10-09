@@ -366,7 +366,7 @@ llvm::Value * BinaryExpression::codeGen() {
 			break;
 		case LOGICAL_AND :
 			/* TODO */
-			//return Builder.CreateLogicalAnd(l_exp, r_exp);
+			// return Builder.CreateLogicalAnd(l_exp, r_exp);
 			// return Builder.CreateICmpNE(l_exp, r_exp);
 			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01562
 			return Builder.CreateSelect(l_exp, r_exp,
@@ -374,13 +374,13 @@ llvm::Value * BinaryExpression::codeGen() {
 			break;
 		case LOGICAL_OR :
 			/* TODO */
-			//return Builder.CreateLogicalOr(l_exp, r_exp);
+			// return Builder.CreateLogicalOr(l_exp, r_exp);
 			// return Builder.CreateICmpNE(l_exp, r_exp);
 			// return Builder.CreateSelect(l_exp,
-			//	llvm::ConstantInt::getAllOnesValue(r_exp->getType()),r_exp);
+			// llvm::ConstantInt::getAllOnesValue(r_exp->getType()),r_exp);
 			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01568
-			return Builder.CreateSelect(l_exp, r_exp,
-				llvm::ConstantInt::getNullValue(r_exp->getType()));
+			return Builder.CreateSelect(l_exp,
+				llvm::ConstantInt::getAllOnesValue(r_exp->getType()), r_exp);
 			break;
 		case IS_EQUAL :
 			return Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, l_exp, r_exp);
@@ -703,7 +703,66 @@ void IfElseStmt::codeGen() {
 }
 
 void SwitchStmt::codeGen() {
-	ALERT("IN SWITCH");
+	llvm::Value *exp_value  = NULL;
+	llvm::Value *exp_value_deref;
+	llvm::Value *case_expr = NULL;
+	llvm::Value *cmp_value_l = NULL;
+	llvm::Value *cmp_value_r = NULL;
+	std::list<CaseBlock *>::iterator case_block_iter;
+	std::list<Expression *>::iterator case_expr_iter;
+
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	llvm::BasicBlock *CaseSwitch = NULL;
+	llvm::BasicBlock *NextCaseSwitch = NULL;
+	llvm::BasicBlock *EndSwitch = llvm::BasicBlock::Create(Context, "end-switch");
+
+
+	if (is_set_exp) {
+		exp_value = e->codeGen();
+		for (case_block_iter = c->case_block_list.begin(); case_block_iter != c->case_block_list.end(); case_block_iter++) {
+
+			if (CaseSwitch) {
+				CaseSwitch = NextCaseSwitch;
+			} else {
+				CaseSwitch = llvm::BasicBlock::Create(Context, "case-switch");
+			}
+			NextCaseSwitch = llvm::BasicBlock::Create(Context, "case-switch");
+
+			if (!(*case_block_iter)->is_default) {
+				for (case_expr_iter = (*case_block_iter)->case_expr_list_ptr->expr_list.begin();
+					case_expr_iter != (*case_block_iter)->case_expr_list_ptr->expr_list.end(); case_expr_iter++) {
+					/* Each case expression */
+					case_expr = (*case_expr_iter)->codeGen();
+					exp_value_deref = Builder.CreateLoad(exp_value);
+					if (cmp_value_l) {
+						cmp_value_r = Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, exp_value_deref, case_expr);
+						cmp_value_l = Builder.CreateSelect(cmp_value_l,
+							llvm::ConstantInt::getAllOnesValue(cmp_value_r->getType()), cmp_value_r);
+					} else {
+						cmp_value_l = Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, exp_value_deref, case_expr);
+					}
+				}
+				Builder.CreateCondBr(cmp_value_l, CaseSwitch, NextCaseSwitch);
+
+				Function->getBasicBlockList().push_back(CaseSwitch);
+				Builder.SetInsertPoint(CaseSwitch);
+
+				(*case_block_iter)->block_ptr->codeGen();
+
+				Builder.CreateBr(EndSwitch);
+
+				Function->getBasicBlockList().push_back(NextCaseSwitch);
+				Builder.SetInsertPoint(NextCaseSwitch);
+			} else {
+				/* Default case */
+				(*case_block_iter)->block_ptr->codeGen();
+				Builder.CreateBr(EndSwitch);
+			}
+		}
+	}
+
+	Function->getBasicBlockList().push_back(EndSwitch);
+	Builder.SetInsertPoint(EndSwitch);
 }
 
 void IterationStmt::codeGen() {

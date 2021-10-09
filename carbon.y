@@ -46,11 +46,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	// #define DEBUG(str) std::cout << str << "\n"
 	#define DEBUG(str)
-	#define ERR(str) std::cout << str
-	#define ALERT(str) std::cout << "\n" \
+	#define ERR(str) std::cout << "\033[49;31m" \
 		<< "**********************************************" << "\n" \
-		<< "                   " << str << "\n" \
-		<< "**********************************************" << "\n";
+		<< str << "\n" \
+		<< "**********************************************" << "\033[0m\n"
+	#define ALERT(str) std::cout << "\033[49;32m" \
+		<< "**********************************************" << "\n" \
+		<< str << "\n" \
+		<< "**********************************************" << "\033[0m\n"
 
 	SourceFile sf;
 
@@ -2274,7 +2277,6 @@ switch_stmt
 						{
 							$$ = new SwitchStmt();
 							$$->is_set_exp = true;
-							$$->is_set_default = false;
 							$$->e = $3;
 							$$->c = $6;
 							DEBUG("[SwitchStmt::SwitchCase]");
@@ -2283,10 +2285,9 @@ switch_stmt
 						{
 							$$ = new SwitchStmt();
 							$$->is_set_exp = false;
-							$$->is_set_default = false;
 							$$->e = NULL;
 							$$->c = $3;
-							DEBUG("[SwitchStmt::SwitchCaseDefault]");
+							DEBUG("[SwitchStmt::SwitchCaseNoExp]");
 						}
 		;
 
@@ -2300,6 +2301,12 @@ case_blocks
 							if (!$1) {
 								$1 = new CaseBlocks();
 							}
+							if ($2->is_default) {
+								if ($1->default_counter >= 1) {
+									ERR("[SwitchStmt::CaseBlocks] More than 1 default block");
+								}
+								$1->default_counter++;
+							}
 							$1->case_block_list.push_back($2);
 							$$ = $1;
 							DEBUG("[SwitchStmt::CaseBlocks]");
@@ -2310,15 +2317,17 @@ case_block
 		: CASE '(' case_expression_list ')' block
 						{
 							$$ = new CaseBlock();
+							$$->is_default = false;
 							$$->case_expr_list_ptr = $3;
-							$$->b = $5;
-							DEBUG("[CaseBlock]");
+							$$->block_ptr = $5;
+							DEBUG("[CaseBlock::Expression]");
 						}
 		| DEFAULT block
 						{
 							$$ = new CaseBlock();
-							$$->b = $2;
-							DEBUG("[CaseBlock]");
+							$$->is_default = true;
+							$$->block_ptr = $2;
+							DEBUG("[CaseBlock::Default]");
 						}
 		;
 

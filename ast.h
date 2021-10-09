@@ -494,7 +494,6 @@ class ElseBlock {
 class SwitchStmt {
 	public:
 		bool is_set_exp = false;
-		bool is_set_default = false;
 		Expression *e;
 		CaseBlocks *c;
 		Statements *default_s;
@@ -504,15 +503,16 @@ class SwitchStmt {
 
 class CaseBlocks {
 	public:
+		int default_counter = 0;
 		std::list<CaseBlock *> case_block_list;
 		void codeGen();
 };
 
 class CaseBlock {
 	public:
-		bool is_set = false;
+		bool is_default = false;
 		CaseExpressionList *case_expr_list_ptr;
-		Block *b;
+		Block *block_ptr;
 		void codeGen();
 };
 
