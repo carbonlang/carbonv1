@@ -137,8 +137,10 @@ def main(int a, bool b) -> (int) {
 	c = a << 1
 	c = a >>> 1
 	c = a <<< 1
-	c = a || b
-	c = a && b
+	// TODO
+	// c = 1 || 4
+	// c = a || b
+	// c = a && b
 	c = a & b
 	c = a | b
 	c = a ^ b

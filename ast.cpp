@@ -369,6 +369,8 @@ llvm::Value * BinaryExpression::codeGen() {
 			// return Builder.CreateLogicalAnd(l_exp, r_exp);
 			// return Builder.CreateICmpNE(l_exp, r_exp);
 			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01562
+			/* From LLVM Souce code */
+			assert(r_exp->getType()->isIntOrIntVectorTy(1));
 			return Builder.CreateSelect(l_exp, r_exp,
 				llvm::ConstantInt::getNullValue(r_exp->getType()));
 			break;
@@ -379,6 +381,8 @@ llvm::Value * BinaryExpression::codeGen() {
 			// return Builder.CreateSelect(l_exp,
 			// llvm::ConstantInt::getAllOnesValue(r_exp->getType()),r_exp);
 			// Refer : https://llvm.org/doxygen/IRBuilder_8h_source.html#l01568
+			/* From LLVM Souce code */
+			assert(r_exp->getType()->isIntOrIntVectorTy(1));
 			return Builder.CreateSelect(l_exp,
 				llvm::ConstantInt::getAllOnesValue(r_exp->getType()), r_exp);
 			break;
@@ -716,19 +720,32 @@ void SwitchStmt::codeGen() {
 	llvm::BasicBlock *NextCaseSwitch = NULL;
 	llvm::BasicBlock *EndSwitch = llvm::BasicBlock::Create(Context, "end-switch");
 
-
 	if (is_set_exp) {
 		exp_value = e->codeGen();
 		for (case_block_iter = c->case_block_list.begin(); case_block_iter != c->case_block_list.end(); case_block_iter++) {
-
 			if (CaseSwitch) {
 				CaseSwitch = NextCaseSwitch;
 			} else {
 				CaseSwitch = llvm::BasicBlock::Create(Context, "case-switch");
 			}
-			NextCaseSwitch = llvm::BasicBlock::Create(Context, "case-switch");
 
-			if (!(*case_block_iter)->is_default) {
+			if (std::next(case_block_iter) == c->case_block_list.end()) {
+				/* If last case block then next case block is end of block */
+				NextCaseSwitch = EndSwitch;
+			} else {
+				NextCaseSwitch = llvm::BasicBlock::Create(Context, "case-switch");
+			}
+
+			if ((*case_block_iter)->is_default) {
+				/* Default case */
+				Function->getBasicBlockList().push_back(CaseSwitch);
+				Builder.SetInsertPoint(CaseSwitch);
+
+				(*case_block_iter)->block_ptr->codeGen();
+
+				Builder.CreateBr(EndSwitch);
+			} else {
+				/* Non-default case */
 				for (case_expr_iter = (*case_block_iter)->case_expr_list_ptr->expr_list.begin();
 					case_expr_iter != (*case_block_iter)->case_expr_list_ptr->expr_list.end(); case_expr_iter++) {
 					/* Each case expression */
@@ -749,13 +766,6 @@ void SwitchStmt::codeGen() {
 
 				(*case_block_iter)->block_ptr->codeGen();
 
-				Builder.CreateBr(EndSwitch);
-
-				Function->getBasicBlockList().push_back(NextCaseSwitch);
-				Builder.SetInsertPoint(NextCaseSwitch);
-			} else {
-				/* Default case */
-				(*case_block_iter)->block_ptr->codeGen();
 				Builder.CreateBr(EndSwitch);
 			}
 		}
