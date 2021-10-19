@@ -580,8 +580,9 @@ class DoWhileStmt {
 
 class JumpStmt {
 	public:
-		enum types { GOTO, CONTINUE, BREAK, RETURN } type;
+		enum types { GOTO, CONTINUE, BREAK, RETURN, RETURN_WITH_ARGS } type;
 		std::string goto_ident;
+		ExpressionList *return_expr_list_ptr;
 		void codeGen();
 };
 

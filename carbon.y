@@ -204,7 +204,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <FunctionCallOp *> func_call_op
 %nterm <FunctionArgumentList *> func_argument_list
 %nterm <FunctionArgument *> func_argument
-%nterm <ReturnArgumentList *> return_argument_list
 
 %nterm <JumpStmt *> jump_stmt
 %nterm <LabelStmt *> label_stmt
@@ -2367,31 +2366,17 @@ jump_stmt
 							$$->type = JumpStmt::types::BREAK;
 							DEBUG("[Break]");
 						}
-		| RETURN return_argument_list
+		| RETURN
 						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::RETURN;
 							DEBUG("[Return]");
 						}
-		;
-
-return_argument_list
-		: %empty
+		| RETURN expression_list
 						{
-							/* empty */
-						}
-		| return_argument_list ',' expression
-						{
-							//$1->el.push_back($3);
-							//$$ = $1;
-							DEBUG("[ExpressionList]");
-						}
-		| expression
-						{
-							//$$ = new ExpressionList;
-							//$$->is_set = true;
-							//$$->el.push_back($1);
-							DEBUG("[ExpressionList]");
+							$$ = new JumpStmt();
+							$$->type = JumpStmt::types::RETURN_WITH_ARGS;
+							$$->return_expr_list_ptr = $2;
 						}
 		;
 

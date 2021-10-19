@@ -314,6 +314,8 @@ jmp5:
 	c = 0
 	b = 0
 
+	return
+	return a
 	return a + b, c
 }
 

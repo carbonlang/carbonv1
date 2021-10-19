@@ -753,6 +753,7 @@ void SwitchStmt::codeGen() {
 					exp_value_deref = Builder.CreateLoad(exp_value);
 					if (cmp_value_l) {
 						cmp_value_r = Builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, exp_value_deref, case_expr);
+						/* TODO. See Logical OR */
 						cmp_value_l = Builder.CreateSelect(cmp_value_l,
 							llvm::ConstantInt::getAllOnesValue(cmp_value_r->getType()), cmp_value_r);
 					} else {
@@ -1009,6 +1010,18 @@ void JumpStmt::codeGen() {
 			return;
 			break;
 		case  RETURN :
+			Builder.CreateRetVoid();
+			return;
+			break;
+		case  RETURN_WITH_ARGS :
+			if (return_expr_list_ptr->expr_list.size() > 1) {
+				/* Multiple return values */
+
+			} else {
+				/* Only single return value */
+				Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+			}
+			return;
 			break;
 		default :
 			ERROR("Error : Jump statement type does not exists");
