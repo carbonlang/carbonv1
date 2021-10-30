@@ -1057,27 +1057,18 @@ void JumpStmt::codeGen() {
 			return;
 			break;
 		case  RETURN :
-			if (!DeferStack.empty()) {
+			if (DeferStack.empty()) {
+				if (return_expr_ptr->expr_list_ptr->expr_list.size() == 0) {
+
+				} else if (return_expr_ptr->expr_list_ptr->expr_list.size() == 1) {
+
+				} else {
+					// Builder.CreateRetVoid();
+					// Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+				}
+			} else {
 				top_defer_stack_item = DeferStack.top();
 				Builder.CreateBr(top_defer_stack_item->BB_ptr);
-			} else {
-				Builder.CreateRetVoid();
-			}
-			if (!DeferStack.empty()) {
-				//if (return_expr_list_ptr->expr_list.size() > 1) {
-				//	/* Multiple return values */
-				//} else {
-				//	/* Only single return value */
-				//}
-				top_defer_stack_item = DeferStack.top();
-				Builder.CreateBr(top_defer_stack_item->BB_ptr);
-			} else {
-				//if (return_expr_list_ptr->expr_list.size() > 1) {
-				//	/* Multiple return values */
-				//} else {
-				//	/* Only single return value */
-				//	Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
-				//}
 			}
 			return;
 			break;

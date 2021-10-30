@@ -589,7 +589,6 @@ class JumpStmt {
 
 class ReturnExpr {
 	public:
-		bool is_set = false;
 		ExpressionList *expr_list_ptr;
 };
 

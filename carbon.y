@@ -2389,13 +2389,13 @@ return_expr
 						{
 							/* Do nothing */
 							$$ = new ReturnExpr();
-							$$->is_set = false;
+							/* Pointer to empty ExpressionList */
+							$$->expr_list_ptr = new ExpressionList();
 							DEBUG("[ReturnExpr]");
 						}
 		| expression_list
 						{
 							$$ = new ReturnExpr();
-							$$->is_set = true;
 							$$->expr_list_ptr = $1;
 							DEBUG("[ReturnExpr]");
 						}
