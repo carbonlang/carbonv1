@@ -65,7 +65,7 @@ public def stop() -> () {
 }
 
 /* The "main" function is entry point of the program. * This is test for multi-line comment */
-def main(int a, bool b) -> (int) {
+def main(int abc, bool defg) -> (int) {
 	bool a, b = false, c = true, d
 	bool b1 = false
 	int in1

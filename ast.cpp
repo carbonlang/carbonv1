@@ -161,11 +161,11 @@ void NamespaceDefn::codeGen() {
 void FunctionDefn::codeGen() {
 
 	llvm::FunctionType *func_type;
+	std::list<TypeIdentifier *>::iterator tii;
 
 	if (fs->fp) {
 		/* Function with parameters */
 		std::vector<llvm::Type *> func_param_vec;
-		std::list<TypeIdentifier *>::iterator tii;
 		for (tii = fs->fp->fpl.begin(); tii != fs->fp->fpl.end(); tii++) {
 			func_param_vec.push_back(getLLVMType((*tii)->t->type_name));
 		}
@@ -188,6 +188,18 @@ void FunctionDefn::codeGen() {
 	}
 
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, parent_ns + ident, Module.get());
+
+	/* Set function argument names */
+	llvm::Function::arg_iterator arg_iter;
+	if (fs->fp) {
+		tii = fs->fp->fpl.begin();
+		for (arg_iter = func->arg_begin(); arg_iter != func->arg_end(); arg_iter++, tii++) {
+			if (tii == fs->fp->fpl.end()) {
+				ERROR("Error : Function arument exceeds more than what is generated");
+			}
+			arg_iter->setName((*tii)->ident);
+		}
+	}
 
 	BB = llvm::BasicBlock::Create(Context, "", func);
 
