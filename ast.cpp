@@ -30,6 +30,13 @@ std::map<std::string, llvm::BasicBlock *> UnlinkedBBMap;
 std::stack<llvm::BasicBlock *> ContinueStack;
 std::stack<llvm::BasicBlock *> BreakStack;
 
+/* Structure to hold defer blocks and stack */
+struct DeferStackItem {
+	llvm::BasicBlock *BB_ptr;
+	Block *block_ptr;
+};
+std::stack<DeferStackItem *> DeferStack;
+
 llvm::Type* getLLVMType(TypeName *);
 
 void SourceFile::codeGen() {
@@ -192,19 +199,44 @@ void FunctionDefn::codeGen() {
 	/* Initialize UnlinkedBBMap, remove all old entries */
 	UnlinkedBBMap.clear();
 
+	/* Check if the ContinueStack, BreakStack & Defer are empty */
+	if (!ContinueStack.empty()) {
+		ERROR("Error : ContinueStack not empty");
+	}
+	if (!BreakStack.empty()) {
+		ERROR("Error : BreakStack not empty");
+	}
+	if (!DeferStack.empty()) {
+		ERROR("Error : DeferStack not empty");
+	}
+
 	if (b) {
 		b->codeGen();
+	}
+
+	/* Generate defer block code */
+	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
+	DeferStackItem *top_defer_stack_item;
+	while (!DeferStack.empty()) {
+		top_defer_stack_item = DeferStack.top();
+		top_defer_stack_item->BB_ptr->insertInto(Function);
+		Builder.SetInsertPoint(top_defer_stack_item->BB_ptr);
+		top_defer_stack_item->block_ptr->codeGen();
+		DeferStack.pop();
 	}
 
 	/* Set pointer to function symbol table to NULL at end of function */
 	func_symbol_table_ptr = NULL;
 
-	/* Clear the ContinueStack & BreakStack at end of function. By default it should be empty at this stage */
+	/* Clear the ContinueStack, BreakStack & Defer stack at end of function. By default it should be empty at this stage */
 	while (!ContinueStack.empty()) {
 		ContinueStack.pop();
 	}
 	while (!BreakStack.empty()) {
-		ContinueStack.pop();
+		BreakStack.pop();
+	}
+	while (!DeferStack.empty()) {
+		DeferStack.pop();
 	}
 
 	verifyFunction(*func);
@@ -948,6 +980,9 @@ void JumpStmt::codeGen() {
 	/* For continue */
 	llvm::BasicBlock *currentBB;
 
+	/* For return */
+	DeferStackItem *top_defer_stack_item;
+
 	switch (type) {
 		case GOTO :
 			ALERT("GOTO : " + goto_ident);
@@ -1010,16 +1045,30 @@ void JumpStmt::codeGen() {
 			return;
 			break;
 		case  RETURN :
-			Builder.CreateRetVoid();
+			if (!DeferStack.empty()) {
+				top_defer_stack_item = DeferStack.top();
+				Builder.CreateBr(top_defer_stack_item->BB_ptr);
+			} else {
+				Builder.CreateRetVoid();
+			}
 			return;
 			break;
 		case  RETURN_WITH_ARGS :
-			if (return_expr_list_ptr->expr_list.size() > 1) {
-				/* Multiple return values */
-
+			if (!DeferStack.empty()) {
+				if (return_expr_list_ptr->expr_list.size() > 1) {
+					/* Multiple return values */
+				} else {
+					/* Only single return value */
+				}
+				top_defer_stack_item = DeferStack.top();
+				Builder.CreateBr(top_defer_stack_item->BB_ptr);
 			} else {
-				/* Only single return value */
-				Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+				if (return_expr_list_ptr->expr_list.size() > 1) {
+					/* Multiple return values */
+				} else {
+					/* Only single return value */
+					Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+				}
 			}
 			return;
 			break;
@@ -1029,6 +1078,13 @@ void JumpStmt::codeGen() {
 }
 
 void DeferStmt::codeGen() {
+	/* Push pointer to the entire Block b on stack, code generation will take
+	    place at the end of the function in FILO manner
+	 */
+	DeferStackItem *defer_stack_item = new DeferStackItem();
+	defer_stack_item->block_ptr = b;
+	defer_stack_item->BB_ptr = llvm::BasicBlock::Create(Context, "defer");
+	DeferStack.push(defer_stack_item);
 }
 
 void LabelStmt::codeGen() {

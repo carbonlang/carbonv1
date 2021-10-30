@@ -322,6 +322,8 @@ jmp5:
 int a = 100
 
 private def calc(ptr : int a) -> () {
+	int z = 0
+	z = main(1, 2)
 	return
 }
 
