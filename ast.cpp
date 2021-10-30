@@ -1063,24 +1063,21 @@ void JumpStmt::codeGen() {
 			} else {
 				Builder.CreateRetVoid();
 			}
-			return;
-			break;
-		case  RETURN_WITH_ARGS :
 			if (!DeferStack.empty()) {
-				if (return_expr_list_ptr->expr_list.size() > 1) {
-					/* Multiple return values */
-				} else {
-					/* Only single return value */
-				}
+				//if (return_expr_list_ptr->expr_list.size() > 1) {
+				//	/* Multiple return values */
+				//} else {
+				//	/* Only single return value */
+				//}
 				top_defer_stack_item = DeferStack.top();
 				Builder.CreateBr(top_defer_stack_item->BB_ptr);
 			} else {
-				if (return_expr_list_ptr->expr_list.size() > 1) {
-					/* Multiple return values */
-				} else {
-					/* Only single return value */
-					Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
-				}
+				//if (return_expr_list_ptr->expr_list.size() > 1) {
+				//	/* Multiple return values */
+				//} else {
+				//	/* Only single return value */
+				//	Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+				//}
 			}
 			return;
 			break;

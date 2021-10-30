@@ -59,6 +59,7 @@ class IterationStmt;
 class JumpStmt;
 class DeferStmt;
 class LabelStmt;
+class ReturnExpr;
 
 class IfElseStmt;
 class IfBlock;
@@ -580,10 +581,16 @@ class DoWhileStmt {
 
 class JumpStmt {
 	public:
-		enum types { GOTO, CONTINUE, BREAK, RETURN, RETURN_WITH_ARGS } type;
+		enum types { GOTO, CONTINUE, BREAK, RETURN } type;
 		std::string goto_ident;
-		ExpressionList *return_expr_list_ptr;
+		ReturnExpr *return_expr_ptr;
 		void codeGen();
+};
+
+class ReturnExpr {
+	public:
+		bool is_set = false;
+		ExpressionList *expr_list_ptr;
 };
 
 class DeferStmt {

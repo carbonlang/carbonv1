@@ -207,6 +207,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %nterm <JumpStmt *> jump_stmt
 %nterm <LabelStmt *> label_stmt
+%nterm <ReturnExpr *> return_expr
 
 %start source_file
 
@@ -316,7 +317,8 @@ namespace_defn
 namespace_block_list
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[NS::BlockList]");
 						}
 		| namespace_block_list namespace_block
 						{
@@ -400,17 +402,20 @@ func_defn
 access_modifier
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[AccessModifier]");
 						}
 		| PUBLIC
 						{
 							$$ = new AccessModifier();
 							$$->type = AccessModifier::types::PUBLIC;
+							DEBUG("[AccessModifier]");
 						}
 		| PRIVATE
 						{
 							$$ = new AccessModifier();
 							$$->type = AccessModifier::types::PRIVATE;
+							DEBUG("[AccessModifier]");
 						}
 		;
 
@@ -513,7 +518,8 @@ type_func
 func_defn_list
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[TypeFunction::FunctionDefn]");
 						}
 		| func_defn_list func_defn EOL
 						{
@@ -785,7 +791,8 @@ function_type
 type_list
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[TypeList]");
 						}
 		| type_list ',' type
 						{
@@ -803,7 +810,8 @@ type_list
 statements
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[Statements]");
 						}
 		| statements statement
 						{
@@ -1395,7 +1403,8 @@ struct_union_fields
 enum_fields
 		: %empty
 						{
-							/* empty */
+							/* Do nothing */
+							DEBUG("[EnumFields]");
 						}
 		| enum_fields IDENTIFIER EOL
 						{
@@ -2366,17 +2375,29 @@ jump_stmt
 							$$->type = JumpStmt::types::BREAK;
 							DEBUG("[Break]");
 						}
-		| RETURN
+		| RETURN return_expr
 						{
 							$$ = new JumpStmt();
 							$$->type = JumpStmt::types::RETURN;
+							$$->return_expr_ptr = $2;
 							DEBUG("[Return]");
 						}
-		| RETURN expression_list
+		;
+
+return_expr
+		: %empty
 						{
-							$$ = new JumpStmt();
-							$$->type = JumpStmt::types::RETURN_WITH_ARGS;
-							$$->return_expr_list_ptr = $2;
+							/* Do nothing */
+							$$ = new ReturnExpr();
+							$$->is_set = false;
+							DEBUG("[ReturnExpr]");
+						}
+		| expression_list
+						{
+							$$ = new ReturnExpr();
+							$$->is_set = true;
+							$$->expr_list_ptr = $1;
+							DEBUG("[ReturnExpr]");
 						}
 		;
 
