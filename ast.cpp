@@ -1140,6 +1140,7 @@ void StructDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
 		if (is_global == true) {
+			/* TODO */
 			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
 			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
@@ -1149,6 +1150,7 @@ void StructDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
 		if (is_global == true) {
+			/* TODO */
 			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
 		} else {
 			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
@@ -1233,9 +1235,23 @@ llvm::Type* getLLVMType(TypeName *tn) {
 	} else if (tn->type_name == TypeName::type_names::GENERIC_POINTER) {
 		return llvm::Type::getInt64Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::STRUCT_TEMPLATE) {
-		return llvm::Type::getInt64Ty(Context);
+		// In new version of LLVM it is in Context */
+		if (Module->getTypeByName(tn->type_ident)) {
+			return Module->getTypeByName(tn->type_ident);
+		} else {
+			ERROR(tn->type_ident);
+			ERROR("Error : struct type not found");
+			return NULL;
+		}
 	} else if (tn->type_name == TypeName::type_names::STRUCT) {
-		return llvm::Type::getInt64Ty(Context);
+		// In new version of LLVM it is in Context */
+		if (Module->getTypeByName(tn->type_ident)) {
+			return Module->getTypeByName(tn->type_ident);
+		} else {
+			ERROR(tn->type_ident);
+			ERROR("Error : struct type not found");
+			return NULL;
+		}
 	} else if (tn->type_name == TypeName::type_names::UNION_TEMPLATE) {
 		return llvm::Type::getInt64Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::UNION) {
