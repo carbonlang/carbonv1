@@ -739,30 +739,35 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT_TEMPLATE;
+							$$->type_ident = $2;
 							DEBUG("[Type::Struct::Template]");
 						}
 		| STRUCT IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT;
+							$$->type_ident = $2;
 							DEBUG("[Type::Struct]");
 						}
 		| UNION	IDENTIFIER template
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UNION_TEMPLATE;
+							$$->type_ident = $2;
 							DEBUG("[Type::Union::Template]");
 						}
 		| UNION	IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UNION;
+							$$->type_ident = $2;
 							DEBUG("[Type::Union]");
 						}
 		| ENUM IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::ENUM;
+							$$->type_ident = $2;
 							DEBUG("[Type::ENUM]");
 						}
 		| function_type

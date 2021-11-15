@@ -162,6 +162,8 @@ void FunctionDefn::codeGen() {
 
 	llvm::FunctionType *func_type;
 	std::list<TypeIdentifier *>::iterator tii;
+	func_return_type = NULL;
+	func_return_instruction = NULL;
 
 	if (fs->fp) {
 		/* Function with parameters */
@@ -173,12 +175,13 @@ void FunctionDefn::codeGen() {
 
 		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
 		if (fs->fr) {
-		//	/* Function with return parameters */
-		//	std::vector<llvm::Type *> func_return_vec;
-		//	std::list<TypeIdentifier *>::iterator tii;
-		//	for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
-		//		func_return_vec.push_back((*tii)->codeGen());
-		//	}
+			/* Function with return parameters */
+			std::vector<llvm::Type *> func_return_vec;
+			std::list<TypeIdentifier *>::iterator tii;
+			for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
+				func_return_vec.push_back(getLLVMType((*tii)->t->type_name));
+			}
+			func_return_type = func_return_vec.back();
 		//	llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
 		//	func_type = llvm::FunctionType::get(func_return_vec, func_param, false);
 		}
@@ -1137,24 +1140,26 @@ void StructDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		}
 
 		llvm::ArrayRef<llvm::Type *> struct_fields(struct_fields_vec);
-		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
+		// llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
+		llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
-		if (is_global == true) {
-			/* TODO */
-			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
-		} else {
-			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
-		}
+		// Struct type does not get created if no variable is using it
+		// if (is_global == true) {
+		//	new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
+		// } else {
+		//	new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
+		// }
 	} else {
 		llvm::ArrayRef<llvm::Type *> struct_fields;
-		llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
+		// llvm::StructType *struct_type = llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
+		llvm::StructType::create(Module->getContext(), struct_fields, parent_ns + ident);
 
-		if (is_global == true) {
-			/* TODO */
-			new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
-		} else {
-			new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
-		}
+		// Struct type does not get created if no variable is using it
+		// if (is_global == true) {
+		//	//new llvm::GlobalVariable(*Module, struct_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
+		// } else {
+		//	new llvm::AllocaInst(struct_type, 0, parent_ns + ident, BB);
+		// }
 	}
 }
 
@@ -1171,22 +1176,26 @@ void UnionDefn::codeGen(bool is_global, std::string parent_ns = "") {
 		}
 
 		llvm::ArrayRef<llvm::Type *> union_fields(union_fields_vec);
-		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
+		// llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
+		llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
 
-		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
-		} else {
-			new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
-		}
+		// Union type does not get created if no variable is using it
+		// if (is_global == true) {
+		//	new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
+		// } else {
+		//	new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
+		// }
 	} else {
 		llvm::ArrayRef<llvm::Type *> union_fields;
-		llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
+		// llvm::StructType *union_type = llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
+		llvm::StructType::create(Module->getContext(), union_fields, parent_ns + ident);
 
-		if (is_global == true) {
-			new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
-		} else {
-			new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
-		}
+		// Union type does not get created if no variable is using it
+		// if (is_global == true) {
+		//	new llvm::GlobalVariable(*Module, union_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + ident);
+		// } else {
+		//	new llvm::AllocaInst(union_type, 0, parent_ns + ident, BB);
+		// }
 	}
 }
 
@@ -1195,7 +1204,6 @@ void EnumDefn::codeGen(bool is_global, std::string parent_ns = "") {
 }
 
 llvm::Type* getLLVMType(TypeName *tn) {
-
 	if (tn->type_name == TypeName::type_names::BOOL) {
 		return llvm::Type::getInt8Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::CHAR) {
