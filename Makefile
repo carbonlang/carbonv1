@@ -4,9 +4,9 @@ all: carbon
 
 OBJS+= ast.o parser.o lexer.o
 LOCALBASE=/home/ps/git-repos/RE-flex
-CFLAGS+= -Wall -g -I${LOCALBASE}/include
+CFLAGS+= -Wall -Wno-deprecated-declarations -g -I${LOCALBASE}/include
 LDFLAGS+= -L${LOCALBASE}/lib -lreflex
-LLVMCONFIG=`llvm-config-11 --libs core native --cxxflags --ldflags` -fexceptions
+LLVMCONFIG=`llvm-config-13 --libs core native --cxxflags --ldflags` -fexceptions
 
 carbon: ${OBJS}
 	${CXX} -g -o $@ ${OBJS} ${LDFLAGS} ${LLVMCONFIG}
@@ -22,8 +22,8 @@ parser.o: parser.cc lexer.cc
 
 parser.cc: carbon.y
 	bison -Wall -v -o $@ $<
-	bison -x $<
-	xsltproc /usr/share/bison/xslt/xml2xhtml.xsl carbon.xml > carbon.html
+	# bison -x $<
+	# xsltproc /usr/share/bison/xslt/xml2xhtml.xsl carbon.xml > carbon.html
 
 ast.o: ast.cpp
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
@@ -39,3 +39,6 @@ clean:
 
 test:
 	./carbon < ./testprog/test1.crb
+
+test2:
+	./carbon < ./testprog/test2.crb

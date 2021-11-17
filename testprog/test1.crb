@@ -30,6 +30,10 @@ struct EmptyStruct {
 
 }
 
+struct Person {
+	int age
+}
+
 union Flags {
 	int i2
 	char c2
@@ -314,6 +318,8 @@ jmp5:
 	c = 0
 	b = 0
 
+	struct GlobalPerson gp1
+
 	return
 	return a
 	return a + b, c
@@ -332,5 +338,5 @@ def template1<:T, S:>(T a, S b) -> (T) {
 }
 
 def template2<:T,S:>(T a, S b) -> (int) {
-	struct Actor <:struct Producer<:struct Director<:int:>:>:> act1
+	// struct Actor <:struct Producer<:struct Director<:int:>:>:> act1
 }

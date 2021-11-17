@@ -1,4 +1,29 @@
-def main(int a, bool b) -> (int) {
-        int a
-        a = [int]-(b + c)
+struct person {
+	int a
+	int b
 }
+
+def main(int ab, bool ba) -> (int) {
+	int b
+	int a = b
+	ab = b
+	struct person p1
+
+	defer {
+		a = 1000
+	}
+
+	if (a > a) {
+		return a
+	}
+	defer {
+		a = 2000
+	}
+
+	return ab
+}
+
+def main2(int ab, bool ba) -> (int) {
+	return 10
+}
+

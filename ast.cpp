@@ -1244,8 +1244,8 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		return llvm::Type::getInt64Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::STRUCT_TEMPLATE) {
 		// In new version of LLVM it is in Context */
-		if (Module->getTypeByName(tn->type_ident)) {
-			return Module->getTypeByName(tn->type_ident);
+		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
+			return llvm::StructType::getTypeByName(Context, tn->type_ident);
 		} else {
 			ERROR(tn->type_ident);
 			ERROR("Error : struct type not found");
@@ -1253,8 +1253,8 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		}
 	} else if (tn->type_name == TypeName::type_names::STRUCT) {
 		// In new version of LLVM it is in Context */
-		if (Module->getTypeByName(tn->type_ident)) {
-			return Module->getTypeByName(tn->type_ident);
+		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
+			return llvm::StructType::getTypeByName(Context, tn->type_ident);
 		} else {
 			ERROR(tn->type_ident);
 			ERROR("Error : struct type not found");
