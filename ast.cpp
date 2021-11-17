@@ -37,6 +37,9 @@ struct DeferStackItem {
 };
 std::stack<DeferStackItem *> DeferStack;
 
+llvm::Type *func_return_type;
+llvm::AllocaInst *func_return_tmp_ptr_variable;
+
 llvm::Type* getLLVMType(TypeName *);
 
 void SourceFile::codeGen() {
@@ -163,7 +166,7 @@ void FunctionDefn::codeGen() {
 	llvm::FunctionType *func_type;
 	std::list<TypeIdentifier *>::iterator tii;
 	func_return_type = NULL;
-	func_return_instruction = NULL;
+	func_return_tmp_ptr_variable = NULL;
 
 	if (fs->fp) {
 		/* Function with parameters */
@@ -998,6 +1001,8 @@ void JumpStmt::codeGen() {
 	/* For return */
 	DeferStackItem *top_defer_stack_item;
 
+	llvm::Value *return_value = nullptr;
+
 	switch (type) {
 		case GOTO :
 			ALERT("GOTO : " + goto_ident);
@@ -1060,16 +1065,26 @@ void JumpStmt::codeGen() {
 			return;
 			break;
 		case  RETURN :
-			if (DeferStack.empty()) {
-				if (return_expr_ptr->expr_list_ptr->expr_list.size() == 0) {
-
-				} else if (return_expr_ptr->expr_list_ptr->expr_list.size() == 1) {
-
-				} else {
-					// Builder.CreateRetVoid();
-					// Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
-				}
+			/* Calculate return values */
+			if (return_expr_ptr->expr_list_ptr->expr_list.size() == 0) {
+				return_value = nullptr;
+			} else if (return_expr_ptr->expr_list_ptr->expr_list.size() == 1) {
+				return_value = return_expr_ptr->expr_list_ptr->expr_list.front()->codeGen();
 			} else {
+				// Builder.CreateRetVoid();
+				// Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+			}
+
+			if (DeferStack.empty()) {
+				 Builder.CreateRet(return_value);
+			} else {
+				if (func_return_type && !func_return_tmp_ptr_variable) {
+					func_return_tmp_ptr_variable = new llvm::AllocaInst(
+						llvm::PointerType::get(func_return_type, 0), 0, "return_tmp_ptr_variable", BB);
+				}
+				// int *ptr_var = &var
+				// store i32* %1/var, i32** %2/ptr_var
+				Builder.CreateStore(return_value, func_return_tmp_ptr_variable, false);
 				top_defer_stack_item = DeferStack.top();
 				Builder.CreateBr(top_defer_stack_item->BB_ptr);
 			}
