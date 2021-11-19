@@ -235,12 +235,21 @@ void FunctionDefn::codeGen() {
 	/* Generate defer block code */
 	llvm::Function *Function = Builder.GetInsertBlock()->getParent();
 	DeferStackItem *top_defer_stack_item;
+	bool defer_present = false;
 	while (!DeferStack.empty()) {
+		defer_present = true;
 		top_defer_stack_item = DeferStack.top();
 		top_defer_stack_item->BB_ptr->insertInto(Function);
 		Builder.SetInsertPoint(top_defer_stack_item->BB_ptr);
 		top_defer_stack_item->block_ptr->codeGen();
 		DeferStack.pop();
+	}
+	if (defer_present) {
+		// translates to return *ret_tmp
+		// Return the deferenced pointer that is used to store the pointer to return value
+		llvm::Value *load_tmp_ptr = Builder.CreateLoad(func_return_tmp_ptr_variable);
+		llvm::Value *load_tmp_value = Builder.CreateLoad(load_tmp_ptr);
+		Builder.CreateRet(load_tmp_value);
 	}
 
 	/* Set pointer to function symbol table to NULL at end of function */
@@ -1071,8 +1080,7 @@ void JumpStmt::codeGen() {
 			} else if (return_expr_ptr->expr_list_ptr->expr_list.size() == 1) {
 				return_value = return_expr_ptr->expr_list_ptr->expr_list.front()->codeGen();
 			} else {
-				// Builder.CreateRetVoid();
-				// Builder.CreateRet(return_expr_list_ptr->expr_list.front()->codeGen());
+				/* TODO : Multiple return */
 			}
 
 			if (DeferStack.empty()) {
@@ -1082,6 +1090,10 @@ void JumpStmt::codeGen() {
 					func_return_tmp_ptr_variable = new llvm::AllocaInst(
 						llvm::PointerType::get(func_return_type, 0), 0, "return_tmp_ptr_variable", BB);
 				}
+				//if (return_value->getType()->getTypeID() != llvm::Type::PointerTyID) {
+				//	llvm::AllocaInst *return_tmp_value = new llvm::AllocaInst(return_value->getType(), 0, "return_tmp_value", BB);
+				//	llvm::Value *return_value1 = Builder.CreateStore(return_tmp_value, return_value, false);
+				//}
 				// int *ptr_var = &var
 				// store i32* %1/var, i32** %2/ptr_var
 				Builder.CreateStore(return_value, func_return_tmp_ptr_variable, false);
