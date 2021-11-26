@@ -1090,13 +1090,36 @@ void JumpStmt::codeGen() {
 					func_return_tmp_ptr_variable = new llvm::AllocaInst(
 						llvm::PointerType::get(func_return_type, 0), 0, "return_tmp_ptr_variable", BB);
 				}
-				//if (return_value->getType()->getTypeID() != llvm::Type::PointerTyID) {
-				//	llvm::AllocaInst *return_tmp_value = new llvm::AllocaInst(return_value->getType(), 0, "return_tmp_value", BB);
-				//	llvm::Value *return_value1 = Builder.CreateStore(return_tmp_value, return_value, false);
-				//}
-				// int *ptr_var = &var
-				// store i32* %1/var, i32** %2/ptr_var
-				Builder.CreateStore(return_value, func_return_tmp_ptr_variable, false);
+
+				// If return_value is a pointer then save the pointer to it as func_return_tmp_ptr_variable
+				// else its a literal, then create a variable called return_tmp_literal_value varaible
+				// and save the return_value to return_tmp_literal_value and then save the pointer to it
+				// as func_return_tmp_ptr_variable
+				// This is because we need to save pointer to the return value to the func_return_tmp_ptr_variable
+				// and literals dont have a pointer value assocaite with it
+				// If its "return" i.e. return void then save nullpointer as literal in the above
+				if (!return_value) {
+					// "return" i.e. return void, create a pointer literal and store NULL value in it
+					llvm::AllocaInst *return_tmp_literal_value = new llvm::AllocaInst(
+						llvm::PointerType::get(func_return_type, 0), 0, "return_tmp_literal_value", BB);
+					Builder.CreateStore(llvm::ConstantPointerNull::get(llvm::PointerType::get(func_return_type, 0)),
+						return_tmp_literal_value, false);
+					// int *ptr_var = &var
+					// store i32* %1/var, i32** %2/ptr_var
+					Builder.CreateStore(return_tmp_literal_value, func_return_tmp_ptr_variable, false);
+				} else if (return_value->getType()->getTypeID() == llvm::Type::PointerTyID) {
+					// int *ptr_var = &var
+					// store i32* %1/var, i32** %2/ptr_var
+					Builder.CreateStore(return_value, func_return_tmp_ptr_variable, false);
+				} else {
+					llvm::AllocaInst *return_tmp_literal_value = new llvm::AllocaInst(
+						return_value->getType(), 0, "return_tmp_literal_value", BB);
+					Builder.CreateStore(return_value, return_tmp_literal_value, false);
+					// int *ptr_var = &var
+					// store i32* %1/var, i32** %2/ptr_var
+					Builder.CreateStore(return_tmp_literal_value, func_return_tmp_ptr_variable, false);
+				}
+
 				top_defer_stack_item = DeferStack.top();
 				Builder.CreateBr(top_defer_stack_item->BB_ptr);
 			}
