@@ -168,7 +168,7 @@ def main(int abc, bool defg) -> (int) {
 
 	_, a, _ = compute()
 
-	ptr : generic gP
+	ptr : void gP
 
 	/* this is a pre comment */ int before_comment = 0
 	io.Print(a, b)

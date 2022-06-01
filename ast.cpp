@@ -1290,7 +1290,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		return llvm::Type::getInt8Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::POINTER) {
 		return llvm::Type::getInt64PtrTy(Context, 0);
-	} else if (tn->type_name == TypeName::type_names::GENERIC_POINTER) {
+	} else if (tn->type_name == TypeName::type_names::VOID) {
 		return llvm::Type::getInt64Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::STRUCT_TEMPLATE) {
 		// In new version of LLVM it is in Context */
