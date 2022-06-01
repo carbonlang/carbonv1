@@ -38,7 +38,7 @@ clean:
 	rm -f carbon.html carbon.xml parser.output
 
 test:
-	./carbon < ./testprog/test1.crb
+	./carbon < ./testing/test1.crb
 
 test2:
-	./carbon < ./testprog/test2.crb
+	./carbon < ./testing/test2.crb

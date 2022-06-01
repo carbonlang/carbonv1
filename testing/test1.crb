@@ -22,7 +22,7 @@ ns Global {
 struct GlobalPerson {
 	int32 i1
 	int64 i2
-	float f1
+	float32 f1
 	char c1
 }
 
@@ -40,7 +40,7 @@ union Flags {
 	float32 f2
 }
 
-extend GlobalPerson {
+extend struct GlobalPerson {
 	def stand(int a) -> (int) {
 		int x
 	}
@@ -55,7 +55,7 @@ extend GlobalPerson {
 	}
 }
 
-extend GlobalPerson1 {
+extend struct GlobalPerson1 {
 }
 
 public def run(int a, int b, ptr : (int , int) -> (bool) c) -> () {
@@ -99,7 +99,7 @@ def main(int abc, bool defg) -> (int) {
 	struct Person p
 	auto p2 = run()
 
-	auto tpl = Calc<:int,float:>()
+	auto tpl = Calc<:int,float32:>()
 
 	static atomic bool isActive = true
 	const int age = 200
@@ -243,9 +243,9 @@ def main(int abc, bool defg) -> (int) {
 		x = 1
 	}
 
-	struct Person<:int,float:> p3
-	ptr : struct Person<:int,float:> p4
-	ptr : <:bool:>(int,float) -> (bool) fx
+	struct Person<:int,float32:> p3
+	ptr : struct Person<:int,float64:> p4
+	ptr : <:bool:>(int,float64) -> (bool) fx
 
 	do {
 		x = x + 1
@@ -333,10 +333,12 @@ private def calc(ptr : int a) -> () {
 	return
 }
 
-def template1<:T, S:>(T a, S b) -> (T) {
-	return
-}
-
-def template2<:T,S:>(T a, S b) -> (int) {
-	// struct Actor <:struct Producer<:struct Director<:int:>:>:> act1
-}
+/* TODO : Templates : type_name -> IDENTIFIER -> CUSTOM uncomment */
+//
+// def template1<:T, S:>(T a, S b) -> (T) {
+//	return
+// }
+//
+// def template2<:T,S:>(T a, S b) -> (int) {
+//	// struct Actor <:struct Producer<:struct Director<:int:>:>:> act1
+// }
