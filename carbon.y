@@ -776,12 +776,18 @@ type_name
 							$$->type_name = TypeName::type_names::FUNCTION;
 							DEBUG("[Function]");
 						}
-		| IDENTIFIER
-						{
-							$$ = new TypeName();
-							$$->type_name = TypeName::type_names::CUSTOM;
-							DEBUG("[Type::CustomType]");
-						}
+		/* TODO : For type alias */
+		/* TODO : For templates */
+		/* TODO : Remove struct/union/enum from declaration */
+		/* TODO : Uses symbol table */
+		//
+		// | IDENTIFIER
+		//				{
+		//					$$ = new TypeName();
+		//					$$->type_name = TypeName::type_names::CUSTOM;
+		//					$$->type_ident = $1;
+		//					DEBUG("[Type::CustomType]");
+		//				}
 		;
 
 function_type
