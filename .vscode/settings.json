@@ -1,0 +1,11 @@
+{
+    "files.exclude": {
+        "**/*.o": true,
+        "**/*.hh": true,
+        "**/*.cc": true,
+        "**/*.output": true,
+        "**/carbon": true,
+        "**/lex.yy.h": true,
+        ".vscode": true
+    }
+}
