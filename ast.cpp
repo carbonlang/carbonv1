@@ -1256,23 +1256,44 @@ void EnumDefn::codeGen(bool is_global, std::string parent_ns = "") {
 llvm::Type* getLLVMType(TypeName *tn) {
 	// If the type is array then calculate the size of the array
 	llvm::Value *array_size_llvm_value;
-	uint64_t array_size;
+	uint64_t array_size = 0;
 	llvm::ConstantInt* CI;
 	if (tn->is_array == true) {
 		if (tn->array_expr_ptr->expr_ptr_list.size() == 1) {
-			calculated_array_size = tn->array_expr_ptr->expr_ptr_list.front()->codeGen();
-			if (CI = llvm::dyn_cast<llvm::ConstantInt>(calculated_array_size)) {
-				// foo indeed is a ConstantInt, we can use CI here
+			// Single dimensional array
+			array_size_llvm_value = tn->array_expr_ptr->expr_ptr_list.front()->codeGen();
+			CI = llvm::dyn_cast<llvm::ConstantInt>(array_size_llvm_value);
+			if (!CI) {
+				// TODO : 24.07.2022 Non constant array
+				ERROR("Error : Array size cannot be non-constant");
+				return NULL;
 			}
-			else {
-				//CI = 10;
-			// foo was not actually a ConstantInt
+			if (CI->isNegative()) {
+				ERROR("Error : Array size cannot be negative");
+				return NULL;
 			}
+			array_size = CI->getZExtValue();
 		} else {
+			// Multi-dimensional array
+			// Since for multi dimensional array we multiply each dimension
+			// hence for first iteration it has to be multiply by 1
+			array_size = 1;
 			std::list<Expression *>::iterator expi;
 			for (expi = tn->array_expr_ptr->expr_ptr_list.begin();
 				expi != tn->array_expr_ptr->expr_ptr_list.end(); expi++) {
-				//return Builder.CreateMul((*expi)->codeGen(), (*expi)->codeGen());
+				array_size_llvm_value = (*expi)->codeGen();
+				CI = llvm::dyn_cast<llvm::ConstantInt>(array_size_llvm_value);
+				if (!CI) {
+					// TODO : 24.07.2022 Non constant array
+					ERROR("Error : Array size cannot be non-constant");
+					return NULL;
+				}
+				if (CI->isNegative()) {
+					ERROR("Error : Array size cannot be negative");
+					return NULL;
+				}
+				// Calculate multi-dimensional array size
+				array_size = array_size * CI->getZExtValue();
 			}
 		}
 	}
@@ -1282,7 +1303,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			return llvm::Type::getInt8Ty(Context);
 		} else {
 			return llvm::ArrayType::get(
-				llvm::Type::getInt8Ty(Context), CI->getZExtValue()
+				llvm::Type::getInt8Ty(Context), array_size
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::CHAR) {
