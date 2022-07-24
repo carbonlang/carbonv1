@@ -1254,8 +1254,37 @@ void EnumDefn::codeGen(bool is_global, std::string parent_ns = "") {
 }
 
 llvm::Type* getLLVMType(TypeName *tn) {
+	// If the type is array then calculate the size of the array
+	llvm::Value *array_size_llvm_value;
+	uint64_t array_size;
+	llvm::ConstantInt* CI;
+	if (tn->is_array == true) {
+		if (tn->array_expr_ptr->expr_ptr_list.size() == 1) {
+			calculated_array_size = tn->array_expr_ptr->expr_ptr_list.front()->codeGen();
+			if (CI = llvm::dyn_cast<llvm::ConstantInt>(calculated_array_size)) {
+				// foo indeed is a ConstantInt, we can use CI here
+			}
+			else {
+				//CI = 10;
+			// foo was not actually a ConstantInt
+			}
+		} else {
+			std::list<Expression *>::iterator expi;
+			for (expi = tn->array_expr_ptr->expr_ptr_list.begin();
+				expi != tn->array_expr_ptr->expr_ptr_list.end(); expi++) {
+				//return Builder.CreateMul((*expi)->codeGen(), (*expi)->codeGen());
+			}
+		}
+	}
+
 	if (tn->type_name == TypeName::type_names::BOOL) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), CI->getZExtValue()
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::CHAR) {
 		return llvm::Type::getInt8Ty(Context);
 	} else if (tn->type_name == TypeName::type_names::BYTE) {
@@ -1323,7 +1352,9 @@ llvm::Type* getLLVMType(TypeName *tn) {
 	} else if (tn->type_name == TypeName::type_names::AUTO) {
 		return llvm::Type::getInt64Ty(Context);
 	} else {
-		ERROR("Error : getLLVMType == NULL");
-		return NULL;
+		return llvm::Type::getInt32Ty(Context);
+		// TODO : 02.06.2022
+		// ERROR("Error : getLLVMType == NULL");
+		// return NULL;
 	}
 }

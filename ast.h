@@ -36,6 +36,7 @@ class Type;
 class Storage;
 class TypeQualifier;
 class TypeName;
+class ArrayExpr;
 class Literal;
 class BooleanLiteral;
 class IntegerLiteral;
@@ -282,8 +283,16 @@ class TypeName {
 		enum type_names { BOOL, CHAR, BYTE, INT, INT8, INT16, INT32, INT64, UINT, UINT8,
 			UINT16, UINT32, UINT64, FLOAT32, FLOAT64, FLOAT128, STRING, POINTER,
 			VOID, STRUCT, STRUCT_TEMPLATE, UNION, UNION_TEMPLATE, ENUM,
-			FUNCTION, CUSTOM, AUTO } type_name;
+			FUNCTION, CUSTOM, AUTO,
+		} type_name;
 		std::string type_ident;
+		bool is_array = false;
+		ArrayExpr *array_expr_ptr;
+};
+
+class ArrayExpr {
+	public:
+		std::list<Expression *> expr_ptr_list;
 };
 
 class Type {

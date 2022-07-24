@@ -147,6 +147,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %nterm <Storage *> storage_class
 %nterm <TypeQualifier *> type_qualifier
 %nterm <TypeName *> type_name
+%nterm <ArrayExpr *> array_expr
 %nterm <Type *> type
 %nterm <Block *> block
 
@@ -625,157 +626,387 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::BOOL;
+							$$->is_array = false;
 							DEBUG("[Type::Bool]");
+						}
+		| BOOL array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::BOOL;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::BoolArray]");
 						}
 		| CHAR
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::CHAR;
+							$$->is_array = false;
 							DEBUG("[Type::Char]");
+						}
+		| CHAR array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::CHAR;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::CharArray]");
 						}
 		| BYTE
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::BYTE;
+							$$->is_array = false;
 							DEBUG("[Type::Byte]");
+						}
+		| BYTE array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::BYTE;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::ByteArray]");
 						}
 		| INT
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::INT;
+							$$->is_array = false;
 							DEBUG("[Type::Int]");
+						}
+		| INT array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::IntArray]");
 						}
 		| INT8
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::INT8;
+							$$->is_array = false;
 							DEBUG("[Type::Int8]");
+						}
+		| INT8 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT8;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Int8Array]");
 						}
 		| INT16
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::INT16;
+							$$->is_array = false;
 							DEBUG("[Type::Int16]");
+						}
+		| INT16 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT16;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Int16Array]");
 						}
 		| INT32
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::INT32;
+							$$->is_array = false;
 							DEBUG("[Type::Int32]");
+						}
+		| INT32 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT32;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Int32Array]");
 						}
 		| INT64
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::INT64;
+							$$->is_array = false;
 							DEBUG("[Type::Int64]");
+						}
+		| INT64 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::INT64;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Int64Array]");
 						}
 		| UINT
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UINT;
+							$$->is_array = false;
 							DEBUG("[Type::UInt]");
+						}
+		| UINT array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::UIntArray]");
 						}
 		| UINT8
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UINT8;
+							$$->is_array = false;
 							DEBUG("[Type::UInt8]");
+						}
+		| UINT8 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT8;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::UInt8Array]");
 						}
 		| UINT16
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UINT16;
+							$$->is_array = false;
 							DEBUG("[Type::UInt16]");
+						}
+		| UINT16 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT16;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::UInt16Array]");
 						}
 		| UINT32
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UINT32;
+							$$->is_array = false;
 							DEBUG("[Type::UInt32]");
+						}
+		| UINT32 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT32;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::UInt32Array]");
 						}
 		| UINT64
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UINT64;
+							$$->is_array = false;
 							DEBUG("[Type::UInt64]");
+						}
+		| UINT64 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UINT64;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::UInt64Array]");
 						}
 		| FLOAT32
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FLOAT32;
+							$$->is_array = false;
 							DEBUG("[Type::Float32]");
+						}
+		| FLOAT32 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT32;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Float32Array]");
 						}
 		| FLOAT64
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FLOAT64;
+							$$->is_array = false;
 							DEBUG("[Type::Float64]");
+						}
+		| FLOAT64 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT64;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Float64Array]");
 						}
 		| FLOAT128
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FLOAT128;
+							$$->is_array = false;
 							DEBUG("[Type::Float128]");
+						}
+		| FLOAT128 array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FLOAT128;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::Float128Array]");
 						}
 		| STRING
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRING;
+							$$->is_array = false;
 							DEBUG("[Type::String]");
+						}
+		| STRING array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRING;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::StringArray]");
 						}
 		/* TODO : Proper testing */
 		| POINTER ':' VOID
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::VOID;
+							$$->is_array = false;
 							DEBUG("[Type::VoidPointer]");
+						}
+		| POINTER array_expr ':' VOID
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::VOID;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::VoidArray]");
 						}
 		| POINTER ':' type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::POINTER;
+							$$->is_array = false;
 							DEBUG("[Type::Pointer]");
+						}
+		| POINTER array_expr ':' type_name
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::POINTER;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::POINTERArray]");
 						}
 		| STRUCT IDENTIFIER template
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT_TEMPLATE;
+							$$->is_array = false;
 							$$->type_ident = $2;
 							DEBUG("[Type::Struct::Template]");
+						}
+		| STRUCT IDENTIFIER template array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRUCT_TEMPLATE;
+							$$->is_array = true;
+							$$->array_expr_ptr = $4;
+							$$->type_ident = $2;
+							DEBUG("[Type::Struct::TemplateArray]");
 						}
 		| STRUCT IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::STRUCT;
+							$$->is_array = false;
 							$$->type_ident = $2;
 							DEBUG("[Type::Struct]");
+						}
+		| STRUCT IDENTIFIER array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::STRUCT;
+							$$->is_array = true;
+							$$->array_expr_ptr = $3;
+							$$->type_ident = $2;
+							DEBUG("[Type::StructArray]");
 						}
 		| UNION	IDENTIFIER template
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UNION_TEMPLATE;
+							$$->is_array = false;
 							$$->type_ident = $2;
 							DEBUG("[Type::Union::Template]");
+						}
+		| UNION IDENTIFIER template array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UNION_TEMPLATE;
+							$$->is_array = true;
+							$$->array_expr_ptr = $4;
+							$$->type_ident = $2;
+							DEBUG("[Type::Union::TemplateArray]");
 						}
 		| UNION	IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::UNION;
+							$$->is_array = false;
 							$$->type_ident = $2;
 							DEBUG("[Type::Union]");
+						}
+		| UNION IDENTIFIER array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::UNION;
+							$$->is_array = true;
+							$$->array_expr_ptr = $3;
+							$$->type_ident = $2;
+							DEBUG("[Type::Union::Array]");
 						}
 		| ENUM IDENTIFIER
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::ENUM;
+							$$->is_array = false;
 							$$->type_ident = $2;
 							DEBUG("[Type::ENUM]");
+						}
+		| ENUM IDENTIFIER array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::ENUM;
+							$$->is_array = true;
+							$$->array_expr_ptr = $3;
+							$$->type_ident = $2;
+							DEBUG("[Type::EnumArray]");
 						}
 		| function_type
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::FUNCTION;
+							$$->is_array = false;
 							DEBUG("[Function]");
+						}
+		| function_type array_expr
+						{
+							$$ = new TypeName();
+							$$->type_name = TypeName::type_names::FUNCTION;
+							$$->is_array = true;
+							$$->array_expr_ptr = $2;
+							DEBUG("[Type::FunctionArray]");
 						}
 		/* TODO : For type alias */
 		/* TODO : For templates */
@@ -786,9 +1017,25 @@ type_name
 		//				{
 		//					$$ = new TypeName();
 		//					$$->type_name = TypeName::type_names::CUSTOM;
+		//					$$->is_array = false;
 		//					$$->type_ident = $1;
 		//					DEBUG("[Type::CustomType]");
 		//				}
+		;
+
+array_expr
+		: '[' expression ']'
+						{
+							$$ = new ArrayExpr();
+							$$->expr_ptr_list.push_back($2);
+							DEBUG("[Type::ArrayExpr]");
+						}
+		| array_expr '[' expression ']'
+						{
+							$1->expr_ptr_list.push_back($3);
+							$$ = $1;
+							DEBUG("[Type::ArrayExpr]");
+						}
 		;
 
 function_type
