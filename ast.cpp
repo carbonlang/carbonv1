@@ -1265,7 +1265,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			CI = llvm::dyn_cast<llvm::ConstantInt>(array_size_llvm_value);
 			if (!CI) {
 				// TODO : 24.07.2022 Non constant array
-				ERROR("Error : Array size cannot be non-constant");
+				ERROR("Error : Array size must be a constant integer value");
 				return NULL;
 			}
 			if (CI->isNegative()) {
@@ -1285,7 +1285,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 				CI = llvm::dyn_cast<llvm::ConstantInt>(array_size_llvm_value);
 				if (!CI) {
 					// TODO : 24.07.2022 Non constant array
-					ERROR("Error : Array size cannot be non-constant");
+					ERROR("Error : Array size must be a constant integer value");
 					return NULL;
 				}
 				if (CI->isNegative()) {
@@ -1307,43 +1307,152 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::CHAR) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::BYTE) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::INT) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::INT8) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::INT16) {
-		return llvm::Type::getInt16Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt16Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt16Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::INT32) {
-		return llvm::Type::getInt32Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt32Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt32Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::INT64) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UINT) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UINT8) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UINT16) {
-		return llvm::Type::getInt16Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt16Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt16Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UINT32) {
-		return llvm::Type::getInt32Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt32Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt32Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UINT64) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::FLOAT32) {
-		return llvm::Type::getFloatTy(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getFloatTy(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getFloatTy(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::FLOAT64) {
-		return llvm::Type::getDoubleTy(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getDoubleTy(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getDoubleTy(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::FLOAT128) {
-		return llvm::Type::getFP128Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getFP128Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getFP128Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::STRING) {
-		return llvm::Type::getInt8Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt8Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt8Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::POINTER) {
-		return llvm::Type::getInt64PtrTy(Context, 0);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64PtrTy(Context, 0);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64PtrTy(Context, 0), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::VOID) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::STRUCT_TEMPLATE) {
 		// In new version of LLVM it is in Context */
+		// TODO : 24.07.2022
 		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
 			return llvm::StructType::getTypeByName(Context, tn->type_ident);
 		} else {
@@ -1353,6 +1462,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		}
 	} else if (tn->type_name == TypeName::type_names::STRUCT) {
 		// In new version of LLVM it is in Context */
+		// TODO : 24.07.2022
 		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
 			return llvm::StructType::getTypeByName(Context, tn->type_ident);
 		} else {
@@ -1361,21 +1471,56 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			return NULL;
 		}
 	} else if (tn->type_name == TypeName::type_names::UNION_TEMPLATE) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::UNION) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::ENUM) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::FUNCTION) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::CUSTOM) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else if (tn->type_name == TypeName::type_names::AUTO) {
-		return llvm::Type::getInt64Ty(Context);
+		if (tn->is_array == false) {
+			return llvm::Type::getInt64Ty(Context);
+		} else {
+			return llvm::ArrayType::get(
+				llvm::Type::getInt64Ty(Context), array_size
+			);
+		}
 	} else {
-		return llvm::Type::getInt32Ty(Context);
 		// TODO : 02.06.2022
-		// ERROR("Error : getLLVMType == NULL");
-		// return NULL;
+		ERROR("Error : getLLVMType == NULL");
+		return NULL;
 	}
 }
