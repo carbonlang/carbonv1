@@ -1454,7 +1454,13 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		// In new version of LLVM it is in Context */
 		// TODO : 24.07.2022
 		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
-			return llvm::StructType::getTypeByName(Context, tn->type_ident);
+			if (tn->is_array == false) {
+				return llvm::StructType::getTypeByName(Context, tn->type_ident);
+			} else {
+				return llvm::ArrayType::get(
+					llvm::StructType::getTypeByName(Context, tn->type_ident), array_size
+				);
+			}
 		} else {
 			ERROR(tn->type_ident);
 			ERROR("Error : struct type not found");
@@ -1464,7 +1470,13 @@ llvm::Type* getLLVMType(TypeName *tn) {
 		// In new version of LLVM it is in Context */
 		// TODO : 24.07.2022
 		if (llvm::StructType::getTypeByName(Context, tn->type_ident)) {
-			return llvm::StructType::getTypeByName(Context, tn->type_ident);
+			if (tn->is_array == false) {
+				return llvm::StructType::getTypeByName(Context, tn->type_ident);
+			} else {
+				return llvm::ArrayType::get(
+					llvm::StructType::getTypeByName(Context, tn->type_ident), array_size
+				);
+			}
 		} else {
 			ERROR(tn->type_ident);
 			ERROR("Error : struct type not found");

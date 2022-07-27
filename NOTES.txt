@@ -2,3 +2,5 @@ https://wiki.unix7.org/cpp/reflex
 https://github.com/xkbeyer/liquid
 https://github.com/lsegal/my_toy_compiler
 https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
+
+clang -S -emit-llvm <filename.c> # Output LLVM IR

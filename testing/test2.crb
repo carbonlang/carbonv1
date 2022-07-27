@@ -1,4 +1,8 @@
+struct Person {
+	int ab
+	float32 cde
+}
 def main(int ab, bool ba) -> (int) {
-	bool[80][70][30] arr1
+	struct Person[10] arr1
 }
 
