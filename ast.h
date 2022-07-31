@@ -286,6 +286,7 @@ class TypeName {
 			FUNCTION, CUSTOM, AUTO,
 		} type_name;
 		std::string type_ident;
+		TypeName *pointer_to_type_name = NULL;
 		bool is_array = false;
 		ArrayExpr *array_expr_ptr;
 };

@@ -3,6 +3,6 @@ struct Person {
 	float32 cde
 }
 def main(int ab, bool ba) -> (int) {
-	struct Person[10] arr1
+	ptr[200] : ptr[20] : void a
 }
 

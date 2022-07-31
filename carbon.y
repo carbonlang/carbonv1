@@ -897,6 +897,7 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::POINTER;
+							$$->pointer_to_type_name = $3;
 							$$->is_array = false;
 							DEBUG("[Type::Pointer]");
 						}
@@ -904,6 +905,7 @@ type_name
 						{
 							$$ = new TypeName();
 							$$->type_name = TypeName::type_names::POINTER;
+							$$->pointer_to_type_name = $4;
 							$$->is_array = true;
 							$$->array_expr_ptr = $2;
 							DEBUG("[Type::POINTERArray]");

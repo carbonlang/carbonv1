@@ -1435,11 +1435,15 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::POINTER) {
+		// i8* type
+		// llvm::PointerType* PtrTy = llvm::PointerType::get(llvm::IntegerType::get(Context, 8), 0);
+		// i8** type
+		// return llvm::PointerType::get(PtrTy, 0);
 		if (tn->is_array == false) {
-			return llvm::Type::getInt64PtrTy(Context, 0);
+			return llvm::PointerType::get(getLLVMType(tn->pointer_to_type_name), 0);
 		} else {
 			return llvm::ArrayType::get(
-				llvm::Type::getInt64PtrTy(Context, 0), array_size
+				llvm::PointerType::get(getLLVMType(tn->pointer_to_type_name), 0), array_size
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::VOID) {
@@ -1483,6 +1487,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			return NULL;
 		}
 	} else if (tn->type_name == TypeName::type_names::UNION_TEMPLATE) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
@@ -1491,6 +1496,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::UNION) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
@@ -1499,6 +1505,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::ENUM) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
@@ -1507,6 +1514,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::FUNCTION) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
@@ -1515,6 +1523,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::CUSTOM) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
@@ -1523,6 +1532,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::AUTO) {
+		/* TODO : 29.07.22 */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
