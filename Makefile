@@ -42,3 +42,6 @@ test:
 
 test2:
 	./carbon < ./testing/test2.crb
+
+compile:
+	llc-13 output.ll -o=output.s
