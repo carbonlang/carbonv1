@@ -1363,6 +1363,7 @@ llvm::Type* getLLVMType(TypeName *tn) {
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::UINT) {
+		/* TODO : All unsigned type */
 		if (tn->is_array == false) {
 			return llvm::Type::getInt64Ty(Context);
 		} else {
