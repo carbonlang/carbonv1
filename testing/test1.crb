@@ -177,7 +177,7 @@ def main(int abc, bool defg) -> (int) {
 	on two separate lines */
 
 	run()
-	a = run()
+	a = run_todo() /* stack smashing error if run returns void */
 
 	int x = 0
 	int y = 0

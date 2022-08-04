@@ -176,21 +176,35 @@ void FunctionDefn::codeGen() {
 		}
 		llvm::ArrayRef<llvm::Type *> func_param(func_param_vec);
 
-		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
+		/* Function return type */
+		// func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), func_param, false);
 		if (fs->fr) {
 			/* Function with return parameters */
-			std::vector<llvm::Type *> func_return_vec;
-			std::list<TypeIdentifier *>::iterator tii;
-			for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
-				func_return_vec.push_back(getLLVMType((*tii)->t->type_name));
-			}
-			func_return_type = func_return_vec.back();
-		//	llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
-		//	func_type = llvm::FunctionType::get(func_return_vec, func_param, false);
+			/* TODO 04.08.2022 : Multiple return parameters */
+			// std::vector<llvm::Type *> func_return_vec;
+			// std::list<TypeIdentifier *>::iterator tii;
+			// for (tii = fs->fr->frl.begin(); tii != fs->fr->frl.end(); tii++) {
+			//	func_return_vec.push_back(getLLVMType((*tii)->t->type_name));
+			// }
+			// func_return_type = func_return_vec.back();
+			// llvm::ArrayRef<llvm::Type *> func_return(func_return_vec);
+			func_return_type = getLLVMType(fs->fr->frl.front()->t->type_name);
+			func_type = llvm::FunctionType::get(func_return_type, func_param, false);
+		} else {
+			/* Function without return parameters */
+			func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), func_param, false);
 		}
 	} else {
 		/* Function without parameters */
-		func_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), false);
+		if (fs->fr) {
+			/* Function with return parameters */
+			/* TODO 04.08.2022 : Multiple return parameters */
+			func_return_type = getLLVMType(fs->fr->frl.front()->t->type_name);
+			func_type = llvm::FunctionType::get(func_return_type, false);
+		} else {
+			/* Function without return parameters */
+			func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), false);
+		}
 	}
 
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, parent_ns + ident, Module.get());
