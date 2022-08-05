@@ -243,7 +243,26 @@ void FunctionDefn::codeGen() {
 	}
 
 	if (b) {
+		/* TODO : 05.08.2022 */
+		/* If b->s is not NULL then code will be generated else */
+		/* if b->s is NULL then no code generated and process empty function below */
 		b->codeGen();
+		if (!(b->s)) {
+			/* Empty function, need return statements to avoid LLVM basic-block error */
+			if (func_return_type) {
+				/* Return type is declared */
+				llvm::AllocaInst *empty_return = new llvm::AllocaInst(
+					func_return_type, 0, "", BB);
+				llvm::LoadInst *empty_return_ld = Builder.CreateLoad(
+					func_return_type, empty_return);
+				Builder.CreateRet(empty_return_ld);
+			} else {
+				/* Return type is void */
+				Builder.CreateRetVoid();
+			}
+		}
+	} else {
+		ERROR("Error : Function block empty");
 	}
 
 	/* Generate defer block code */
