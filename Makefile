@@ -22,8 +22,8 @@ parser.o: parser.cc lexer.cc
 
 parser.cc: carbon.y
 	bison -Wall -v -o $@ $<
-	# bison -x $<
-	# xsltproc /usr/share/bison/xslt/xml2xhtml.xsl carbon.xml > carbon.html
+	@# bison -x $<
+	@# xsltproc /usr/share/bison/xslt/xml2xhtml.xsl carbon.xml > carbon.html
 
 ast.o: ast.cpp
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
@@ -45,3 +45,10 @@ test2:
 
 compile:
 	llc-13 output.ll -o=output.s
+
+all:
+	@# clang-13 -g -O3 output.ll `llvm-config-13 --cxxflags --ldflags --system-libs --libs all` -o output
+	@# ld output.o --entry main -o output
+	@# objdump output
+	llc-13 output.ll -filetype=obj -o=output.o
+	clang-13 output.ll `llvm-config-13 --cxxflags --ldflags --system-libs --libs all` -o output
