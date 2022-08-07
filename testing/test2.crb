@@ -1,8 +1,7 @@
-struct Person {
-	int ab
-	float32 cde
-}
-def main(int ab, bool ba) -> (int) {
-	ptr[200] : ptr[20] : void a
+def main() -> (int) {
+	bool a, b
+	a = true
+	b = a
+	return 10
 }
 

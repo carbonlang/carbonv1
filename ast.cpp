@@ -17,6 +17,7 @@
 #include "ast.h"
 
 #define ALERT(str) std::cout << "\033[49;32m" << str << "\033[0m\n"
+#define DEBUG(str) std::cout << "\033[49;34m" << str << "\033[0m\n"
 #define ERROR(str) std::cout << "\033[49;31m" << str << "\033[0m\n"
 
 /* Pointer to global and current function symbol table as stored in LLVM */
@@ -379,7 +380,12 @@ void AssignmentStmt::codeGen() {
 			expr_val = (*expr_iter)->codeGen();
 			/* TODO */
 			if (l_val && expr_val) {
-				Builder.CreateStore(expr_val, l_val, false);
+				/* If expr_val is a variable then need to load it first */
+				if (expr_val->getType()->isPointerTy()) {
+					Builder.CreateStore(Builder.CreateLoad(expr_val), l_val, false);
+				} else {
+					Builder.CreateStore(expr_val, l_val, false);
+				}
 			}
 			expr_iter++;
 		}
@@ -1333,10 +1339,10 @@ llvm::Type* getLLVMType(TypeName *tn) {
 
 	if (tn->type_name == TypeName::type_names::BOOL) {
 		if (tn->is_array == false) {
-			return llvm::Type::getInt8Ty(Context);
+			return llvm::Type::getInt1Ty(Context);
 		} else {
 			return llvm::ArrayType::get(
-				llvm::Type::getInt8Ty(Context), array_size
+				llvm::Type::getInt1Ty(Context), array_size
 			);
 		}
 	} else if (tn->type_name == TypeName::type_names::CHAR) {
