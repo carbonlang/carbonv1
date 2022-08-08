@@ -46,7 +46,7 @@ test2:
 compile:
 	llc-13 output.ll -o=output.s
 
-all:
+exec:
 	@# clang-13 -g -O3 output.ll `llvm-config-13 --cxxflags --ldflags --system-libs --libs all` -o output
 	@# ld output.o --entry main -o output
 	@# objdump output

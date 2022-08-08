@@ -1,7 +1,6 @@
 def main() -> (int) {
-	bool a, b
-	a = true
-	b = a
-	return 10
+	int a
+	a = 150
+	return a
 }
 

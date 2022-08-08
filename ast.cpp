@@ -93,6 +93,17 @@ void VariableDef::codeGen() {
 				ERROR("Function variable '" + parent_ns + (*viei)->ident + "' already defined previously");
 			}
 			new llvm::AllocaInst(llvm_type, 0, parent_ns + (*viei)->ident, BB);
+			// llvm::Value *alloc = new llvm::AllocaInst(llvm_type, 0, parent_ns + (*viei)->ident, BB);
+			/* If initial value to variable is specified */
+			/* TODO : 08.08.22 Error on assign from function call, etc */
+			// if ((*viei)->e) {
+			//	llvm::Value *initial_value = (*viei)->e->codeGen();
+			//	if (initial_value->getType()->isPointerTy()) {
+			//		Builder.CreateStore(Builder.CreateLoad(initial_value), alloc, false);
+			//	} else {
+			//		Builder.CreateStore(initial_value, alloc, false);
+			//	}
+			//}
 		}
 	}
 
@@ -281,6 +292,7 @@ void FunctionDefn::codeGen() {
 	if (defer_present) {
 		// translates to return *ret_tmp
 		// Return the deferenced pointer that is used to store the pointer to return value
+		/* TODO : 08.08.2022 */
 		llvm::Value *load_tmp_ptr = Builder.CreateLoad(func_return_tmp_ptr_variable);
 		llvm::Value *load_tmp_value = Builder.CreateLoad(load_tmp_ptr);
 		Builder.CreateRet(load_tmp_value);
@@ -1123,7 +1135,16 @@ void JumpStmt::codeGen() {
 			}
 
 			if (DeferStack.empty()) {
-				 Builder.CreateRet(return_value);
+				/* If the return type is pointer first load the value */
+				if (return_value) {
+					if (return_value->getType()->isPointerTy()) {
+						Builder.CreateRet(Builder.CreateLoad(return_value));
+					} else {
+						Builder.CreateRet(return_value);
+					}
+				} else {
+					Builder.CreateRetVoid();
+				}
 			} else {
 				if (func_return_type && !func_return_tmp_ptr_variable) {
 					func_return_tmp_ptr_variable = new llvm::AllocaInst(
