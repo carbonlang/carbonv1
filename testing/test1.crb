@@ -139,7 +139,8 @@ def main(int abc, bool defg) -> (int) {
 
 	a = b
 	a = (b + c) - d
-	c = a >> 1
+	int16 j
+	c = j >> a
 	c = a << 1
 	c = a >>> 1
 	c = a <<< 1

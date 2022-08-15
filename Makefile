@@ -2,7 +2,7 @@ CXX=c++
 
 all: carbon
 
-OBJS+= ast.o parser.o lexer.o
+OBJS+= ast.o parser.o lexer.o symbol_table.o
 LOCALBASE=/home/ps/git-repos/RE-flex
 CFLAGS+= -Wall -Wno-deprecated-declarations -g -I${LOCALBASE}/include
 LDFLAGS+= -L${LOCALBASE}/lib -lreflex
@@ -28,11 +28,14 @@ parser.cc: carbon.y
 ast.o: ast.cpp
 	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
 
+symbol_table.o: symbol_table.cpp
+	${CXX} ${CFLAGS} ${LLVMCONFIG} -c -o $@ $<
+
 clean:
 	rm -f lexer.cc lexer.hh lex.yy.h
 	rm -f parser.cc parser.hh location.hh position.hh stack.hh
 	rm -f y.tab.c y.tab.h y.output lex.yy.cpp
-	rm -f ast.o
+	rm -f ast.o symbol_table.o
 	rm -f carbon *.o *~
 	rm -f carbon.tab.c carbon.tab.h
 	rm -f carbon.html carbon.xml parser.output

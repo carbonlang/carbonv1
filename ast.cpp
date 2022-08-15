@@ -15,6 +15,7 @@
 #include "llvm/IR/ValueSymbolTable.h"
 
 #include "ast.h"
+#include "symbol_table.h"
 
 #define ALERT(str) std::cout << "\033[49;32m" << str << "\033[0m\n"
 #define DEBUG(str) std::cout << "\033[49;34m" << str << "\033[0m\n"
@@ -44,10 +45,12 @@ llvm::AllocaInst *func_return_tmp_ptr_variable;
 llvm::Type* getLLVMType(TypeName *);
 
 void SourceFile::codeGen() {
+	SymTable::Init();
 	std::list<TopLevel *>::iterator tli;
 	for (tli = t.begin(); tli != t.end(); tli++) {
 		(*tli)->codeGen();
 	}
+	SymTable::Destroy();
 }
 
 void TopLevel::codeGen() {
@@ -88,6 +91,7 @@ void VariableDef::codeGen() {
 				ERROR("Global variable '" + parent_ns + (*viei)->ident + "' already defined previously");
 			}
 			new llvm::GlobalVariable(*Module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 0, parent_ns + (*viei)->ident);
+			SymTable::InsertGlobalSymbol((*viei)->ident, llvm_type);
 		} else {
 			if (func_symbol_table_ptr->lookup(parent_ns + (*viei)->ident)) {
 				ERROR("Function variable '" + parent_ns + (*viei)->ident + "' already defined previously");
@@ -104,6 +108,7 @@ void VariableDef::codeGen() {
 			//		Builder.CreateStore(initial_value, alloc, false);
 			//	}
 			//}
+			SymTable::InsertSymbol((*viei)->ident, llvm_type);
 		}
 	}
 
@@ -237,6 +242,8 @@ void FunctionDefn::codeGen() {
 
 	Builder.SetInsertPoint(BB);
 
+	SymTable::EnterScope();
+
 	/* Save pointer to function symbol table */
 	func_symbol_table_ptr = func->getValueSymbolTable();
 
@@ -311,6 +318,9 @@ void FunctionDefn::codeGen() {
 	while (!DeferStack.empty()) {
 		DeferStack.pop();
 	}
+
+	SymTable::Print();
+	SymTable::ExitScope();
 
 	verifyFunction(*func);
 }
@@ -446,6 +456,12 @@ llvm::Value * BinaryExpression::codeGen() {
 		ERROR("NULL BINARY EXPR");
 		return NULL;
 	}
+	if (l_exp->getType()->isPointerTy()) {
+		l_exp = Builder.CreateLoad(l_exp);
+	}
+	if (r_exp->getType()->isPointerTy()) {
+		r_exp = Builder.CreateLoad(r_exp);
+	}
 	switch (type) {
 		case PLUS :
 			return Builder.CreateAdd(l_exp, r_exp);
@@ -463,7 +479,17 @@ llvm::Value * BinaryExpression::codeGen() {
 			return Builder.CreateURem(l_exp, r_exp);
 			break;
 		case RIGHT_SHIFT :
-			return Builder.CreateAShr(l_exp, r_exp);
+		/* TODO : 10.08.22 : Size of Int 64 set by default in parser */
+		/* TODO : For CreateAShr both parameter should be of same type */
+			if (llvm::isa<llvm::ConstantInt>(r_exp)) {
+				if (llvm::ConstantInt* CI = llvm::dyn_cast<llvm::ConstantInt>(r_exp)) {
+					return Builder.CreateAShr(l_exp, Builder.getInt16(CI->getSExtValue()));
+				} else {
+					/* TODO */
+				}
+			} else {
+				return Builder.CreateAShr(l_exp, r_exp);
+			}
 			break;
 		case LEFT_SHIFT :
 			return Builder.CreateShl(l_exp, r_exp);
